@@ -6,13 +6,16 @@
 import { deployPancakeswap, getUniswapRouterAddress } from "./helpers";
 import * as hardhat from "hardhat";
 import { DP } from "../typechain";
+import { ethers } from "hardhat";
 
 
 async function main() {
   // Hardhat always runs the compile task when running scripts with its command
   const [owner, address0, address1, ...others] = await hardhat.ethers.getSigners()
 
-  const devWallet = address1;
+  console.log(await owner.getBalance(), owner.address)
+
+  const devWallet = others.pop()!!;
 
   const DPContract = await hardhat.ethers.getContractFactory("DP")
   const uniswapV2RouterAddress = await getUniswapRouterAddress(hardhat.network.name)
@@ -21,7 +24,7 @@ async function main() {
 
   await dp.deployed()
 
-  console.log(`DP deployed at:${dp.address}`)
+  console.log(`DP deployed at:${dp.address} by ${owner.address}`)
 }
 
 // We recommend this pattern to be able to use async/await everywhere

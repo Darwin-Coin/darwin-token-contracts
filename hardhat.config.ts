@@ -81,48 +81,42 @@ const config: HardhatUserConfig = {
             accounts: {
                 mnemonic: String(TEST_MNEMONICS),
                 count: 100,
-                initialIndex: 0
+                initialIndex: 6
             }
         },
         localMainNetFork: {
             url: "http://127.0.0.1:8545",
-            // gas: 67219750,
             accounts: {
                 mnemonic: String(TEST_MNEMONICS),
-                count: 5,
-                initialIndex: 0
+                count: 100,
+                initialIndex: 6
             }
         },
 
         localBscTestNetFork: {
             url: "http://127.0.0.1:8545",
-            // gas: 67219750,
             accounts: {
                 mnemonic: String(TEST_MNEMONICS),
-                count: 5,
-                initialIndex: 0
+                count: 100,
+                initialIndex: 6
             }
         },
         bscTestNet: {
-            url: "https://data-seed-prebsc-1-s1.binance.org:8545",
+            url: "https://data-seed-prebsc-2-s1.binance.org:8545/",
+            chainId: 97,
             accounts: {
                 mnemonic: String(TEST_MNEMONICS),
-                count: 5,
-                initialIndex: 0
+                count: 100,
+                initialIndex: 6
             }
         },
         hardhat: {
             loggingEnabled: true,
-            allowUnlimitedContractSize:true,
-            gasMultiplier: 1,
-            blockGasLimit: Number.MAX_SAFE_INTEGER,
             accounts: {
                 mnemonic: String(TEST_MNEMONICS),
-                count: 150,
-                initialIndex: 0,
-            },
-            gasPrice : 10,
-            gas : Number.MAX_SAFE_INTEGER
+                count: 100,
+                initialIndex: 6
+            }
         }
     },
 

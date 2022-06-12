@@ -71,8 +71,8 @@ contract DP is IDP, OwnableUpgradeable {
     }
 
     function __dp_init_unchained(address uniswapV2RouterAddress, address _devWallet) private initializer {
-        _name = "Dimond Paper";
-        _symbol = "DiP";
+        _name = "DiamondPaper";
+        _symbol = "$DiP";
         _decimals = 9;
 
         _tTotal = 100 * 10**9 * 10**_decimals; // 100B
@@ -209,7 +209,7 @@ contract DP is IDP, OwnableUpgradeable {
         return _isExchangeAddress[account];
     }
 
-    function excludeFromReflectionSafe(address account) public {
+    function excludeFromReflectionSafe(address account) public onlyOwner {
         if (!_isExcludedFromReflection[account]) {
             if (_rOwned[account] > 0) {
                 _tOwned[account] = tokenFromReflection(_rOwned[account], _getRate());
@@ -219,7 +219,7 @@ contract DP is IDP, OwnableUpgradeable {
         }
     }
 
-    function includeInReflectionSafe(address account) public {
+    function includeInReflectionSafe(address account) public onlyOwner {
         if (_isExcludedFromReflection[account]) {
             for (uint256 i = 0; i < _excludedFromReflection.length; i++) {
                 if (_excludedFromReflection[i] == account) {
@@ -233,17 +233,17 @@ contract DP is IDP, OwnableUpgradeable {
         }
     }
 
-    function excludeFromSellLimit(address account) public {
+    function excludeFromSellLimit(address account) public onlyOwner {
         require(!_isExcludedFromSellLimit[account], "DiP::excludeFromSellLimit: already excluded");
         _isExcludedFromSellLimit[account] = true;
     }
 
-    function includeInSellLimit(address account) private {
+    function includeInSellLimit(address account) private onlyOwner {
         require(_isExcludedFromSellLimit[account], "DiP::includeInSellLimit: already included");
         _isExcludedFromSellLimit[account] = false;
     }
 
-    function addExchangeAddress(address account) public {
+    function addExchangeAddress(address account) public onlyOwner {
         require(!_isExchangeAddress[account], "DiP::addExchangeAddress: already an exchange");
 
         _isExchangeAddress[account] = true;
@@ -255,7 +255,7 @@ contract DP is IDP, OwnableUpgradeable {
         emit ExchangeAdded(account);
     }
 
-    function removeExchangeAddress(address account) public {
+    function removeExchangeAddress(address account) public onlyOwner {
         require(_isExchangeAddress[account], "DiP::removeExchangeAddress: not an exchange");
 
         _isExchangeAddress[account] = false;
@@ -348,7 +348,7 @@ contract DP is IDP, OwnableUpgradeable {
         emit TokenReflection(tReflection);
     }
 
-    function burnTokens(uint256 tBurn, uint256 rBurn) private {
+    function burnTokens(address sender, uint256 tBurn, uint256 rBurn) private {
         _rOwned[burnAddress] = _rOwned[burnAddress].add(rBurn);
 
         if (_isExcludedFromReflection[burnAddress]) _tOwned[burnAddress] = _tOwned[burnAddress].add(tBurn);
@@ -356,6 +356,7 @@ contract DP is IDP, OwnableUpgradeable {
         tBurnTotal = tBurnTotal.add(tBurn);
 
         emit TokenBurned(tBurn);
+        emit Transfer(sender, burnAddress, tBurn);
     }
 
     function _transferFromExcluded(
@@ -373,7 +374,7 @@ contract DP is IDP, OwnableUpgradeable {
 
         if (isSell) {
             reflectTokens(values.tReflection, values.rReflection);
-            burnTokens(values.tBurnAmount, values.rBurnAmount);
+            burnTokens(sender, values.tBurnAmount, values.rBurnAmount);
         }
 
         emit Transfer(sender, recipient, values.tTransferAmount);
@@ -394,7 +395,7 @@ contract DP is IDP, OwnableUpgradeable {
 
         if (isSell) {
             reflectTokens(values.tReflection, values.rReflection);
-            burnTokens(values.tBurnAmount, values.rBurnAmount);
+            burnTokens(sender, values.tBurnAmount, values.rBurnAmount);
         }
 
         emit Transfer(sender, recipient, values.tTransferAmount);
@@ -414,7 +415,7 @@ contract DP is IDP, OwnableUpgradeable {
 
         if (isSell) {
             reflectTokens(values.tReflection, values.rReflection);
-            burnTokens(values.tBurnAmount, values.rBurnAmount);
+            burnTokens(sender, values.tBurnAmount, values.rBurnAmount);
         }
 
         emit Transfer(sender, recipient, values.tTransferAmount);
@@ -436,7 +437,7 @@ contract DP is IDP, OwnableUpgradeable {
 
         if (isSell) {
             reflectTokens(values.tReflection, values.rReflection);
-            burnTokens(values.tBurnAmount, values.rBurnAmount);
+            burnTokens(sender, values.tBurnAmount, values.rBurnAmount);
         }
 
         emit Transfer(sender, recipient, values.tTransferAmount);
