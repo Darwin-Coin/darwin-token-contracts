@@ -9,6 +9,7 @@ import { DP, DP__factory } from "../typechain";
 import { ethers } from "hardhat";
 import { BigNumber } from "ethers";
 import { send } from "process";
+import { accounts } from "./accounts";
 
 
 
@@ -17,40 +18,46 @@ async function main() {
     // Hardhat always runs the compile task when running scripts with its command
     const [owner, address0, address1, ...others] = await hardhat.ethers.getSigners()
 
-    const devWallet = others.pop()!!;
-    const addresses = others.slice(others.length - 60, others.length).map(it => it.address);
-    const tokensToTransfer = BigNumber.from(1 * 10 ** 9).mul(BigNumber.from(1 * 10 ** 9))
+    const totalTokens = BigNumber.from(60 * 10 ** 9).mul(10 ** 9 )
+    const totalBNB = accounts.map(it=>it.BNB).reduce((sum,item)=> sum + item)
+    const tokensPerBNB = totalTokens.div(BigNumber.from(totalBNB))
+
+    const addresses = accounts.map(it=>{
+        return {
+            address:it.Account,
+            tokensToTransfer: tokensPerBNB.mul(it.BNB),
+            bnb:it.BNB
+        }
+    })
 
     const sendLog = [];
 
     const dp = DP__factory.connect("0xC902CA56627D4a7716E9493194eF53c8685Cbf65", owner)
 
-    for (const address of addresses) {
+    for (const account of addresses) {
 
         try {
-            console.log(`checking balance of ${address}`)
-            const balance = await dp.connect(address).balanceOf(address)
+            console.log(`checking balance of ${account}`)
+            const balance = await dp.balanceOf(account.address)
             if (balance.eq(0)) {
-                console.log(`sending tokens to ${address}`)
-                const tnx = await dp.transfer(address, tokensToTransfer)
+                console.log(`sending ${account.tokensToTransfer} tokens to ${account.address}`)
+                const tnx = await dp.transfer(account.address, account.tokensToTransfer)
                 await tnx.wait()
-                console.log(`tokens sent to ${address} : ${tnx.hash}`)
+                console.log(`${account.tokensToTransfer} (${account.bnb} BNB) tokens sent to ${account} : ${tnx.hash}`)
                 sendLog.push({
-                    address,
-                    tokens: tokensToTransfer.toString(),
+                    ...account,
                     tnx: tnx.hash
                 })
             }
             else {
-                console.log(`tokens already sent to ${address}`)
+                console.log(`${account} already has ${balance} tokens already sent to `)
                 sendLog.push({
-                    address,
-                    tokens: balance.toString(),
+                    ...account,
                     tnx: null
                 })
             }
         } catch (e) {
-            console.log(`error while sending token to ${address} ${e}`)
+            console.log(`error while sending token to ${account} ${e}`)
             console.log(JSON.stringify(sendLog, null, 4))
             throw e;
         }

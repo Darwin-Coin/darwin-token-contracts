@@ -11,4 +11,8 @@ interface IDP is IERC20Upgradeable{
 
     event TokenBurned(uint256 amount);
     event TokenReflection(uint256 amount);
+
+    event ExcludedFromReflection(address account, bool isExcluded);
+    event ExcludedFromSellLimit(address account, bool isExcluded);
+    
 }

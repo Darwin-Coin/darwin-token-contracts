@@ -20,7 +20,7 @@ contract DP is IDP, OwnableUpgradeable {
     using AddressUpgradeable for address;
 
     uint256 private constant MAX = ~uint256(0);
-    uint256 private constant DEV_WALLET_PECENTAGE = 10;
+    uint256 public constant DEV_WALLET_PECENTAGE = 10;
 
     struct Values {
         uint256 tTransferAmount;
@@ -44,7 +44,6 @@ contract DP is IDP, OwnableUpgradeable {
     mapping(address => bool) private _isExcludedFromReflection;
     address[] private _excludedFromReflection;
 
-    mapping(address => bool) private _isExcludedFromHoldingLimit;
     mapping(address => bool) private _isExcludedFromSellLimit;
     mapping(address => bool) private _isExchangeAddress;
     mapping(address => mapping(address => uint256)) private _allowances;
@@ -93,9 +92,6 @@ contract DP is IDP, OwnableUpgradeable {
 
         // Create a uniswap pair for this new token
         uniswapV2Pair = IUniswapV2Pair(IUniswapV2Factory(uniswapV2Router.factory()).createPair(address(this), uniswapV2Router.WETH()));
-
-        // exclude wallets from holding limit
-        _isExcludedFromHoldingLimit[_msgSender()] = true;
 
         // exclude wallets from sell limit
         _isExcludedFromSellLimit[_msgSender()] = true;
@@ -155,7 +151,7 @@ contract DP is IDP, OwnableUpgradeable {
     }
 
     function tokenFromReflection(uint256 rAmount, uint256 rate) public view returns (uint256) {
-        require(rAmount <= _rTotal, "DP: Amount must be less than total reflections");
+        require(rAmount <= _rTotal, "DiP::tokenFromReflection: Amount must be less than total reflections");
         return rAmount.div(rate);
     }
 
@@ -205,10 +201,6 @@ contract DP is IDP, OwnableUpgradeable {
         return true;
     }
 
-    function isExchangeAddress(address account) public view returns (bool) {
-        return _isExchangeAddress[account];
-    }
-
     function excludeFromReflectionSafe(address account) public onlyOwner {
         if (!_isExcludedFromReflection[account]) {
             if (_rOwned[account] > 0) {
@@ -216,6 +208,8 @@ contract DP is IDP, OwnableUpgradeable {
             }
             _isExcludedFromReflection[account] = true;
             _excludedFromReflection.push(account);
+
+            emit ExcludedFromReflection(account, true);
         }
     }
 
@@ -230,24 +224,35 @@ contract DP is IDP, OwnableUpgradeable {
                     break;
                 }
             }
+
+             emit ExcludedFromReflection(account, false);
         }
+    }
+
+    function isExcludedFromReflection(address account) public view returns (bool) {
+        return _isExcludedFromReflection[account];
     }
 
     function excludeFromSellLimit(address account) public onlyOwner {
         require(!_isExcludedFromSellLimit[account], "DiP::excludeFromSellLimit: already excluded");
         _isExcludedFromSellLimit[account] = true;
+        emit ExcludedFromSellLimit(account, true);
     }
 
     function includeInSellLimit(address account) private onlyOwner {
         require(_isExcludedFromSellLimit[account], "DiP::includeInSellLimit: already included");
         _isExcludedFromSellLimit[account] = false;
+         emit ExcludedFromSellLimit(account, false);
+    }
+
+    function isExcludedFromSellLimit(address account) public view returns (bool) {
+        return _isExcludedFromSellLimit[account];
     }
 
     function addExchangeAddress(address account) public onlyOwner {
         require(!_isExchangeAddress[account], "DiP::addExchangeAddress: already an exchange");
 
         _isExchangeAddress[account] = true;
-        _isExcludedFromHoldingLimit[account] = true;
         _isExcludedFromSellLimit[account] = true;
 
         excludeFromReflectionSafe(account);
@@ -259,12 +264,15 @@ contract DP is IDP, OwnableUpgradeable {
         require(_isExchangeAddress[account], "DiP::removeExchangeAddress: not an exchange");
 
         _isExchangeAddress[account] = false;
-        _isExcludedFromHoldingLimit[account] = false;
         _isExcludedFromSellLimit[account] = false;
 
         includeInReflectionSafe(account);
 
         emit ExchangedRemoved(account);
+    }
+
+    function isExchangeAddress(address account) public view returns (bool) {
+        return _isExchangeAddress[account];
     }
 
     function isTnxSell(address from, address to) private returns (bool) {
@@ -285,7 +293,7 @@ contract DP is IDP, OwnableUpgradeable {
         require(balance >= tokenReceivedInLastLimitPeriod, "DiP::enforceSellLimit: sell not allowed");
     }
 
-    function calculateSellLimitFrame() private view returns (uint256){
+    function calculateSellLimitFrame() private view returns (uint256) {
         return block.timestamp / sellLimitDuration;
     }
 
@@ -348,7 +356,11 @@ contract DP is IDP, OwnableUpgradeable {
         emit TokenReflection(tReflection);
     }
 
-    function burnTokens(address sender, uint256 tBurn, uint256 rBurn) private {
+    function burnTokens(
+        address sender,
+        uint256 tBurn,
+        uint256 rBurn
+    ) private {
         _rOwned[burnAddress] = _rOwned[burnAddress].add(rBurn);
 
         if (_isExcludedFromReflection[burnAddress]) _tOwned[burnAddress] = _tOwned[burnAddress].add(tBurn);
@@ -508,20 +520,6 @@ contract DP is IDP, OwnableUpgradeable {
         return (rAmount, rTransferAmount, rBurnAmount, rReflection);
     }
 
-    function markNextSellAsLP() public {
-        require(!_nextSellIsLP[msg.sender], "NC::markNextSellAsLP: already marked");
-        _nextSellIsLP[msg.sender] = true;
-    }
-
-    function unmarkNextSellAsLP() public {
-        require(_nextSellIsLP[msg.sender], "NC::unmarkNextSellAsLP: not already marked");
-        _nextSellIsLP[msg.sender] = false;
-    }
-
-    function isNextSellLP() public view returns (bool) {
-        return _nextSellIsLP[msg.sender];
-    }
-
     function calculateTransferAndBurnAmount(uint256 tAmount) private view returns (uint256, uint256) {
         uint256 tBurnAmount = (tAmount * burnPercentage) / 100;
         uint256 tTransferAmount = tAmount - tBurnAmount;
@@ -530,6 +528,21 @@ contract DP is IDP, OwnableUpgradeable {
     }
 
     function calculateReflectionAmount(uint256 _amount) private view returns (uint256) {
-        return _amount * reflectionPercentage / 100;
+        return (_amount * reflectionPercentage) / 100;
     }
+
+    function markNextSellAsLP() public {
+        require(!_nextSellIsLP[msg.sender], "NC::markNextSellAsLP: already marked");
+        _nextSellIsLP[msg.sender] = true;
+    }
+
+    function unmarkNextSellAsLP() public {
+        require(_nextSellIsLP[msg.sender], "NC::unmarkNextSellAsLP: not marked");
+        _nextSellIsLP[msg.sender] = false;
+    }
+
+    function isNextSellLP() public view returns (bool) {
+        return _nextSellIsLP[msg.sender];
+    }
+
 }
