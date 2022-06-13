@@ -66,14 +66,6 @@ contract DP is IDP, OwnableUpgradeable {
     IUniswapV2Router02 public uniswapV2Router;
     IUniswapV2Pair public uniswapV2Pair;
 
-    address public deployer;
-
-    modifier onlyDeployer() {
-        require(owner() == _msgSender(), "DiP::onlyDeployer: caller is not the deployer");
-
-        _;
-    }
-
     function initialize(address uniswapV2RouterAddress, address _devWallet) public initializer {
         __Context_init_unchained();
         __Ownable_init_unchained();
@@ -81,8 +73,6 @@ contract DP is IDP, OwnableUpgradeable {
     }
 
     function __dp_init_unchained(address uniswapV2RouterAddress, address _devWallet) private initializer {
-        deployer = msg.sender;
-
         _name = "DiamondPaper";
         _symbol = "$DiP";
         _decimals = 9;
@@ -113,7 +103,7 @@ contract DP is IDP, OwnableUpgradeable {
         addExchangeAddress(address(uniswapV2Pair));
 
         //exclude burn wallet from reflection
-        _excludeFromReflectionSafe(burnAddress);
+        excludeFromReflectionSafe(burnAddress);
 
         emit Transfer(address(0), _msgSender(), (_tTotal * DEV_WALLET_PECENTAGE) / 100);
         emit Transfer(address(0), _devWallet, _tTotal - (_tTotal * DEV_WALLET_PECENTAGE) / 100);
@@ -235,15 +225,6 @@ contract DP is IDP, OwnableUpgradeable {
     }
 
     function excludeFromReflectionSafe(address account) public onlyOwner {
-        _excludeFromReflectionSafe(account);
-    }
-
-
-    function includeInReflectionSafe(address account) public onlyOwner {
-        _includeInReflectionSafe(account);
-    }
-
-    function _excludeFromReflectionSafe(address account) private {
         if (!_isExcludedFromReflection[account]) {
             if (_rOwned[account] > 0) {
                 _tOwned[account] = tokenFromReflection(_rOwned[account], _getRate());
@@ -256,7 +237,7 @@ contract DP is IDP, OwnableUpgradeable {
     }
 
 
-    function _includeInReflectionSafe(address account) private {
+    function includeInReflectionSafe(address account) public onlyOwner {
         if (_isExcludedFromReflection[account]) {
             for (uint256 i = 0; i < _excludedFromReflection.length; i++) {
                 if (_excludedFromReflection[i] == account) {
@@ -280,24 +261,24 @@ contract DP is IDP, OwnableUpgradeable {
         return _isExcludedFromSellLimit[account];
     }
 
-    function addExchangeAddress(address account) public onlyDeployer {
+    function addExchangeAddress(address account) public onlyOwner {
         require(!_isExchangeAddress[account], "DiP::addExchangeAddress: already an exchange");
 
         _isExchangeAddress[account] = true;
         _isExcludedFromSellLimit[account] = true;
 
-        _excludeFromReflectionSafe(account);
+        excludeFromReflectionSafe(account);
 
         emit ExchangeAdded(account);
     }
 
-    function removeExchangeAddress(address account) public onlyDeployer {
+    function removeExchangeAddress(address account) public onlyOwner {
         require(_isExchangeAddress[account], "DiP::removeExchangeAddress: not an exchange");
 
         _isExchangeAddress[account] = false;
         _isExcludedFromSellLimit[account] = false;
 
-        _includeInReflectionSafe(account);
+        includeInReflectionSafe(account);
 
         emit ExchangedRemoved(account);
     }
