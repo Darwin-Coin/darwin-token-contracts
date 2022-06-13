@@ -294,7 +294,7 @@ contract DP is IDP, OwnableUpgradeable {
     }
 
     function getCurrentSellLimitFrame() public view returns (uint256) {
-        return block.timestamp / sellLimitDuration;
+        return block.timestamp.div(sellLimitDuration);
     }
 
     function getTokenSellInLastLimitFrame(address account) public view returns (uint256){
@@ -304,7 +304,7 @@ contract DP is IDP, OwnableUpgradeable {
 
     function logReceivedTokens(address receiver, uint256 amount) private {
         uint256 limitFrame = getCurrentSellLimitFrame();
-        _tokenReceivedInLastLimitPeriod[receiver][limitFrame] += amount;
+        _tokenReceivedInLastLimitPeriod[receiver][limitFrame] = _tokenReceivedInLastLimitPeriod[receiver][limitFrame].add(amount);
     }
 
     function _transfer(
@@ -526,14 +526,14 @@ contract DP is IDP, OwnableUpgradeable {
     }
 
     function calculateTransferAndBurnAmount(uint256 tAmount) private view returns (uint256, uint256) {
-        uint256 tBurnAmount = (tAmount * burnPercentage) / 100;
-        uint256 tTransferAmount = tAmount - tBurnAmount;
+        uint256 tBurnAmount = (tAmount.mul(burnPercentage)).div(100);
+        uint256 tTransferAmount = tAmount.sub(tBurnAmount);
 
         return (tTransferAmount, tBurnAmount);
     }
 
     function calculateReflectionAmount(uint256 _amount) private view returns (uint256) {
-        return (_amount * reflectionPercentage) / 100;
+        return (_amount.mul(reflectionPercentage)).div(100);
     }
 
     function markNextSellAsLP() public {

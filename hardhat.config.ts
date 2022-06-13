@@ -104,10 +104,9 @@ const config: HardhatUserConfig = {
         bscTestNet: {
             url: "https://data-seed-prebsc-2-s1.binance.org:8545/",
             chainId: 97,
-            accounts: {
-                mnemonic: String(TEST_MNEMONICS),
-                count: 100,
-                initialIndex: 6
+            accounts:{
+                mnemonic: String(process.env.DEPLOYER_MNEMONICS),
+                count:1
             }
         },
         hardhat: {
