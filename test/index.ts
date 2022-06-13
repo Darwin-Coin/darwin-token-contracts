@@ -287,7 +287,7 @@ describe("DP", function () {
     });
 
 
-    it.only("It should let selling token received before 24 hours", async function () {
+    it("It should let selling token received before 24 hours", async function () {
         const balanceOfOwnerBefore = await dp.balanceOf(owner.address)
 
         const tokensToAddLiqidity = BigNumber.from(balanceOfOwnerBefore.div(2))

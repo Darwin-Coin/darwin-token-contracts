@@ -11,16 +11,17 @@ import { ethers } from "hardhat";
 
 async function main() {
   // Hardhat always runs the compile task when running scripts with its command
-  const [owner, address0, address1, ...others] = await hardhat.ethers.getSigners()
+  const [owner, ...others] = await hardhat.ethers.getSigners()
 
-  console.log(await owner.getBalance(), owner.address)
+  const devWallet = String(process.env.DEV_WALLET);
 
-  const devWallet = others.pop()!!;
+  console.log(`owner: ${owner.address} with ${ethers.utils.formatEther(await owner.getBalance())} ETH`)
+  console.log(`dev wallet: ${devWallet}`);
 
   const DPContract = await hardhat.ethers.getContractFactory("DP")
   const uniswapV2RouterAddress = await getUniswapRouterAddress(hardhat.network.name)
 
-  const dp = await (hardhat as  any).upgrades.deployProxy(DPContract, [uniswapV2RouterAddress,devWallet.address], { initializer: "initialize" }) as DP;
+  const dp = await (hardhat as  any).upgrades.deployProxy(DPContract, [uniswapV2RouterAddress,devWallet], { initializer: "initialize" }) as DP;
 
   await dp.deployed()
 

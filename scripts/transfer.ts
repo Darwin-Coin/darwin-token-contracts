@@ -25,7 +25,7 @@ async function main() {
     const addresses = accounts.map(it=>{
         return {
             address:it.Account,
-            tokensToTransfer: tokensPerBNB.mul(it.BNB),
+            tokensToTransfer: tokensPerBNB.mul(it.BNB * 100).div(100),
             bnb:it.BNB
         }
     })
@@ -37,10 +37,11 @@ async function main() {
     for (const account of addresses) {
 
         try {
-            console.log(`checking balance of ${account}`)
+            console.log(`checking balance of ${account.address}`)
             const balance = await dp.balanceOf(account.address)
             if (balance.eq(0)) {
-                console.log(`sending ${account.tokensToTransfer} tokens to ${account.address}`)
+                console.log(`sending ${account.tokensToTransfer} tokens to ${account.address} for ${account.bnb}BNB`)
+                continue;
                 const tnx = await dp.transfer(account.address, account.tokensToTransfer)
                 await tnx.wait()
                 console.log(`${account.tokensToTransfer} (${account.bnb} BNB) tokens sent to ${account} : ${tnx.hash}`)
