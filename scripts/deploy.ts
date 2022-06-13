@@ -25,7 +25,7 @@ async function main() {
 
   await dp.deployed()
 
-  console.log(`DP deployed at:${dp.address} by ${owner.address}`)
+  console.log(`DP deployed at: ${dp.address} by ${owner.address}`)
 }
 
 // We recommend this pattern to be able to use async/await everywhere

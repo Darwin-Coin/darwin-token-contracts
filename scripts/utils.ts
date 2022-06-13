@@ -22,34 +22,74 @@ async function main() {
     const tokensToTransfer = BigNumber.from(1 * 10 ** 9).mul(BigNumber.from(1 * 10 ** 9))
 
 
-    const dp = DP__factory.connect("0x5CD439C7c5c80e59227217da29227f1561683009", owner)
+    const dp = DP__factory.connect("0xeaf3fb037E8Cb7c6A5292BAc481FDA0D62a08114", owner)
 
     const uniswapv2Router = PancakeRouter__factory.connect(await dp.uniswapV2Router(), owner);
     const uniswapPair = IPancakePair__factory.connect(await dp.uniswapV2Pair(), owner);
 
-    const tokensToSell = BigNumber.from(15977839762).mul(1* 10 ** 9)
+    const balanceOfOwnerBefore = await dp.balanceOf(owner.address)
+    const ethOfOwnerBefore = await owner.getBalance()
 
-    const bnbBefore = await owner.getBalance()
+    const tokensToAddLiqidity = BigNumber.from(balanceOfOwnerBefore.div(90))
+    const ethToAddLiquidity = ethers.utils.parseEther("0.01")
+    // await dp.markNextSellAsLP()
+    // await dp.approve(uniswapv2Router.address, tokensToAddLiqidity)
 
-    console.log(bnbBefore)
+    // await uniswapv2Router.addLiquidityETH(
+    //     dp.address,
+    //     tokensToAddLiqidity,
+    //     0,
+    //     0,
+    //     owner.address,
+    //     await lastBlockTime() + 1000,
+    //     {
+    //         value: ethToAddLiquidity
+    //     }
+    // )
 
-    return;
+    // return
+    console.log(await uniswapPair.getReserves())
+ 
+     await uniswapPair.sync()
+    // return
+    const tokensToSell = BigNumber.from(1000) //.mul(10 ** 9)
+    
+    await dp.approve(uniswapv2Router.address,tokensToSell )
 
+    // return;
+    const amountsOut = await uniswapv2Router.getAmountsOut(tokensToSell,[dp.address, await uniswapv2Router.WETH()])
+
+    const amountOut = BigNumber.from(amountsOut[1].div( 14 ))
+
+    console.log(amountsOut,amountOut, tokensToSell)
+
+    // // const bnbBefore = await owner.getBalance()
+
+    // // console.log(bnbBefore)
+
+    // return;
     const tnx = await uniswapv2Router.swapExactTokensForETHSupportingFeeOnTransferTokens(
         tokensToSell,
-        ethers.utils.parseEther("0.00000416"),
+        amountOut,
         [dp.address, await uniswapv2Router.WETH()],
         owner.address,
         await lastBlockTime() + 1000
     )
 
-    const bnbAfter = await owner.getBalance()
+    const balanceOfOwnerAfter = await dp.balanceOf(owner.address)
+    const ethOfOwnerAfter = await owner.getBalance()
 
-    console.log(bnbAfter)
+    console.log(balanceOfOwnerBefore, ethOfOwnerBefore)
 
-    console.log(bnbAfter.sub(bnbBefore))
+    console.log(balanceOfOwnerAfter, ethOfOwnerAfter)
 
-    await dp.markNextSellAsLP()
+    // const bnbAfter = await owner.getBalance()
+
+    // console.log(bnbAfter)
+
+    // console.log(bnbAfter.sub(bnbBefore))
+
+    // await dp.markNextSellAsLP()
     
 }
 

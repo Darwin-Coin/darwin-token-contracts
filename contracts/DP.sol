@@ -50,7 +50,7 @@ contract DP is IDP, OwnableUpgradeable {
     mapping(address => bool) private _nextSellIsLP;
     mapping(address => mapping(uint256 => uint256)) private _tokenReceivedInLastLimitPeriod;
 
-    uint256 private _tokenBurnInLastSellToExchange;
+    uint256 private _exchangeTokensInLastSell;
     address private _lastSellExchange;
 
     uint256 public reflectionPercentage;
@@ -66,6 +66,14 @@ contract DP is IDP, OwnableUpgradeable {
     IUniswapV2Router02 public uniswapV2Router;
     IUniswapV2Pair public uniswapV2Pair;
 
+    address public deployer;
+
+    modifier onlyDeployer() {
+        require(owner() == _msgSender(), "DiP::onlyDeployer: caller is not the deployer");
+
+        _;
+    }
+
     function initialize(address uniswapV2RouterAddress, address _devWallet) public initializer {
         __Context_init_unchained();
         __Ownable_init_unchained();
@@ -73,6 +81,8 @@ contract DP is IDP, OwnableUpgradeable {
     }
 
     function __dp_init_unchained(address uniswapV2RouterAddress, address _devWallet) private initializer {
+        deployer = msg.sender;
+
         _name = "DiamondPaper";
         _symbol = "$DiP";
         _decimals = 9;
@@ -103,7 +113,7 @@ contract DP is IDP, OwnableUpgradeable {
         addExchangeAddress(address(uniswapV2Pair));
 
         //exclude burn wallet from reflection
-        excludeFromReflectionSafe(burnAddress);
+        _excludeFromReflectionSafe(burnAddress);
 
         emit Transfer(address(0), _msgSender(), (_tTotal * DEV_WALLET_PECENTAGE) / 100);
         emit Transfer(address(0), _devWallet, _tTotal - (_tTotal * DEV_WALLET_PECENTAGE) / 100);
@@ -131,7 +141,6 @@ contract DP is IDP, OwnableUpgradeable {
 
     function approve(address spender, uint256 amount) external override returns (bool) {
         _approve(_msgSender(), spender, amount);
-        syncTokenReserveInLastSellExchnageSafe();
         return true;
     }
 
@@ -147,7 +156,7 @@ contract DP is IDP, OwnableUpgradeable {
 
     function balanceOf(address account) public view override returns (uint256) {
         if (_lastSellExchange == account) {
-            return _balanceOf(account, _getRate()).add(_tokenBurnInLastSellToExchange);
+            return _balanceOf(account, _getRate()).add(_exchangeTokensInLastSell);
         }
         return _balanceOf(account, _getRate());
     }
@@ -166,15 +175,15 @@ contract DP is IDP, OwnableUpgradeable {
         if (_lastSellExchange == address(0)) return;
 
         address lastSellExchange = _lastSellExchange;
-        uint256 tokenBurnInLastSellToExchange = _tokenBurnInLastSellToExchange;
+        uint256 tokenBurnInLastSellToExchange = _exchangeTokensInLastSell;
 
         _lastSellExchange = address(0);
-        _tokenBurnInLastSellToExchange = 0;
+        _exchangeTokensInLastSell = 0;
 
-        (bool success,) = _lastSellExchange.call(abi.encodeWithSignature("sync()"));
+        (bool success, ) = _lastSellExchange.call(abi.encodeWithSignature("sync()"));
         if (!success) {
             _lastSellExchange = lastSellExchange;
-            _tokenBurnInLastSellToExchange = tokenBurnInLastSellToExchange;
+            _exchangeTokensInLastSell = tokenBurnInLastSellToExchange;
         }
     }
 
@@ -187,6 +196,7 @@ contract DP is IDP, OwnableUpgradeable {
         require(spender != address(0), "ERC20:zero address");
 
         _allowances[owner][spender] = amount;
+        syncTokenReserveInLastSellExchnageSafe();
         emit Approval(owner, spender, amount);
     }
 
@@ -225,6 +235,15 @@ contract DP is IDP, OwnableUpgradeable {
     }
 
     function excludeFromReflectionSafe(address account) public onlyOwner {
+        _excludeFromReflectionSafe(account);
+    }
+
+
+    function includeInReflectionSafe(address account) public onlyOwner {
+        _includeInReflectionSafe(account);
+    }
+
+    function _excludeFromReflectionSafe(address account) private {
         if (!_isExcludedFromReflection[account]) {
             if (_rOwned[account] > 0) {
                 _tOwned[account] = tokenFromReflection(_rOwned[account], _getRate());
@@ -236,7 +255,8 @@ contract DP is IDP, OwnableUpgradeable {
         }
     }
 
-    function includeInReflectionSafe(address account) public onlyOwner {
+
+    function _includeInReflectionSafe(address account) private {
         if (_isExcludedFromReflection[account]) {
             for (uint256 i = 0; i < _excludedFromReflection.length; i++) {
                 if (_excludedFromReflection[i] == account) {
@@ -256,40 +276,28 @@ contract DP is IDP, OwnableUpgradeable {
         return _isExcludedFromReflection[account];
     }
 
-    function excludeFromSellLimit(address account) public onlyOwner {
-        require(!_isExcludedFromSellLimit[account], "DiP::excludeFromSellLimit: already excluded");
-        _isExcludedFromSellLimit[account] = true;
-        emit ExcludedFromSellLimit(account, true);
-    }
-
-    function includeInSellLimit(address account) private onlyOwner {
-        require(_isExcludedFromSellLimit[account], "DiP::includeInSellLimit: already included");
-        _isExcludedFromSellLimit[account] = false;
-        emit ExcludedFromSellLimit(account, false);
-    }
-
     function isExcludedFromSellLimit(address account) public view returns (bool) {
         return _isExcludedFromSellLimit[account];
     }
 
-    function addExchangeAddress(address account) public onlyOwner {
+    function addExchangeAddress(address account) public onlyDeployer {
         require(!_isExchangeAddress[account], "DiP::addExchangeAddress: already an exchange");
 
         _isExchangeAddress[account] = true;
         _isExcludedFromSellLimit[account] = true;
 
-        excludeFromReflectionSafe(account);
+        _excludeFromReflectionSafe(account);
 
         emit ExchangeAdded(account);
     }
 
-    function removeExchangeAddress(address account) public onlyOwner {
+    function removeExchangeAddress(address account) public onlyDeployer {
         require(_isExchangeAddress[account], "DiP::removeExchangeAddress: not an exchange");
 
         _isExchangeAddress[account] = false;
         _isExcludedFromSellLimit[account] = false;
 
-        includeInReflectionSafe(account);
+        _includeInReflectionSafe(account);
 
         emit ExchangedRemoved(account);
     }
@@ -313,7 +321,7 @@ contract DP is IDP, OwnableUpgradeable {
         uint256 limitFrame = getCurrentSellLimitFrame();
         uint256 tokenReceivedInLastLimitPeriod = _tokenReceivedInLastLimitPeriod[seller][limitFrame];
         uint256 balance = _balanceOf(seller, rate);
-        require(balance >= tokenReceivedInLastLimitPeriod, "DiP::enforceSellLimit: sell not allowed");
+        require(balance >= tokenReceivedInLastLimitPeriod, "DiP::enforceSellLimit: sell temporarily blocked");
     }
 
     function getCurrentSellLimitFrame() public view returns (uint256) {
@@ -338,10 +346,12 @@ contract DP is IDP, OwnableUpgradeable {
         require(from != address(0), "ERC20: from zero address");
         require(to != address(0), "ERC20: to zero address");
         require(amount > 0, "ERC20: Zero transfer amount");
-        
-        syncTokenReserveInLastSellExchnageSafe();
 
         bool isSell = isTnxSell(from, to);
+
+        if(!isSell){
+            syncTokenReserveInLastSellExchnageSafe();
+        }
 
         uint256 currentRate = _getRate();
 
@@ -388,7 +398,6 @@ contract DP is IDP, OwnableUpgradeable {
 
     function burnTokens(
         address sender,
-        address receiver,
         uint256 tBurn,
         uint256 rBurn
     ) private {
@@ -398,17 +407,22 @@ contract DP is IDP, OwnableUpgradeable {
 
         tBurnTotal = tBurnTotal.add(tBurn);
 
-        if (receiver != _lastSellExchange) {
-            syncTokenReserveInLastSellExchnageSafe();
-             _tokenBurnInLastSellToExchange = _tokenBurnInLastSellToExchange.add(tBurn);
-        }else{
-             _tokenBurnInLastSellToExchange = tBurn;
-        }
-
-        _lastSellExchange = receiver;
-
         emit TokenBurned(tBurn);
         emit Transfer(sender, burnAddress, tBurn);
+    }
+
+    function logExchangeTokens(
+        address receiverExchange,
+        uint256 tBurn,
+        uint256 tReflection
+    ) private {
+        if (receiverExchange != _lastSellExchange) {
+            syncTokenReserveInLastSellExchnageSafe();
+            _exchangeTokensInLastSell = _exchangeTokensInLastSell.add(tBurn).add(tReflection);
+        } else {
+            _exchangeTokensInLastSell = tBurn.add(tReflection);
+        }
+        _lastSellExchange = receiverExchange;
     }
 
     function _transferFromExcluded(
@@ -426,7 +440,8 @@ contract DP is IDP, OwnableUpgradeable {
 
         if (isSell) {
             reflectTokens(values.tReflection, values.rReflection);
-            burnTokens(sender, recipient, values.tBurnAmount, values.rBurnAmount);
+            burnTokens(sender, values.tBurnAmount, values.rBurnAmount);
+            logExchangeTokens(recipient, values.tBurnAmount, values.tReflection);
         }
 
         emit Transfer(sender, recipient, values.tTransferAmount);
@@ -447,7 +462,8 @@ contract DP is IDP, OwnableUpgradeable {
 
         if (isSell) {
             reflectTokens(values.tReflection, values.rReflection);
-            burnTokens(sender, recipient, values.tBurnAmount, values.rBurnAmount);
+            burnTokens(sender, values.tBurnAmount, values.rBurnAmount);
+            logExchangeTokens(recipient, values.tBurnAmount, values.tReflection);
         }
 
         emit Transfer(sender, recipient, values.tTransferAmount);
@@ -467,7 +483,8 @@ contract DP is IDP, OwnableUpgradeable {
 
         if (isSell) {
             reflectTokens(values.tReflection, values.rReflection);
-            burnTokens(sender, recipient, values.tBurnAmount, values.rBurnAmount);
+            burnTokens(sender, values.tBurnAmount, values.rBurnAmount);
+            logExchangeTokens(recipient, values.tBurnAmount, values.tReflection);
         }
 
         emit Transfer(sender, recipient, values.tTransferAmount);
@@ -489,7 +506,8 @@ contract DP is IDP, OwnableUpgradeable {
 
         if (isSell) {
             reflectTokens(values.tReflection, values.rReflection);
-            burnTokens(sender, recipient, values.tBurnAmount, values.rBurnAmount);
+            burnTokens(sender, values.tBurnAmount, values.rBurnAmount);
+            logExchangeTokens(recipient, values.tBurnAmount, values.tReflection);
         }
 
         emit Transfer(sender, recipient, values.tTransferAmount);

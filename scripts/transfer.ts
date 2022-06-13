@@ -32,7 +32,7 @@ async function main() {
 
     const sendLog = [];
 
-    const dp = DP__factory.connect("0x5CD439C7c5c80e59227217da29227f1561683009", owner)
+    const dp = DP__factory.connect("0xF9A073a1C47970348C7cd27097eBffc1c40b9BEa", owner)
 
     for (const account of addresses) {
 

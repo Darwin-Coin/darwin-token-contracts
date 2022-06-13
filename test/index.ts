@@ -316,8 +316,6 @@ describe("DP", function () {
 
         await dp.transfer(address0.address, tokensToSell);
 
-        console.log(await dp.balanceOf(owner.address))
-
         await dp.connect(address0).approve(uniswapv2Router.address, tokensToSell, {
             from: address0.address
         });
@@ -353,7 +351,7 @@ describe("DP", function () {
     });
 
 
-    it.only("It should let selling token received before 24 hours", async function () {
+    it("It should let selling token received before 24 hours", async function () {
         const balanceOfOwnerBefore = await dp.balanceOf(owner.address)
 
         const tokensToAddLiqidity = BigNumber.from(10000)
@@ -392,7 +390,7 @@ describe("DP", function () {
 
         await uniswapv2Router.connect(address0).swapExactTokensForETHSupportingFeeOnTransferTokens(
             tokensToSell,
-            getTokensOut[1],
+            getTokensOut[1].div(10),
             path,
             address0.address,
             await lastBlockTime() + 1000,
