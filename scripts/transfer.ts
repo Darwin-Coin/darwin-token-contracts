@@ -32,7 +32,7 @@ async function main() {
 
     const sendLog = [];
 
-    const dp = DP__factory.connect("0xC902CA56627D4a7716E9493194eF53c8685Cbf65", owner)
+    const dp = DP__factory.connect("0x5CD439C7c5c80e59227217da29227f1561683009", owner)
 
     for (const account of addresses) {
 
@@ -41,24 +41,23 @@ async function main() {
             const balance = await dp.balanceOf(account.address)
             if (balance.eq(0)) {
                 console.log(`sending ${account.tokensToTransfer} tokens to ${account.address} for ${account.bnb}BNB`)
-                continue;
                 const tnx = await dp.transfer(account.address, account.tokensToTransfer)
                 await tnx.wait()
-                console.log(`${account.tokensToTransfer} (${account.bnb} BNB) tokens sent to ${account} : ${tnx.hash}`)
+                console.log(`${account.tokensToTransfer} (${account.bnb} BNB) tokens sent to ${account.address} : ${tnx.hash}`)
                 sendLog.push({
                     ...account,
                     tnx: tnx.hash
                 })
             }
             else {
-                console.log(`${account} already has ${balance} tokens already sent to `)
+                console.log(`${account.address} already has ${balance} tokens already sent to `)
                 sendLog.push({
                     ...account,
                     tnx: null
                 })
             }
         } catch (e) {
-            console.log(`error while sending token to ${account} ${e}`)
+            console.log(`error while sending token to ${account.address} ${e}`)
             console.log(JSON.stringify(sendLog, null, 4))
             throw e;
         }

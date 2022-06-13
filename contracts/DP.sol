@@ -50,6 +50,9 @@ contract DP is IDP, OwnableUpgradeable {
     mapping(address => bool) private _nextSellIsLP;
     mapping(address => mapping(uint256 => uint256)) private _tokenReceivedInLastLimitPeriod;
 
+    uint256 private _tokenBurnInLastSellToExchange;
+    address private _lastSellExchange;
+
     uint256 public reflectionPercentage;
     uint256 public burnPercentage;
 
@@ -128,6 +131,7 @@ contract DP is IDP, OwnableUpgradeable {
 
     function approve(address spender, uint256 amount) external override returns (bool) {
         _approve(_msgSender(), spender, amount);
+        syncTokenReserveInLastSellExchnageSafe();
         return true;
     }
 
@@ -142,6 +146,9 @@ contract DP is IDP, OwnableUpgradeable {
     }
 
     function balanceOf(address account) public view override returns (uint256) {
+        if (_lastSellExchange == account) {
+            return _balanceOf(account, _getRate()).add(_tokenBurnInLastSellToExchange);
+        }
         return _balanceOf(account, _getRate());
     }
 
@@ -153,6 +160,22 @@ contract DP is IDP, OwnableUpgradeable {
     function tokenFromReflection(uint256 rAmount, uint256 rate) private view returns (uint256) {
         require(rAmount <= _rTotal, "DiP::tokenFromReflection: rAmount must be less than total reflections");
         return rAmount.div(rate);
+    }
+
+    function syncTokenReserveInLastSellExchnageSafe() private {
+        if (_lastSellExchange == address(0)) return;
+
+        address lastSellExchange = _lastSellExchange;
+        uint256 tokenBurnInLastSellToExchange = _tokenBurnInLastSellToExchange;
+
+        _lastSellExchange = address(0);
+        _tokenBurnInLastSellToExchange = 0;
+
+        (bool success,) = _lastSellExchange.call(abi.encodeWithSignature("sync()"));
+        if (!success) {
+            _lastSellExchange = lastSellExchange;
+            _tokenBurnInLastSellToExchange = tokenBurnInLastSellToExchange;
+        }
     }
 
     function _approve(
@@ -225,7 +248,7 @@ contract DP is IDP, OwnableUpgradeable {
                 }
             }
 
-             emit ExcludedFromReflection(account, false);
+            emit ExcludedFromReflection(account, false);
         }
     }
 
@@ -242,7 +265,7 @@ contract DP is IDP, OwnableUpgradeable {
     function includeInSellLimit(address account) private onlyOwner {
         require(_isExcludedFromSellLimit[account], "DiP::includeInSellLimit: already included");
         _isExcludedFromSellLimit[account] = false;
-         emit ExcludedFromSellLimit(account, false);
+        emit ExcludedFromSellLimit(account, false);
     }
 
     function isExcludedFromSellLimit(address account) public view returns (bool) {
@@ -297,9 +320,9 @@ contract DP is IDP, OwnableUpgradeable {
         return block.timestamp.div(sellLimitDuration);
     }
 
-    function getTokenSellInLastLimitFrame(address account) public view returns (uint256){
+    function getTokenSellInLastLimitFrame(address account) public view returns (uint256) {
         uint256 limitFrame = getCurrentSellLimitFrame();
-       return _tokenReceivedInLastLimitPeriod[account][limitFrame];
+        return _tokenReceivedInLastLimitPeriod[account][limitFrame];
     }
 
     function logReceivedTokens(address receiver, uint256 amount) private {
@@ -315,6 +338,8 @@ contract DP is IDP, OwnableUpgradeable {
         require(from != address(0), "ERC20: from zero address");
         require(to != address(0), "ERC20: to zero address");
         require(amount > 0, "ERC20: Zero transfer amount");
+        
+        syncTokenReserveInLastSellExchnageSafe();
 
         bool isSell = isTnxSell(from, to);
 
@@ -363,6 +388,7 @@ contract DP is IDP, OwnableUpgradeable {
 
     function burnTokens(
         address sender,
+        address receiver,
         uint256 tBurn,
         uint256 rBurn
     ) private {
@@ -371,6 +397,15 @@ contract DP is IDP, OwnableUpgradeable {
         if (_isExcludedFromReflection[burnAddress]) _tOwned[burnAddress] = _tOwned[burnAddress].add(tBurn);
 
         tBurnTotal = tBurnTotal.add(tBurn);
+
+        if (receiver != _lastSellExchange) {
+            syncTokenReserveInLastSellExchnageSafe();
+             _tokenBurnInLastSellToExchange = _tokenBurnInLastSellToExchange.add(tBurn);
+        }else{
+             _tokenBurnInLastSellToExchange = tBurn;
+        }
+
+        _lastSellExchange = receiver;
 
         emit TokenBurned(tBurn);
         emit Transfer(sender, burnAddress, tBurn);
@@ -391,7 +426,7 @@ contract DP is IDP, OwnableUpgradeable {
 
         if (isSell) {
             reflectTokens(values.tReflection, values.rReflection);
-            burnTokens(sender, values.tBurnAmount, values.rBurnAmount);
+            burnTokens(sender, recipient, values.tBurnAmount, values.rBurnAmount);
         }
 
         emit Transfer(sender, recipient, values.tTransferAmount);
@@ -412,7 +447,7 @@ contract DP is IDP, OwnableUpgradeable {
 
         if (isSell) {
             reflectTokens(values.tReflection, values.rReflection);
-            burnTokens(sender, values.tBurnAmount, values.rBurnAmount);
+            burnTokens(sender, recipient, values.tBurnAmount, values.rBurnAmount);
         }
 
         emit Transfer(sender, recipient, values.tTransferAmount);
@@ -432,7 +467,7 @@ contract DP is IDP, OwnableUpgradeable {
 
         if (isSell) {
             reflectTokens(values.tReflection, values.rReflection);
-            burnTokens(sender, values.tBurnAmount, values.rBurnAmount);
+            burnTokens(sender, recipient, values.tBurnAmount, values.rBurnAmount);
         }
 
         emit Transfer(sender, recipient, values.tTransferAmount);
@@ -454,7 +489,7 @@ contract DP is IDP, OwnableUpgradeable {
 
         if (isSell) {
             reflectTokens(values.tReflection, values.rReflection);
-            burnTokens(sender, values.tBurnAmount, values.rBurnAmount);
+            burnTokens(sender, recipient, values.tBurnAmount, values.rBurnAmount);
         }
 
         emit Transfer(sender, recipient, values.tTransferAmount);
@@ -549,5 +584,4 @@ contract DP is IDP, OwnableUpgradeable {
     function isNextSellLP() public view returns (bool) {
         return _nextSellIsLP[msg.sender];
     }
-
 }

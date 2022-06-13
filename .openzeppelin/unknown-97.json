@@ -1,20 +1,20 @@
 {
   "manifestVersion": "3.2",
   "admin": {
-    "address": "0xeC635f9dA6eb13AdB3e27189802E8E492d9B480c",
-    "txHash": "0x8d576f6db19b1a3657e75eacaf18c94b2ecafcdcc4e90681521c17b344436632"
+    "address": "0xF7CdC09679236575A964378049eB5d4485870f15",
+    "txHash": "0x3c48aa49aa8ce88b150b77102fddca8517066d248affe62971221f13dc16b052"
   },
   "proxies": [
     {
-      "address": "0x813A203D509611fA2e9cCc0853BAA5FFE70F479f",
-      "txHash": "0x5bb9ef96e498409b0f87a0b48e0c8dcf1fa42021b5523efe80a7df232f93f9a8",
+      "address": "0x5CD439C7c5c80e59227217da29227f1561683009",
+      "txHash": "0x9ccd5170c0ec24347f85ca06fb94f9e0133628cd7e2ba1c5760f735d967e6601",
       "kind": "transparent"
     }
   ],
   "impls": {
-    "dece633e70d2f1eaa74023282760919ada940e7225893db88b34b22b3ab7df09": {
-      "address": "0xD87b5f44c6b951Fe5eCdC2cBFe84221d0c9C8E35",
-      "txHash": "0x1206d5209033d8d05230d483bfbd9569f8b3b6b08302dba5def94b9fd5a53f7f",
+    "3fd224352b938096c39ce936a52db2151141892bd2c8c7483822e037820a501f": {
+      "address": "0x60f17791425A6731008Ea4Ec63f9610e05624bA6",
+      "txHash": "0xffb2df5a7af37d2cd6135a58530ac3898e1127edd8f22f0f0a7892cd26d59b49",
       "layout": {
         "storage": [
           {
@@ -222,7 +222,7 @@
             "label": "uniswapV2Router",
             "offset": 0,
             "slot": "121",
-            "type": "t_contract(IUniswapV2Router02)3593",
+            "type": "t_contract(IUniswapV2Router02)3606",
             "contract": "DP",
             "src": "contracts/DP.sol:63"
           },
@@ -230,7 +230,7 @@
             "label": "uniswapV2Pair",
             "offset": 0,
             "slot": "122",
-            "type": "t_contract(IUniswapV2Pair)3200",
+            "type": "t_contract(IUniswapV2Pair)3213",
             "contract": "DP",
             "src": "contracts/DP.sol:64"
           }
@@ -256,11 +256,11 @@
             "label": "bool",
             "numberOfBytes": "1"
           },
-          "t_contract(IUniswapV2Pair)3200": {
+          "t_contract(IUniswapV2Pair)3213": {
             "label": "contract IUniswapV2Pair",
             "numberOfBytes": "20"
           },
-          "t_contract(IUniswapV2Router02)3593": {
+          "t_contract(IUniswapV2Router02)3606": {
             "label": "contract IUniswapV2Router02",
             "numberOfBytes": "20"
           },
