@@ -187,6 +187,17 @@ describe("DP", function () {
     });
 
 
+    it("Sell lmit frame should be correct", async function () {
+        const prevFrame = await dp.getCurrentSellLimitFrame()
+
+        await setNetworkTimeStamp(hoursToSeconds(24).add(await lastBlockTime()))
+
+        const newFrame = await dp.getCurrentSellLimitFrame()
+
+        expect(prevFrame).to.equal(newFrame.sub(1))
+    });
+
+
     it("It shouldn't let selling token in 24 hours", async function () {
         const balanceOfOwnerBefore = await dp.balanceOf(owner.address)
 
@@ -273,6 +284,74 @@ describe("DP", function () {
             }
         )
 
+    });
+
+
+    it.only("It should let selling token received before 24 hours", async function () {
+        const balanceOfOwnerBefore = await dp.balanceOf(owner.address)
+
+        const tokensToAddLiqidity = BigNumber.from(balanceOfOwnerBefore.div(2))
+        const ethToAddLiquidity = ethers.utils.parseEther("500")
+
+        await dp.markNextSellAsLP()
+        await dp.approve(uniswapv2Router.address, tokensToAddLiqidity)
+
+        await uniswapv2Router.addLiquidityETH(
+            dp.address,
+            tokensToAddLiqidity,
+            0,
+            0,
+            owner.address,
+            await lastBlockTime() + 1000,
+            {
+                value: ethToAddLiquidity
+            }
+        )
+
+        const tokensToSell = BigNumber.from(1000)
+
+        await dp.transfer(address0.address, tokensToSell);
+
+        await setNetworkTimeStamp(hoursToSeconds(24).add(await lastBlockTime()))
+
+        await dp.transfer(address0.address, tokensToSell);
+
+        console.log(await dp.balanceOf(owner.address))
+
+        await dp.connect(address0).approve(uniswapv2Router.address, tokensToSell, {
+            from: address0.address
+        });
+
+        await uniswapv2Router.connect(address0).swapExactTokensForETHSupportingFeeOnTransferTokens(
+            tokensToSell,
+            0,
+            [dp.address, await uniswapv2Router.WETH()],
+            address0.address,
+            await lastBlockTime() + 1000,
+            {
+                from: address0.address
+            }
+        )
+
+        await dp.connect(address0).approve(uniswapv2Router.address, tokensToSell, {
+            from: address0.address
+        });
+
+        console.log(await dp.balanceOf(owner.address))
+
+        const secondSell =  uniswapv2Router.connect(address0).swapExactTokensForETHSupportingFeeOnTransferTokens(
+            tokensToSell,
+            0,
+            [dp.address, await uniswapv2Router.WETH()],
+            address0.address,
+            await lastBlockTime() + 1000,
+            {
+                from: address0.address
+            }
+        )
+
+        await expect(secondSell).to.be.reverted
+            
     });
 
 

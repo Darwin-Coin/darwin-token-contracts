@@ -150,8 +150,8 @@ contract DP is IDP, OwnableUpgradeable {
         return tokenFromReflection(_rOwned[account], rate);
     }
 
-    function tokenFromReflection(uint256 rAmount, uint256 rate) public view returns (uint256) {
-        require(rAmount <= _rTotal, "DiP::tokenFromReflection: Amount must be less than total reflections");
+    function tokenFromReflection(uint256 rAmount, uint256 rate) private view returns (uint256) {
+        require(rAmount <= _rTotal, "DiP::tokenFromReflection: rAmount must be less than total reflections");
         return rAmount.div(rate);
     }
 
@@ -286,20 +286,25 @@ contract DP is IDP, OwnableUpgradeable {
         return _isExchangeAddress[to];
     }
 
-    function enforceSellLimit(address from, uint256 rate) private view {
-        uint256 limitFrame = calculateSellLimitFrame();
-        uint256 tokenReceivedInLastLimitPeriod = _tokenReceivedInLastLimitPeriod[from][limitFrame];
-        uint256 balance = _balanceOf(from, rate);
+    function enforceSellLimit(address seller, uint256 rate) private view {
+        uint256 limitFrame = getCurrentSellLimitFrame();
+        uint256 tokenReceivedInLastLimitPeriod = _tokenReceivedInLastLimitPeriod[seller][limitFrame];
+        uint256 balance = _balanceOf(seller, rate);
         require(balance >= tokenReceivedInLastLimitPeriod, "DiP::enforceSellLimit: sell not allowed");
     }
 
-    function calculateSellLimitFrame() private view returns (uint256) {
+    function getCurrentSellLimitFrame() public view returns (uint256) {
         return block.timestamp / sellLimitDuration;
     }
 
-    function logReceivedTokens(address to, uint256 amount) private {
-        uint256 limitFrame = calculateSellLimitFrame();
-        _tokenReceivedInLastLimitPeriod[to][limitFrame] += amount;
+    function getTokenSellInLastLimitFrame(address account) public view returns (uint256){
+        uint256 limitFrame = getCurrentSellLimitFrame();
+       return _tokenReceivedInLastLimitPeriod[account][limitFrame];
+    }
+
+    function logReceivedTokens(address receiver, uint256 amount) private {
+        uint256 limitFrame = getCurrentSellLimitFrame();
+        _tokenReceivedInLastLimitPeriod[receiver][limitFrame] += amount;
     }
 
     function _transfer(
@@ -322,7 +327,7 @@ contract DP is IDP, OwnableUpgradeable {
         }
 
         if (!_isExcludedFromSellLimit[to]) {
-            logReceivedTokens(to, currentRate);
+            logReceivedTokens(to, amount);
         }
 
         return true;
