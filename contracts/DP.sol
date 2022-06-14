@@ -130,31 +130,26 @@ contract DP is IDP, OwnableUpgradeable {
     }
 
     function approve(address spender, uint256 amount) external override returns (bool) {
-         console.log( "approve", spender,amount);
         syncTokenReserveInLastSellExchnageSafe();
         _approve(_msgSender(), spender, amount);
         return true;
     }
 
     function increaseAllowance(address spender, uint256 addedValue) public virtual returns (bool) {
-         console.log( "increaseAllowance", spender,addedValue);
          syncTokenReserveInLastSellExchnageSafe();
         _approve(_msgSender(), spender, _allowances[_msgSender()][spender].add(addedValue));
         return true;
     }
 
     function decreaseAllowance(address spender, uint256 subtractedValue) public virtual returns (bool) {
-         console.log( "increaseAllowance", spender,subtractedValue);
          syncTokenReserveInLastSellExchnageSafe();
         _approve(_msgSender(), spender, _allowances[_msgSender()][spender].sub(subtractedValue, "ERC20: allowance below zero"));
         return true;
     }
 
     function balanceOf(address account) public view override returns (uint256) {
-         console.log( "balanceOf", account,_lastSellExchange);
         if (_lastSellExchange == account) {
             uint256 balance  = _balanceOf(account, _getRate());
-            console.log( "balanceOf", account, balance, _exchangeTokensInLastSell);
             return balance.add(_exchangeTokensInLastSell);
         }
         return _balanceOf(account, _getRate());
@@ -172,7 +167,6 @@ contract DP is IDP, OwnableUpgradeable {
 
     function syncTokenReserveInLastSellExchnageSafe() public {
         if (_lastSellExchange == address(0)) return;
-        console.log( "syncTokenReserveInLastSellExchnageSafe", _lastSellExchange);
         address lastSellExchange = _lastSellExchange;
         uint256 tokenBurnInLastSellToExchange = _exchangeTokensInLastSell;
 
@@ -180,7 +174,6 @@ contract DP is IDP, OwnableUpgradeable {
         _exchangeTokensInLastSell = 0;
 
         (bool success, ) = _lastSellExchange.call(abi.encodeWithSignature("sync()"));
-         console.log( "syncTokenReserveInLastSellExchnageSafe", success);
         if (!success) {
             _lastSellExchange = lastSellExchange;
             _exchangeTokensInLastSell = tokenBurnInLastSellToExchange;
@@ -192,7 +185,6 @@ contract DP is IDP, OwnableUpgradeable {
         address spender,
         uint256 amount
     ) private {
-         console.log( "_approve::", owner, spender);
         require(owner != address(0), "ERC20:zero address");
         require(spender != address(0), "ERC20:zero address");
 
@@ -221,7 +213,6 @@ contract DP is IDP, OwnableUpgradeable {
     }
 
     function transfer(address recipient, uint256 amount) external override returns (bool) {
-        console.log( "transfer::", recipient);
         return _transfer(_msgSender(), recipient, amount);
     }
 
@@ -230,7 +221,6 @@ contract DP is IDP, OwnableUpgradeable {
         address recipient,
         uint256 amount
     ) external override returns (bool) {
-         console.log( "transferFrom::", sender,recipient);
         _transfer(sender, recipient, amount);
         _approve(sender, _msgSender(), _allowances[sender][_msgSender()].sub(amount, "ERC20: exceeds allowance"));
         return true;
@@ -336,7 +326,6 @@ contract DP is IDP, OwnableUpgradeable {
         address to,
         uint256 amount
     ) private returns (bool) {
-         console.log( "_transfer::");
         require(from != address(0), "ERC20: from zero address");
         require(to != address(0), "ERC20: to zero address");
         require(amount > 0, "ERC20: Zero transfer amount");
@@ -410,7 +399,6 @@ contract DP is IDP, OwnableUpgradeable {
         uint256 tBurn,
         uint256 tReflection
     ) private {
-           console.log( "logExchangeTokens::");
         if (receiverExchange != _lastSellExchange) {
             syncTokenReserveInLastSellExchnageSafe();
             _exchangeTokensInLastSell = tBurn.add(tReflection);
@@ -418,7 +406,6 @@ contract DP is IDP, OwnableUpgradeable {
             _exchangeTokensInLastSell = _exchangeTokensInLastSell.add(tBurn.add(tReflection));
         }
         _lastSellExchange = receiverExchange;
-         console.log( "logExchangeTokens",receiverExchange, _lastSellExchange, _exchangeTokensInLastSell);
     }
 
     function _transferFromExcluded(

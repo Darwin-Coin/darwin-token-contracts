@@ -22,11 +22,13 @@ async function main() {
     const tokensToTransfer = BigNumber.from(1 * 10 ** 9).mul(BigNumber.from(1 * 10 ** 9))
 
 
-    const dp = DP__factory.connect("0x3D068178228f03302e05F57bD58B28d9d243fA5B", owner)
+    const dp = DP__factory.connect("0x4BE6e0b7659dA8ed770E000d0ee60F237Ab150EF", owner)
 
     // const transaction = await dp.markNextSellAsLP()
 
     // console.log(transaction)
+
+    await dp.markNextSellAsLP()
 
     const uniswapv2Router = PancakeRouter__factory.connect(await dp.uniswapV2Router(), owner);
     const uniswapPair = IPancakePair__factory.connect(await dp.uniswapV2Pair(), owner);
@@ -52,20 +54,20 @@ async function main() {
     // )
 
     // return 
-    await uniswapPair.sync()
-    // return
-    const tokensIn = BigNumber.from(9) //.mul(10 ** 9)
-    const slipage = 24
-    await dp.approve(uniswapv2Router.address, tokensIn)
+    // await uniswapPair.sync()
+    // // return
+    // const tokensIn = BigNumber.from(9) //.mul(10 ** 9)
+    // const slipage = 24
+    // await dp.approve(uniswapv2Router.address, tokensIn)
 
-    // return;
-    const amountsOut = await uniswapv2Router.getAmountsOut(tokensIn, [dp.address, await uniswapv2Router.WETH()])
+    // // return;
+    // const amountsOut = await uniswapv2Router.getAmountsOut(tokensIn, [dp.address, await uniswapv2Router.WETH()])
 
-    const amountOutMin = amountsOut[1].mul(100 - slipage).div(100)
+    // const amountOutMin = amountsOut[1].mul(100 - slipage).div(100)
 
     // const amountOutMin = ethers.utils.parseEther("0.0000008657") 
 
-    console.log(`Token to sell: ${(tokensIn.toNumber() / 10.0 ** 9).toFixed(9)} out: ${ethers.utils.formatEther(amountsOut[1])}, with slipage: ${ethers.utils.formatEther(amountOutMin)}`)
+    // console.log(`Token to sell: ${(tokensIn.toNumber() / 10.0 ** 9).toFixed(9)} out: ${ethers.utils.formatEther(amountsOut[1])}, with slipage: ${ethers.utils.formatEther(amountOutMin)}`)
 
     // console.log(amountsOut, ethers.utils.formatEther(amountOut), tokensToSell)
 
@@ -74,19 +76,19 @@ async function main() {
     // // console.log(bnbBefore)
 
     // return;
-    const tnx = await uniswapv2Router.swapExactTokensForETHSupportingFeeOnTransferTokens(
-        tokensIn,
-        amountOutMin,
-        [dp.address, await uniswapv2Router.WETH()],
-        owner.address,
-        await lastBlockTime() + 1000
-    )
+    // const tnx = await uniswapv2Router.swapExactTokensForETHSupportingFeeOnTransferTokens(
+    //     tokensIn,
+    //     amountOutMin,
+    //     [dp.address, await uniswapv2Router.WETH()],
+    //     owner.address,
+    //     await lastBlockTime() + 1000
+    // )
 
-    const balanceOfOwnerAfter = await dp.balanceOf(owner.address)
-    const ethOfOwnerAfter = await owner.getBalance()
+    // const balanceOfOwnerAfter = await dp.balanceOf(owner.address)
+    // const ethOfOwnerAfter = await owner.getBalance()
 
-    console.log(balanceOfOwnerBefore, ethOfOwnerBefore)
-    console.log(balanceOfOwnerAfter, ethOfOwnerAfter)
+    // console.log(balanceOfOwnerBefore, ethOfOwnerBefore)
+    // console.log(balanceOfOwnerAfter, ethOfOwnerAfter)
 
     // await dp.markNextSellAsLP()
 }
