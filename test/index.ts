@@ -269,13 +269,17 @@ describe("DP", function () {
 
         await setNetworkTimeStamp(hoursToSeconds(24).add(await lastBlockTime()))
 
+        const amountsOut = await uniswapv2Router.getAmountsOut(tokensToSell, [dp.address, await uniswapv2Router.WETH()])
+
+        const amountOutMin = amountsOut[1].mul(100 - 10).div(100)
+
         await dp.connect(address0).approve(uniswapv2Router.address, tokensToSell.mul(BigNumber.from(1)), {
             from: address0.address
         });
 
         const tnx = await uniswapv2Router.connect(address0).swapExactTokensForETHSupportingFeeOnTransferTokens(
             tokensToSell,
-            0,
+            amountOutMin,
             [dp.address, await uniswapv2Router.WETH()],
             address0.address,
             await lastBlockTime() + 1000,
@@ -316,13 +320,17 @@ describe("DP", function () {
 
         await dp.transfer(address0.address, tokensToSell);
 
+        const amountsOut = await uniswapv2Router.getAmountsOut(tokensToSell, [dp.address, await uniswapv2Router.WETH()])
+
+        const amountOutMin = amountsOut[1].mul(100 - 10).div(100)
+
         await dp.connect(address0).approve(uniswapv2Router.address, tokensToSell, {
             from: address0.address
         });
 
         await uniswapv2Router.connect(address0).swapExactTokensForETHSupportingFeeOnTransferTokens(
             tokensToSell,
-            0,
+            amountOutMin,
             [dp.address, await uniswapv2Router.WETH()],
             address0.address,
             await lastBlockTime() + 1000,
@@ -331,13 +339,17 @@ describe("DP", function () {
             }
         )
 
+        const amountsOut1 = await uniswapv2Router.getAmountsOut(tokensToSell, [dp.address, await uniswapv2Router.WETH()])
+
+        const amountOutMin1 = amountsOut1[1].mul(100 - 10).div(100)
+
         await dp.connect(address0).approve(uniswapv2Router.address, tokensToSell, {
             from: address0.address
         });
 
         const secondSell =  uniswapv2Router.connect(address0).swapExactTokensForETHSupportingFeeOnTransferTokens(
             tokensToSell,
-            0,
+            amountOutMin1,
             [dp.address, await uniswapv2Router.WETH()],
             address0.address,
             await lastBlockTime() + 1000,
