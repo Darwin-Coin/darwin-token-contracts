@@ -44,19 +44,19 @@ contract DP is IDP, OwnableUpgradeable {
     mapping(address => bool) private _isExcludedFromReflection;
     address[] private _excludedFromReflection;
 
-    mapping(address => bool) private _isExcludedFromSellLimit;
-    mapping(address => bool) private _isExchangeAddress;
+    mapping(address => bool) private _isPairAddress;
+    mapping(address => bool) private _isExchnageRouterAddress;
+    mapping(address => address) private _pairToRouter;
+
     mapping(address => mapping(address => uint256)) private _allowances;
     mapping(address => bool) private _nextSellIsLP;
     mapping(address => mapping(uint256 => uint256)) private _tokenReceivedInLastLimitPeriod;
 
-    uint256 private _exchangeTokensInLastSell;
-    address private _lastSellExchange;
+    mapping(address => uint256) private _pairUnsyncAmount;
+    address[] public outOfSyncPairs;
 
     uint256 public reflectionPercentage;
     uint256 public burnPercentage;
-
-    uint256 public sellLimitDuration;
 
     uint256 public tReflectionTotal;
     uint256 public tBurnTotal;
@@ -83,7 +83,7 @@ contract DP is IDP, OwnableUpgradeable {
         reflectionPercentage = 5;
         burnPercentage = 90;
 
-        sellLimitDuration = 24 hours;
+        // sellLimitDuration = 24 hours;
 
         // transfer tokens to owner
         _rOwned[_devWallet] = (_rTotal / 100) * DEV_WALLET_PECENTAGE;
@@ -97,10 +97,10 @@ contract DP is IDP, OwnableUpgradeable {
         uniswapV2Pair = IUniswapV2Pair(IUniswapV2Factory(uniswapV2Router.factory()).createPair(address(this), uniswapV2Router.WETH()));
 
         // exclude wallets from sell limit
-        _isExcludedFromSellLimit[_msgSender()] = true;
+        // _isExcludedFromSellLimit[_msgSender()] = true;
 
         // add exchange wallets
-        addExchangeAddress(address(uniswapV2Pair));
+        registerPair(uniswapV2RouterAddress, address(uniswapV2Pair));
 
         //exclude burn wallet from reflection
         excludeFromReflectionSafe(burnAddress);
@@ -136,21 +136,21 @@ contract DP is IDP, OwnableUpgradeable {
     }
 
     function increaseAllowance(address spender, uint256 addedValue) public virtual returns (bool) {
-         syncTokenReserveInLastSellExchnageSafe();
+        syncTokenReserveInLastSellExchnageSafe();
         _approve(_msgSender(), spender, _allowances[_msgSender()][spender].add(addedValue));
         return true;
     }
 
     function decreaseAllowance(address spender, uint256 subtractedValue) public virtual returns (bool) {
-         syncTokenReserveInLastSellExchnageSafe();
+        syncTokenReserveInLastSellExchnageSafe();
         _approve(_msgSender(), spender, _allowances[_msgSender()][spender].sub(subtractedValue, "ERC20: allowance below zero"));
         return true;
     }
 
     function balanceOf(address account) public view override returns (uint256) {
-        if (_lastSellExchange == account) {
-            uint256 balance  = _balanceOf(account, _getRate());
-            return balance.add(_exchangeTokensInLastSell);
+        if (_isPairAddress[account]) {
+            uint256 balance = _balanceOf(account, _getRate());
+            return balance.add(_pairUnsyncAmount[account]);
         }
         return _balanceOf(account, _getRate());
     }
@@ -165,18 +165,37 @@ contract DP is IDP, OwnableUpgradeable {
         return rAmount.div(rate);
     }
 
+    function getOutOfSyncedPairs() public view returns( address[] memory){
+        return outOfSyncPairs;
+    }
+
+    function getOutOfSyncedAmount(address pair) public view returns(uint256){
+        return _pairUnsyncAmount[pair];
+    }
+
+    function shouldPerformSync(address destinationExchnage) private view returns (bool) {
+        return msg.sender != destinationExchnage && msg.sender != _pairToRouter[msg.sender];
+    }
+
     function syncTokenReserveInLastSellExchnageSafe() public {
-        if (_lastSellExchange == address(0)) return;
-        address lastSellExchange = _lastSellExchange;
-        uint256 tokenBurnInLastSellToExchange = _exchangeTokensInLastSell;
+        if (outOfSyncPairs.length == 0) return;
+        for (int256 i = 0; uint256(i) < outOfSyncPairs.length; i++) {
+            address unSyncedPair = outOfSyncPairs[uint256(i)];
 
-        _lastSellExchange = address(0);
-        _exchangeTokensInLastSell = 0;
+            if (shouldPerformSync(unSyncedPair)) {
+                uint256 amount = _pairUnsyncAmount[unSyncedPair];
 
-        (bool success, ) = _lastSellExchange.call(abi.encodeWithSignature("sync()"));
-        if (!success) {
-            _lastSellExchange = lastSellExchange;
-            _exchangeTokensInLastSell = tokenBurnInLastSellToExchange;
+                _pairUnsyncAmount[unSyncedPair] = 0;
+
+                (bool success, ) = unSyncedPair.call(abi.encodeWithSignature("sync()"));
+                if (!success) {
+                    _pairUnsyncAmount[unSyncedPair] = amount;
+                } else {
+                    outOfSyncPairs[uint256(i)] = outOfSyncPairs[outOfSyncPairs.length - 1];
+                    outOfSyncPairs.pop();
+                    i--;
+                }
+            }
         }
     }
 
@@ -238,7 +257,6 @@ contract DP is IDP, OwnableUpgradeable {
         }
     }
 
-
     function includeInReflectionSafe(address account) public onlyOwner {
         if (_isExcludedFromReflection[account]) {
             for (uint256 i = 0; i < _excludedFromReflection.length; i++) {
@@ -259,66 +277,43 @@ contract DP is IDP, OwnableUpgradeable {
         return _isExcludedFromReflection[account];
     }
 
-    function isExcludedFromSellLimit(address account) public view returns (bool) {
-        return _isExcludedFromSellLimit[account];
+
+    function registerPair(address routerAddress, address pairAddress) public onlyOwner {
+        require(!_isPairAddress[pairAddress] || !_isExchnageRouterAddress[routerAddress], "DiP::registerPair: already registered");
+
+        _isPairAddress[pairAddress] = true;
+        _isExchnageRouterAddress[routerAddress] = true;
+        _pairToRouter[pairAddress] = routerAddress;
+
+        excludeFromReflectionSafe(pairAddress);
+
+        emit ExchangeAdded(pairAddress);
     }
 
-    function addExchangeAddress(address account) public onlyOwner {
-        require(!_isExchangeAddress[account], "DiP::addExchangeAddress: already an exchange");
+    function unRegisterPair(address pairAddress) public onlyOwner {
+        require(_isPairAddress[pairAddress], "DiP::unRegisterPair: not found");
 
-        _isExchangeAddress[account] = true;
-        _isExcludedFromSellLimit[account] = true;
+        _isPairAddress[pairAddress] = false;
+        _pairToRouter[pairAddress] = address(0);
 
-        excludeFromReflectionSafe(account);
+        excludeFromReflectionSafe(pairAddress);
 
-        emit ExchangeAdded(account);
-    }
-
-    function removeExchangeAddress(address account) public onlyOwner {
-        require(_isExchangeAddress[account], "DiP::removeExchangeAddress: not an exchange");
-
-        _isExchangeAddress[account] = false;
-        _isExcludedFromSellLimit[account] = false;
-
-        includeInReflectionSafe(account);
-
-        emit ExchangedRemoved(account);
+        emit ExchangedRemoved(pairAddress);
     }
 
     function isExchangeAddress(address account) public view returns (bool) {
-        return _isExchangeAddress[account];
+        return _isPairAddress[account];
     }
 
     function isTnxSell(address from, address to) private returns (bool) {
-        if (_isExchangeAddress[to]) {
+        if (_isPairAddress[to]) {
             if (_nextSellIsLP[from]) {
                 _nextSellIsLP[from] = false;
                 return false;
             }
             return true;
         }
-        return _isExchangeAddress[to];
-    }
-
-    function enforceSellLimit(address seller, uint256 rate) private view {
-        uint256 limitFrame = getCurrentSellLimitFrame();
-        uint256 tokenReceivedInLastLimitPeriod = _tokenReceivedInLastLimitPeriod[seller][limitFrame];
-        uint256 balance = _balanceOf(seller, rate);
-        require(balance >= tokenReceivedInLastLimitPeriod, "DiP::enforceSellLimit: sell temporarily blocked");
-    }
-
-    function getCurrentSellLimitFrame() public view returns (uint256) {
-        return block.timestamp.div(sellLimitDuration);
-    }
-
-    function getTokenSellInLastLimitFrame(address account) public view returns (uint256) {
-        uint256 limitFrame = getCurrentSellLimitFrame();
-        return _tokenReceivedInLastLimitPeriod[account][limitFrame];
-    }
-
-    function logReceivedTokens(address receiver, uint256 amount) private {
-        uint256 limitFrame = getCurrentSellLimitFrame();
-        _tokenReceivedInLastLimitPeriod[receiver][limitFrame] = _tokenReceivedInLastLimitPeriod[receiver][limitFrame].add(amount);
+        return _isPairAddress[to];
     }
 
     function _transfer(
@@ -332,21 +327,13 @@ contract DP is IDP, OwnableUpgradeable {
 
         bool isSell = isTnxSell(from, to);
 
-        if(!isSell){
+        if (!isSell) {
             syncTokenReserveInLastSellExchnageSafe();
         }
 
         uint256 currentRate = _getRate();
 
         _tokenTransfer(from, to, amount, currentRate, isSell);
-
-        if (isSell && !_isExcludedFromSellLimit[from]) {
-            enforceSellLimit(from, currentRate);
-        }
-
-        if (!_isExcludedFromSellLimit[to]) {
-            logReceivedTokens(to, amount);
-        }
 
         return true;
     }
@@ -399,13 +386,13 @@ contract DP is IDP, OwnableUpgradeable {
         uint256 tBurn,
         uint256 tReflection
     ) private {
-        if (receiverExchange != _lastSellExchange) {
-            syncTokenReserveInLastSellExchnageSafe();
-            _exchangeTokensInLastSell = tBurn.add(tReflection);
-        } else {
-            _exchangeTokensInLastSell = _exchangeTokensInLastSell.add(tBurn.add(tReflection));
+
+        bool isNewValue =  _pairUnsyncAmount[receiverExchange] == 0;
+        _pairUnsyncAmount[receiverExchange] = _pairUnsyncAmount[receiverExchange].add(tBurn).add(tReflection);
+
+        if (isNewValue && _pairUnsyncAmount[receiverExchange] > 0 ) {
+            outOfSyncPairs.push(receiverExchange);
         }
-        _lastSellExchange = receiverExchange;
     }
 
     function _transferFromExcluded(

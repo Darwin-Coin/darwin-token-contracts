@@ -13,9 +13,9 @@ async function main() {
   // Hardhat always runs the compile task when running scripts with its command
   const [owner, ...others] = await hardhat.ethers.getSigners()
 
-  const devWallet = String(process.env.DEV_WALLET);
+  const devWallet =  String(process.env.DEV_WALLET);
 
-  console.log(`owner: ${owner.address} with ${ethers.utils.formatEther(await owner.getBalance())} ETH`)
+  console.log(`deployer wallet: ${owner.address} with ${ethers.utils.formatEther(await owner.getBalance())} ETH`)
   console.log(`dev wallet: ${devWallet}`);
 
   const DPContract = await hardhat.ethers.getContractFactory("DP")

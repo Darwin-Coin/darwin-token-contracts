@@ -1,25 +1,75 @@
 {
   "manifestVersion": "3.2",
   "admin": {
-    "address": "0xbBf651d7CE8c550e82032C25b27f24d8791c7845",
-    "txHash": "0x33598f23d98308a7650bad053b2b9571a888f3d6bfbecbe94dc67dea7d179432"
+    "address": "0x5CD439C7c5c80e59227217da29227f1561683009",
+    "txHash": "0x0941a20f543c8acb48b8801255151ddc271ee440893c4bf679674b95d1f7ba6a"
   },
   "proxies": [
     {
-      "address": "0x4BE6e0b7659dA8ed770E000d0ee60F237Ab150EF",
-      "txHash": "0xc91bdc930c07c729906dc90cd7f541c3a54e161e5daaf084c95e1bb14417c1cf",
+      "address": "0x017E1e078A5bF7E014267DD2b726232599fd05c0",
+      "txHash": "0xd24a962de39d3dd239709a75c418a5d8634391c0a4994c50b234b2a0d336137e",
       "kind": "transparent"
     },
     {
-      "address": "0x579135993dA0E126EE3f277009e012FfDfd710c6",
-      "txHash": "0xd146f2809f19f322e8812b3e9091feba116b0e78011bf2c700f10e465531fb85",
+      "address": "0x5Fd113D8Ee470A1B3e252f3089D0C9F9437F4861",
+      "txHash": "0x642c39c00fe9bfe5b420418cd52e1a2e1bb090a2a2403812dc3536bafa1ed460",
+      "kind": "transparent"
+    },
+    {
+      "address": "0x30a37600860835332D44104A665fA4e30284d9a3",
+      "txHash": "0x533e3cc1dba12c30e67631080c7c6601a9e433dd714f0ce235e5aadc1b607298",
+      "kind": "transparent"
+    },
+    {
+      "address": "0xeAD289d5e9E88ece8c81EC5bd5827c037b512000",
+      "txHash": "0x4ef8d81cb156050fa5793bb3f112d921d39a44b0fbae2a71bf6845ac89e32444",
+      "kind": "transparent"
+    },
+    {
+      "address": "0x8187b47676F2Db93bFb51808B53cE2ED9Ee79bA4",
+      "txHash": "0xeff338928f571deaf2b102e6c4daf1c8f68fcfd6d102f7a24de9ef7a5cca905b",
+      "kind": "transparent"
+    },
+    {
+      "address": "0x83c7BB250aB28717F28824fA10B9672AB13Ad642",
+      "txHash": "0x244c2471da96334bbf003b6300e1f990e8d4989c884dee33bea39197619f9ed2",
+      "kind": "transparent"
+    },
+    {
+      "address": "0xF4DB53cd746d7B9A6041BEF8B5Ebf1A2ED3eC183",
+      "txHash": "0x82d294092c9a9cf8116c64c49e767cbbe5a98b23920e295a6f24ac8e3b8d4536",
+      "kind": "transparent"
+    },
+    {
+      "address": "0x23872EdBd680DF5B4536925BC68466E49A23caC8",
+      "txHash": "0x1478f1df05de4a9a82a805acf33f033bf8da423078ce7968bb80186b334e3d14",
+      "kind": "transparent"
+    },
+    {
+      "address": "0x3FAa9D61e224314c9F56C7907c960FC58b24EF2C",
+      "txHash": "0xc5791feaba5f92698906946b0e0bc5f26e532a9184826cdb0f6cc27f1e30ce05",
+      "kind": "transparent"
+    },
+    {
+      "address": "0x1fb1B108eaf8AdEa98c201aff6FC648E6652Fc41",
+      "txHash": "0xd013f18cacf31477880ef7582265e517ac0ec2d35e27a4004317df01a7904c7f",
+      "kind": "transparent"
+    },
+    {
+      "address": "0x6EFc70337213595cBc9077c465e13deeA9Db451C",
+      "txHash": "0xb29fc022e5a5ebb600c37b54bbf75bd97cee771a9b58110ae14164dd89ec4590",
+      "kind": "transparent"
+    },
+    {
+      "address": "0xB6419Bb63b82a2b3c6524a4f8c8029A9b689330A",
+      "txHash": "0x7e4fa2b5b357e7294ebf64e9cdd5eb446307db18e8d149465340bf38314bb827",
       "kind": "transparent"
     }
   ],
   "impls": {
-    "5a09bef41dab19f60c73a69d4c488363fe9f291bf9ec1acc609c666457a538c2": {
-      "address": "0xBFC1FaFDA3231D9B5fd617BD829B0f137D9FF494",
-      "txHash": "0x75052c0ac18a07df428720570bf9348dc72cff1b0bf777f7863365f8511fe985",
+    "0326f60a89279fba25ebd6d867484ade125a43016ac58391b2186f7d1ccf0260": {
+      "address": "0xc3754085E239c91b7A56fBa69be6e9c79205f6e9",
+      "txHash": "0xde2856bc52d1e22788987f24bdc16fe1e70a57a7cdb1a447e6cfce39b2eb466d",
       "layout": {
         "storage": [
           {
@@ -136,7 +186,7 @@
             "src": "contracts/DP.sol:45"
           },
           {
-            "label": "_isExcludedFromSellLimit",
+            "label": "_isPairAddress",
             "offset": 0,
             "slot": "110",
             "type": "t_mapping(t_address,t_bool)",
@@ -144,7 +194,7 @@
             "src": "contracts/DP.sol:47"
           },
           {
-            "label": "_isExchangeAddress",
+            "label": "_isExchnageRouterAddress",
             "offset": 0,
             "slot": "111",
             "type": "t_mapping(t_address,t_bool)",
@@ -152,63 +202,63 @@
             "src": "contracts/DP.sol:48"
           },
           {
-            "label": "_allowances",
+            "label": "_pairToRouter",
             "offset": 0,
             "slot": "112",
-            "type": "t_mapping(t_address,t_mapping(t_address,t_uint256))",
+            "type": "t_mapping(t_address,t_address)",
             "contract": "DP",
             "src": "contracts/DP.sol:49"
           },
           {
-            "label": "_nextSellIsLP",
+            "label": "_allowances",
             "offset": 0,
             "slot": "113",
-            "type": "t_mapping(t_address,t_bool)",
-            "contract": "DP",
-            "src": "contracts/DP.sol:50"
-          },
-          {
-            "label": "_tokenReceivedInLastLimitPeriod",
-            "offset": 0,
-            "slot": "114",
-            "type": "t_mapping(t_address,t_mapping(t_uint256,t_uint256))",
+            "type": "t_mapping(t_address,t_mapping(t_address,t_uint256))",
             "contract": "DP",
             "src": "contracts/DP.sol:51"
           },
           {
-            "label": "_exchangeTokensInLastSell",
+            "label": "_nextSellIsLP",
+            "offset": 0,
+            "slot": "114",
+            "type": "t_mapping(t_address,t_bool)",
+            "contract": "DP",
+            "src": "contracts/DP.sol:52"
+          },
+          {
+            "label": "_tokenReceivedInLastLimitPeriod",
             "offset": 0,
             "slot": "115",
-            "type": "t_uint256",
+            "type": "t_mapping(t_address,t_mapping(t_uint256,t_uint256))",
             "contract": "DP",
             "src": "contracts/DP.sol:53"
           },
           {
-            "label": "_lastSellExchange",
+            "label": "_pairUnsyncAmount",
             "offset": 0,
             "slot": "116",
-            "type": "t_address",
+            "type": "t_mapping(t_address,t_uint256)",
             "contract": "DP",
-            "src": "contracts/DP.sol:54"
+            "src": "contracts/DP.sol:55"
           },
           {
-            "label": "reflectionPercentage",
+            "label": "outOfSyncPairs",
             "offset": 0,
             "slot": "117",
-            "type": "t_uint256",
+            "type": "t_array(t_address)dyn_storage",
             "contract": "DP",
             "src": "contracts/DP.sol:56"
           },
           {
-            "label": "burnPercentage",
+            "label": "reflectionPercentage",
             "offset": 0,
             "slot": "118",
             "type": "t_uint256",
             "contract": "DP",
-            "src": "contracts/DP.sol:57"
+            "src": "contracts/DP.sol:58"
           },
           {
-            "label": "sellLimitDuration",
+            "label": "burnPercentage",
             "offset": 0,
             "slot": "119",
             "type": "t_uint256",
@@ -243,7 +293,7 @@
             "label": "uniswapV2Router",
             "offset": 0,
             "slot": "123",
-            "type": "t_contract(IUniswapV2Router02)3821",
+            "type": "t_contract(IUniswapV2Router02)3689",
             "contract": "DP",
             "src": "contracts/DP.sol:66"
           },
@@ -251,7 +301,7 @@
             "label": "uniswapV2Pair",
             "offset": 0,
             "slot": "124",
-            "type": "t_contract(IUniswapV2Pair)3428",
+            "type": "t_contract(IUniswapV2Pair)3296",
             "contract": "DP",
             "src": "contracts/DP.sol:67"
           }
@@ -277,13 +327,17 @@
             "label": "bool",
             "numberOfBytes": "1"
           },
-          "t_contract(IUniswapV2Pair)3428": {
+          "t_contract(IUniswapV2Pair)3296": {
             "label": "contract IUniswapV2Pair",
             "numberOfBytes": "20"
           },
-          "t_contract(IUniswapV2Router02)3821": {
+          "t_contract(IUniswapV2Router02)3689": {
             "label": "contract IUniswapV2Router02",
             "numberOfBytes": "20"
+          },
+          "t_mapping(t_address,t_address)": {
+            "label": "mapping(address => address)",
+            "numberOfBytes": "32"
           },
           "t_mapping(t_address,t_bool)": {
             "label": "mapping(address => bool)",
@@ -320,9 +374,9 @@
         }
       }
     },
-    "204eb4d9743000e721a3d7a5c3ea41835aabbacf7188af6e83eb68bd6bdab094": {
-      "address": "0x27336cC862f441770a080D67bBA7F5BA6CBEf22C",
-      "txHash": "0xc2eb5f3db570b689205f3626086bab6853a322aa234d68f0858cdeef42830e72",
+    "59e8520fc4dd47bc7a2cf8551d22ef55f3a871ea6a759bc7e9b48225119feae3": {
+      "address": "0xF7CdC09679236575A964378049eB5d4485870f15",
+      "txHash": "0xe90d94d95065a1b8254da20b45f3dc89da91b9147ee5378089e2e950fa08f5f0",
       "layout": {
         "storage": [
           {
@@ -439,7 +493,7 @@
             "src": "contracts/DP.sol:45"
           },
           {
-            "label": "_isExcludedFromSellLimit",
+            "label": "_isPairAddress",
             "offset": 0,
             "slot": "110",
             "type": "t_mapping(t_address,t_bool)",
@@ -447,7 +501,7 @@
             "src": "contracts/DP.sol:47"
           },
           {
-            "label": "_isExchangeAddress",
+            "label": "_isExchnageRouterAddress",
             "offset": 0,
             "slot": "111",
             "type": "t_mapping(t_address,t_bool)",
@@ -455,63 +509,63 @@
             "src": "contracts/DP.sol:48"
           },
           {
-            "label": "_allowances",
+            "label": "_pairToRouter",
             "offset": 0,
             "slot": "112",
-            "type": "t_mapping(t_address,t_mapping(t_address,t_uint256))",
+            "type": "t_mapping(t_address,t_address)",
             "contract": "DP",
             "src": "contracts/DP.sol:49"
           },
           {
-            "label": "_nextSellIsLP",
+            "label": "_allowances",
             "offset": 0,
             "slot": "113",
-            "type": "t_mapping(t_address,t_bool)",
-            "contract": "DP",
-            "src": "contracts/DP.sol:50"
-          },
-          {
-            "label": "_tokenReceivedInLastLimitPeriod",
-            "offset": 0,
-            "slot": "114",
-            "type": "t_mapping(t_address,t_mapping(t_uint256,t_uint256))",
+            "type": "t_mapping(t_address,t_mapping(t_address,t_uint256))",
             "contract": "DP",
             "src": "contracts/DP.sol:51"
           },
           {
-            "label": "_exchangeTokensInLastSell",
+            "label": "_nextSellIsLP",
+            "offset": 0,
+            "slot": "114",
+            "type": "t_mapping(t_address,t_bool)",
+            "contract": "DP",
+            "src": "contracts/DP.sol:52"
+          },
+          {
+            "label": "_tokenReceivedInLastLimitPeriod",
             "offset": 0,
             "slot": "115",
-            "type": "t_uint256",
+            "type": "t_mapping(t_address,t_mapping(t_uint256,t_uint256))",
             "contract": "DP",
             "src": "contracts/DP.sol:53"
           },
           {
-            "label": "_lastSellExchange",
+            "label": "_pairUnsyncAmount",
             "offset": 0,
             "slot": "116",
-            "type": "t_address",
+            "type": "t_mapping(t_address,t_uint256)",
             "contract": "DP",
-            "src": "contracts/DP.sol:54"
+            "src": "contracts/DP.sol:55"
           },
           {
-            "label": "reflectionPercentage",
+            "label": "outOfSyncPairs",
             "offset": 0,
             "slot": "117",
-            "type": "t_uint256",
+            "type": "t_array(t_address)dyn_storage",
             "contract": "DP",
             "src": "contracts/DP.sol:56"
           },
           {
-            "label": "burnPercentage",
+            "label": "reflectionPercentage",
             "offset": 0,
             "slot": "118",
             "type": "t_uint256",
             "contract": "DP",
-            "src": "contracts/DP.sol:57"
+            "src": "contracts/DP.sol:58"
           },
           {
-            "label": "sellLimitDuration",
+            "label": "burnPercentage",
             "offset": 0,
             "slot": "119",
             "type": "t_uint256",
@@ -546,7 +600,7 @@
             "label": "uniswapV2Router",
             "offset": 0,
             "slot": "123",
-            "type": "t_contract(IUniswapV2Router02)3722",
+            "type": "t_contract(IUniswapV2Router02)3713",
             "contract": "DP",
             "src": "contracts/DP.sol:66"
           },
@@ -554,7 +608,7 @@
             "label": "uniswapV2Pair",
             "offset": 0,
             "slot": "124",
-            "type": "t_contract(IUniswapV2Pair)3329",
+            "type": "t_contract(IUniswapV2Pair)3320",
             "contract": "DP",
             "src": "contracts/DP.sol:67"
           }
@@ -580,13 +634,17 @@
             "label": "bool",
             "numberOfBytes": "1"
           },
-          "t_contract(IUniswapV2Pair)3329": {
+          "t_contract(IUniswapV2Pair)3320": {
             "label": "contract IUniswapV2Pair",
             "numberOfBytes": "20"
           },
-          "t_contract(IUniswapV2Router02)3722": {
+          "t_contract(IUniswapV2Router02)3713": {
             "label": "contract IUniswapV2Router02",
             "numberOfBytes": "20"
+          },
+          "t_mapping(t_address,t_address)": {
+            "label": "mapping(address => address)",
+            "numberOfBytes": "32"
           },
           "t_mapping(t_address,t_bool)": {
             "label": "mapping(address => bool)",

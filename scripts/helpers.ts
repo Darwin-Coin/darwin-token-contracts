@@ -17,7 +17,7 @@ export const getUniswapRouterAddress = async (network: string) => {
 
         case "bscMainNet":
         case "localMainNetFork":
-            return '0x05fF2B0DB69458A0750badebc4f9e13aDd608C7F';
+            return '0x10ed43c718714eb63d5aa57b78b54704e256024e';
 
         default:
             return '0x9Ac64Cc6e4415144C455BD8E4837Fea55603e5c3';

@@ -187,61 +187,6 @@ describe("DP", function () {
     });
 
 
-    it("Sell lmit frame should be correct", async function () {
-        const prevFrame = await dp.getCurrentSellLimitFrame()
-
-        await setNetworkTimeStamp(hoursToSeconds(24).add(await lastBlockTime()))
-
-        const newFrame = await dp.getCurrentSellLimitFrame()
-
-        expect(prevFrame).to.equal(newFrame.sub(1))
-    });
-
-
-    it("It shouldn't let selling token in 24 hours", async function () {
-        const balanceOfOwnerBefore = await dp.balanceOf(owner.address)
-
-        const tokensToAddLiqidity = BigNumber.from(balanceOfOwnerBefore.div(2))
-        const ethToAddLiquidity = ethers.utils.parseEther("500")
-
-        await dp.markNextSellAsLP()
-        await dp.approve(uniswapv2Router.address, tokensToAddLiqidity)
-
-        await uniswapv2Router.addLiquidityETH(
-            dp.address,
-            tokensToAddLiqidity,
-            0,
-            0,
-            owner.address,
-            await lastBlockTime() + 1000,
-            {
-                value: ethToAddLiquidity
-            }
-        )
-
-        const tokensToSell = BigNumber.from(1000).mul(decimalPoints)
-
-        await dp.transfer(address0.address, tokensToSell);
-
-        await dp.connect(address0).approve(uniswapv2Router.address, tokensToSell.mul(BigNumber.from(1)), {
-            from: address0.address
-        });
-
-        const tnx = uniswapv2Router.connect(address0).swapExactTokensForETHSupportingFeeOnTransferTokens(
-            tokensToSell,
-            0,
-            [dp.address, await uniswapv2Router.WETH()],
-            address0.address,
-            await lastBlockTime() + 1000,
-            {
-                from: address0.address
-            }
-        )
-
-        await expect(tnx).to.be.reverted
-    });
-
-
     it("It should let selling token after 24 hours", async function () {
         const balanceOfOwnerBefore = await dp.balanceOf(owner.address)
 
@@ -291,11 +236,9 @@ describe("DP", function () {
     });
 
 
-    it("It should let selling token received before 24 hours", async function () {
-        const balanceOfOwnerBefore = await dp.balanceOf(owner.address)
-
-        const tokensToAddLiqidity = BigNumber.from(balanceOfOwnerBefore.div(2))
-        const ethToAddLiquidity = ethers.utils.parseEther("500")
+    it("It should currectly store the unsynced amount of tokens on sell", async function () {
+        const tokensToAddLiqidity = BigNumber.from(1).mul(decimalPoints)
+        const ethToAddLiquidity = ethers.utils.parseEther("1")
 
         await dp.markNextSellAsLP()
         await dp.approve(uniswapv2Router.address, tokensToAddLiqidity)
@@ -314,60 +257,74 @@ describe("DP", function () {
 
         const tokensToSell = BigNumber.from(1000)
 
-        await dp.transfer(address0.address, tokensToSell);
+        await dp.transfer(address0.address, tokensToSell.mul(4));
 
-        await setNetworkTimeStamp(hoursToSeconds(24).add(await lastBlockTime()))
+        {
+            const amountsOut = await uniswapv2Router.getAmountsOut(tokensToSell, [dp.address, await uniswapv2Router.WETH()])
 
-        await dp.transfer(address0.address, tokensToSell);
+            const amountOutMin = amountsOut[1] // no slipage
 
-        const amountsOut = await uniswapv2Router.getAmountsOut(tokensToSell, [dp.address, await uniswapv2Router.WETH()])
-
-        const amountOutMin = amountsOut[1].mul(100 - 10).div(100)
-
-        await dp.connect(address0).approve(uniswapv2Router.address, tokensToSell, {
-            from: address0.address
-        });
-
-        await uniswapv2Router.connect(address0).swapExactTokensForETHSupportingFeeOnTransferTokens(
-            tokensToSell,
-            amountOutMin,
-            [dp.address, await uniswapv2Router.WETH()],
-            address0.address,
-            await lastBlockTime() + 1000,
-            {
+            await dp.connect(address0).approve(uniswapv2Router.address, tokensToSell, {
                 from: address0.address
-            }
-        )
+            });
 
-        const amountsOut1 = await uniswapv2Router.getAmountsOut(tokensToSell, [dp.address, await uniswapv2Router.WETH()])
+            await uniswapv2Router.connect(address0).swapExactTokensForETHSupportingFeeOnTransferTokens(
+                tokensToSell,
+                amountOutMin,
+                [dp.address, await uniswapv2Router.WETH()],
+                address0.address,
+                await lastBlockTime() + 1000,
+                {
+                    from: address0.address
+                }
+            )
 
-        const amountOutMin1 = amountsOut1[1].mul(100 - 10).div(100)
+            const unSyncedPairs = await dp.getOutOfSyncedPairs()
+            const outOfSyncAmount = await dp.getOutOfSyncedAmount(uniswapPair.address)
 
-        await dp.connect(address0).approve(uniswapv2Router.address, tokensToSell, {
-            from: address0.address
-        });
+            expect(unSyncedPairs).to.eql([uniswapPair.address])
+            expect(outOfSyncAmount).to.eql(tokensToSell.mul(95).div(100))
+        }
 
-        const secondSell =  uniswapv2Router.connect(address0).swapExactTokensForETHSupportingFeeOnTransferTokens(
-            tokensToSell,
-            amountOutMin1,
-            [dp.address, await uniswapv2Router.WETH()],
-            address0.address,
-            await lastBlockTime() + 1000,
-            {
+        {
+            const amountsOut = await uniswapv2Router.getAmountsOut(tokensToSell, [dp.address, await uniswapv2Router.WETH()])
+
+            const amountOutMin = amountsOut[1] // no slipage
+
+            await dp.connect(address0).approve(uniswapv2Router.address, tokensToSell, {
                 from: address0.address
-            }
-        )
+            });
 
-        await expect(secondSell).to.be.reverted
-            
+            const unSyncedPairsAfterApprove = await dp.getOutOfSyncedPairs()
+            const outOfSyncAmountAfterApprove = await dp.getOutOfSyncedAmount(uniswapPair.address)
+
+            expect(unSyncedPairsAfterApprove).to.eql([])
+            expect(outOfSyncAmountAfterApprove).to.eql(BigNumber.from(0))
+
+            await uniswapv2Router.connect(address0).swapExactTokensForETHSupportingFeeOnTransferTokens(
+                tokensToSell,
+                amountOutMin,
+                [dp.address, await uniswapv2Router.WETH()],
+                address0.address,
+                await lastBlockTime() + 1000,
+                {
+                    from: address0.address
+                }
+            )
+
+            const unSyncedPairs = await dp.getOutOfSyncedPairs()
+            const outOfSyncAmount = await dp.getOutOfSyncedAmount(uniswapPair.address)
+
+            expect(unSyncedPairs).to.eql([uniswapPair.address])
+            expect(outOfSyncAmount).to.eql(tokensToSell.mul(95).div(100))
+
+        }
+
     });
 
-
-    it("It should let selling token received before 24 hours", async function () {
-        const balanceOfOwnerBefore = await dp.balanceOf(owner.address)
-
-        const tokensToAddLiqidity = BigNumber.from(10000)
-        const ethToAddLiquidity = ethers.utils.parseEther("500")
+    it.only("It should currectly store the unsynced amount of tokens on consecutive sells", async function () {
+        const tokensToAddLiqidity = BigNumber.from(1).mul(decimalPoints)
+        const ethToAddLiquidity = ethers.utils.parseEther("1")
 
         await dp.markNextSellAsLP()
         await dp.approve(uniswapv2Router.address, tokensToAddLiqidity)
@@ -384,51 +341,63 @@ describe("DP", function () {
             }
         )
 
-        const tokensToSell = BigNumber.from(10)
+        const tokensToSell = BigNumber.from(1000)
 
-        await dp.transfer(address0.address, tokensToSell);
+        await dp.transfer(address0.address, tokensToSell.mul(4));
 
-        await setNetworkTimeStamp(hoursToSeconds(24).add(await lastBlockTime()))
-
-        await dp.transfer(address0.address, tokensToSell);
-
-        await dp.connect(address0).approve(uniswapv2Router.address, tokensToSell, {
+        await dp.connect(address0).approve(uniswapv2Router.address, tokensToSell.mul(4), {
             from: address0.address
         });
 
-        const path = [dp.address, await uniswapv2Router.WETH()]
+        console.log(await uniswapPair.getReserves())
 
-        const getTokensOut = await uniswapv2Router.getAmountsOut(tokensToSell, path);
 
-        await uniswapv2Router.connect(address0).swapExactTokensForETHSupportingFeeOnTransferTokens(
-            tokensToSell,
-            getTokensOut[1].div(10),
-            path,
-            address0.address,
-            await lastBlockTime() + 1000,
-            {
-                from: address0.address
-            }
-        )
+        {
+            const amountsOut = await uniswapv2Router.getAmountsOut(tokensToSell, [dp.address, await uniswapv2Router.WETH()])
 
-        await dp.connect(address0).approve(uniswapv2Router.address, tokensToSell, {
-            from: address0.address
-        });
+            const amountOutMin = amountsOut[1] // no slipage
 
-        const secondSell =  uniswapv2Router.connect(address0).swapExactTokensForETHSupportingFeeOnTransferTokens(
-            tokensToSell,
-            0,
-            [dp.address, await uniswapv2Router.WETH()],
-            address0.address,
-            await lastBlockTime() + 1000,
-            {
-                from: address0.address
-            }
-        )
+            await uniswapv2Router.connect(address0).swapExactTokensForETHSupportingFeeOnTransferTokens(
+                tokensToSell,
+                amountOutMin,
+                [dp.address, await uniswapv2Router.WETH()],
+                address0.address,
+                await lastBlockTime() + 1000,
+                {
+                    from: address0.address
+                }
+            )
 
-        await expect(secondSell).to.be.reverted
-            
+            const unSyncedPairs = await dp.getOutOfSyncedPairs()
+            const outOfSyncAmount = await dp.getOutOfSyncedAmount(uniswapPair.address)
+                        
+            expect(unSyncedPairs).to.eql([uniswapPair.address])
+            expect(outOfSyncAmount).to.eql(tokensToSell.mul(95).div(100))
+        }
+
+        {
+            const amountsOut = await uniswapv2Router.getAmountsOut(tokensToSell, [dp.address, await uniswapv2Router.WETH()])
+
+            const amountOutMin = amountsOut[1].mul(100-10).div(100) // 10 % slipage
+
+            await uniswapv2Router.connect(address0).swapExactTokensForETHSupportingFeeOnTransferTokens(
+                tokensToSell,
+                amountOutMin,
+                [dp.address, await uniswapv2Router.WETH()],
+                address0.address,
+                await lastBlockTime() + 1000,
+                {
+                    from: address0.address
+                }
+            )
+
+            const unSyncedPairs = await dp.getOutOfSyncedPairs()
+            const outOfSyncAmount = await dp.getOutOfSyncedAmount(uniswapPair.address)
+
+            expect(unSyncedPairs).to.eql([uniswapPair.address])
+            expect(outOfSyncAmount).to.eql(tokensToSell.mul(95).div(100).mul(2))
+        }
+
     });
-
 
 });

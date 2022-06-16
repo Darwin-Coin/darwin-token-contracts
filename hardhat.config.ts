@@ -79,24 +79,24 @@ const config: HardhatUserConfig = {
         local: {
             url: "http://127.0.0.1:8545",
             accounts: {
-                mnemonic: String(TEST_MNEMONICS),
+                mnemonic: String(process.env.DEPLOYER_MNEMONICS),
                 count: 100,
-                initialIndex: 6
+                initialIndex: 0
             }
         },
         localMainNetFork: {
             url: "http://127.0.0.1:8545",
             accounts: {
-                mnemonic: String(TEST_MNEMONICS),
+                mnemonic: String(process.env.DEPLOYER_MNEMONICS),
                 count: 100,
-                initialIndex: 6
+                initialIndex: 0
             }
         },
 
         localBscTestNetFork: {
             url: "http://127.0.0.1:8545",
             accounts: {
-                mnemonic: String(TEST_MNEMONICS),
+                mnemonic: String(process.env.DEPLOYER_MNEMONICS),
                 count: 100,
                 initialIndex: 6
             }
@@ -109,12 +109,25 @@ const config: HardhatUserConfig = {
                 count:1
             }
         },
+        bscMainNet: {
+            url: "https://bsc-dataseed1.binance.org/",
+            chainId: 56,
+            accounts:{
+                mnemonic: String(process.env.DEPLOYER_MNEMONICS),
+                count:1
+            }
+        },
         hardhat: {
             loggingEnabled: true,
+            // gasMultiplier:1,
+            forking:{
+                enabled:false,
+                url : "https://bsc-dataseed1.binance.org/"
+            },
             accounts: {
-                mnemonic: String(TEST_MNEMONICS),
+                mnemonic: String(process.env.DEPLOYER_MNEMONICS),
                 count: 100,
-                initialIndex: 6
+                initialIndex: 0
             }
         }
     },
