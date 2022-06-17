@@ -11,9 +11,6 @@ import { BigNumber } from "ethers";
 import { send } from "process";
 import { accounts } from "./accounts";
 
-
-
-
 async function main() {
     // Hardhat always runs the compile task when running scripts with its command
     const [owner, address0, address1, ...others] = await hardhat.ethers.getSigners()
@@ -32,7 +29,7 @@ async function main() {
 
     const sendLog = [];
 
-    const dp = DP__factory.connect("0x579135993dA0E126EE3f277009e012FfDfd710c6", owner)
+    const dp = DP__factory.connect("0x2C972481F047361fdef2543a8CF59Eff36415579", owner)
 
     for (const account of addresses) {
 

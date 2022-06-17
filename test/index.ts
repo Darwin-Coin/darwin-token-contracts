@@ -349,9 +349,6 @@ describe("DP", function () {
             from: address0.address
         });
 
-        console.log(await uniswapPair.getReserves())
-
-
         {
             const amountsOut = await uniswapv2Router.getAmountsOut(tokensToSell, [dp.address, await uniswapv2Router.WETH()])
 
@@ -370,7 +367,7 @@ describe("DP", function () {
 
             const unSyncedPairs = await dp.getOutOfSyncedPairs()
             const outOfSyncAmount = await dp.getOutOfSyncedAmount(uniswapPair.address)
-                        
+
             expect(unSyncedPairs).to.eql([uniswapPair.address])
             expect(outOfSyncAmount).to.eql(tokensToSell.mul(95).div(100))
         }
@@ -378,7 +375,7 @@ describe("DP", function () {
         {
             const amountsOut = await uniswapv2Router.getAmountsOut(tokensToSell, [dp.address, await uniswapv2Router.WETH()])
 
-            const amountOutMin = amountsOut[1].mul(100-10).div(100) // 10 % slipage
+            const amountOutMin = amountsOut[1].mul(100 - 10).div(100) // 10 % slipage
 
             await uniswapv2Router.connect(address0).swapExactTokensForETHSupportingFeeOnTransferTokens(
                 tokensToSell,
@@ -396,6 +393,42 @@ describe("DP", function () {
 
             expect(unSyncedPairs).to.eql([uniswapPair.address])
             expect(outOfSyncAmount).to.eql(tokensToSell.mul(95).div(100).mul(2))
+        }
+
+        {
+            const amountsOut = await uniswapv2Router.getAmountsOut(ethers.utils.parseEther("0.5"), [await uniswapv2Router.WETH(), dp.address])
+
+            const amountOutMin = amountsOut[1].mul(100 - 10).div(100) // 10 % slipage
+
+            console.log(amountOutMin)
+
+            await uniswapv2Router.connect(address0).swapExactETHForTokensSupportingFeeOnTransferTokens(
+                amountOutMin,
+                [await uniswapv2Router.WETH(), dp.address],
+                address0.address,
+                await lastBlockTime() + 1000,
+                {
+                    from: address0.address,
+                    value: ethers.utils.parseEther("0.5")
+                }
+            )
+
+            const unSyncedPairs = await dp.getOutOfSyncedPairs()
+            const outOfSyncAmount = await dp.getOutOfSyncedAmount(uniswapPair.address)
+
+            expect(unSyncedPairs).to.eql([uniswapPair.address])
+            expect(outOfSyncAmount).to.eql(tokensToSell.mul(95).div(100).mul(2))
+        }
+
+        {
+
+            await dp.transfer(address0.address, tokensToSell);
+
+            const unSyncedPairs = await dp.getOutOfSyncedPairs()
+            const outOfSyncAmount = await dp.getOutOfSyncedAmount(uniswapPair.address)
+
+            expect(unSyncedPairs).to.eql([])
+            expect(outOfSyncAmount).to.eql(BigNumber.from(0))
         }
 
     });
