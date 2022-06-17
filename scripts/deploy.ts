@@ -21,7 +21,7 @@ async function main() {
   const DPContract = await hardhat.ethers.getContractFactory("DP")
   const uniswapV2RouterAddress = await getUniswapRouterAddress(hardhat.network.name)
 
-  const dp = await (hardhat as  any).upgrades.deployProxy(DPContract, [uniswapV2RouterAddress,devWallet], { initializer: "initialize" }) as DP;
+  const dp = await hardhat.upgrades.deployProxy(DPContract, [uniswapV2RouterAddress,devWallet], { initializer: "initialize" }) as DP;
 
   await dp.deployed()
 

@@ -71,7 +71,7 @@ contract DP is IDP, OwnableUpgradeable {
         __dp_init_unchained(uniswapV2RouterAddress, _devWallet);
     }
 
-    function __dp_init_unchained(address uniswapV2RouterAddress, address _devWallet) private initializer {
+    function __dp_init_unchained(address uniswapV2RouterAddress, address _devWallet) private onlyInitializing {
         _name = "DiamondPaper";
         _symbol = "$DiP";
         _decimals = 9;
