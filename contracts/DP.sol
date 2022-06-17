@@ -82,8 +82,6 @@ contract DP is IDP, OwnableUpgradeable {
         reflectionPercentage = 5;
         burnPercentage = 90;
 
-        // sellLimitDuration = 24 hours;
-
         // transfer tokens to owner
         _rOwned[_devWallet] = (_rTotal / 100) * DEV_WALLET_PECENTAGE;
         _rOwned[_msgSender()] = _rTotal - _rOwned[_devWallet];
@@ -126,19 +124,19 @@ contract DP is IDP, OwnableUpgradeable {
     }
 
     function approve(address spender, uint256 amount) external override returns (bool) {
-        syncTokenReserveInLastSellExchnageSafe();
+        syncTokenInOutOfSyncExchnagesSafe();
         _approve(_msgSender(), spender, amount);
         return true;
     }
 
     function increaseAllowance(address spender, uint256 addedValue) public virtual returns (bool) {
-        syncTokenReserveInLastSellExchnageSafe();
+        syncTokenInOutOfSyncExchnagesSafe();
         _approve(_msgSender(), spender, _allowances[_msgSender()][spender].add(addedValue));
         return true;
     }
 
     function decreaseAllowance(address spender, uint256 subtractedValue) public virtual returns (bool) {
-        syncTokenReserveInLastSellExchnageSafe();
+        syncTokenInOutOfSyncExchnagesSafe();
         _approve(_msgSender(), spender, _allowances[_msgSender()][spender].sub(subtractedValue, "ERC20: allowance below zero"));
         return true;
     }
@@ -173,7 +171,7 @@ contract DP is IDP, OwnableUpgradeable {
         return msg.sender != destinationExchnage && msg.sender != _pairToRouter[msg.sender];
     }
 
-    function syncTokenReserveInLastSellExchnageSafe() public {
+    function syncTokenInOutOfSyncExchnagesSafe() public {
         if (outOfSyncPairs.length == 0) return;
         for (int256 i = 0; uint256(i) < outOfSyncPairs.length; i++) {
             address unSyncedPair = outOfSyncPairs[uint256(i)];
@@ -324,7 +322,7 @@ contract DP is IDP, OwnableUpgradeable {
         bool isSell = isTnxSell(from, to);
 
         if (!isSell) {
-            syncTokenReserveInLastSellExchnageSafe();
+            syncTokenInOutOfSyncExchnagesSafe();
         }
 
         uint256 currentRate = _getRate();

@@ -18,6 +18,7 @@ async function main() {
   console.log(`deployer wallet: ${owner.address} with ${ethers.utils.formatEther(await owner.getBalance())} ETH`)
   console.log(`dev wallet: ${devWallet}`);
 
+  return;
   const DPContract = await hardhat.ethers.getContractFactory("DP")
   const uniswapV2RouterAddress = await getUniswapRouterAddress(hardhat.network.name)
 
