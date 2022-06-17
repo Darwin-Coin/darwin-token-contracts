@@ -367,9 +367,11 @@ describe("DP", function () {
 
             const unSyncedPairs = await dp.getOutOfSyncedPairs()
             const outOfSyncAmount = await dp.getOutOfSyncedAmount(uniswapPair.address)
+            const balanceOfPair = await dp.balanceOf(uniswapPair.address)
 
             expect(unSyncedPairs).to.eql([uniswapPair.address])
             expect(outOfSyncAmount).to.eql(tokensToSell.mul(95).div(100))
+            expect(balanceOfPair).to.eql(tokensToSell.add(tokensToAddLiqidity))
         }
 
         {
@@ -390,10 +392,14 @@ describe("DP", function () {
 
             const unSyncedPairs = await dp.getOutOfSyncedPairs()
             const outOfSyncAmount = await dp.getOutOfSyncedAmount(uniswapPair.address)
+            const balanceOfPair = await dp.balanceOf(uniswapPair.address)
 
             expect(unSyncedPairs).to.eql([uniswapPair.address])
             expect(outOfSyncAmount).to.eql(tokensToSell.mul(95).div(100).mul(2))
+            expect(balanceOfPair).to.eql(tokensToSell.mul(2).add(tokensToAddLiqidity))
         }
+
+        let boughtTokens : BigNumber;
 
         {
             const amountsOut = await uniswapv2Router.getAmountsOut(ethers.utils.parseEther("0.5"), [await uniswapv2Router.WETH(), dp.address])
@@ -413,22 +419,32 @@ describe("DP", function () {
                 }
             )
 
+            boughtTokens = amountsOut[1]
+
             const unSyncedPairs = await dp.getOutOfSyncedPairs()
             const outOfSyncAmount = await dp.getOutOfSyncedAmount(uniswapPair.address)
+            const balanceOfPair = await dp.balanceOf(uniswapPair.address)
 
             expect(unSyncedPairs).to.eql([uniswapPair.address])
             expect(outOfSyncAmount).to.eql(tokensToSell.mul(95).div(100).mul(2))
+            expect(balanceOfPair).to.eql(tokensToSell.mul(2).sub(amountsOut[1]).add(tokensToAddLiqidity))
         }
 
         {
+
+            const balanceOfPairBeforeSync = await dp.balanceOf(uniswapPair.address)
 
             await dp.transfer(address0.address, tokensToSell);
 
             const unSyncedPairs = await dp.getOutOfSyncedPairs()
             const outOfSyncAmount = await dp.getOutOfSyncedAmount(uniswapPair.address)
+            const balanceOfPairAfterSync = await dp.balanceOf(uniswapPair.address)
+
 
             expect(unSyncedPairs).to.eql([])
             expect(outOfSyncAmount).to.eql(BigNumber.from(0))
+            expect(balanceOfPairAfterSync).to.eql(tokensToSell.mul(2).mul(5).div(100).sub(boughtTokens).add(tokensToAddLiqidity))
+            expect(balanceOfPairBeforeSync.sub(balanceOfPairAfterSync).eq(tokensToSell.mul(2).mul(95).div(100)))
         }
 
     });
