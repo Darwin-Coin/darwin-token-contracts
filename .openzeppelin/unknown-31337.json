@@ -2,7 +2,7 @@
   "manifestVersion": "3.2",
   "admin": {
     "address": "0x45297bf36Fe361d3F8725a6f3B7f09649F7Dc792",
-    "txHash": "0x2e5cfdfea09f7ba9a1b43a1bdb65df65b71d04dea8baa25a0546121c9dabc90a"
+    "txHash": "0x92d33c80a77064c56ecc7ac33ee87f838283f4d225fc3c87a2c8c4ff80300cdb"
   },
   "proxies": [
     {
@@ -67,7 +67,42 @@
     },
     {
       "address": "0xEaE023Dc0Acd05975828B9E01D82Fc2ADDe0271F",
-      "txHash": "0x8bf4597712f421f556f4d2635e8f9307b469a8df0a9c0c4e5bd5afdb8ca785b7",
+      "txHash": "0x6b18b3c7a53e53ca8eca0a38b723c997ff7954fc3aa0b0ae4d99afa7f0a6b4da",
+      "kind": "transparent"
+    },
+    {
+      "address": "0x9E72df797ed8420028Ce52A1a898AE92C213A3EF",
+      "txHash": "0x4d5dea724ab558a82e5860c95ddce5fbb81a8b099bc9641d4882dbcd8076f8fc",
+      "kind": "transparent"
+    },
+    {
+      "address": "0x66E873366E493C17B65d8Df3ebE4Da515e36e013",
+      "txHash": "0x40ed5b4505bc7af1cf16bfe6ed9e1394c9b07272c3097561a1026b9bc5ced3f4",
+      "kind": "transparent"
+    },
+    {
+      "address": "0x61a2A0160361ad1a03C2Bab1BaDB8978E3530Ce6",
+      "txHash": "0xb0def50342dce5d121b7620f0560e726c98d5ee5b61bb7724f7fdcea74735e7e",
+      "kind": "transparent"
+    },
+    {
+      "address": "0x07af1ad17190B6715D2790dF39F75c62d8588c6d",
+      "txHash": "0xf8d9332756b519c7540621e9e8d2d983bcdcbc24e924c0b00d7ab47fa0df0df2",
+      "kind": "transparent"
+    },
+    {
+      "address": "0xA5CCE19f1B0FDDaCcEddB7c45D8c953dEcE9F970",
+      "txHash": "0xab024c189ebc81ed73f4278cab7d7e1b11b5dc3df40a8c25892dea8dc3b21af7",
+      "kind": "transparent"
+    },
+    {
+      "address": "0xc66D07B64DE03b7301bC4eF55846283595Cff602",
+      "txHash": "0xd79cb0e161afa82a1f2cd08d974e992e52b00c6eb18df6dc774ad8f715bd9162",
+      "kind": "transparent"
+    },
+    {
+      "address": "0xb5490644C87b04950f59d9da9F2a148E16a8F9f1",
+      "txHash": "0x99ffb9c64bc0cd09c15062afc434c05e689e9d1885bbd6adbb8b84082f2b2c94",
       "kind": "transparent"
     }
   ],
@@ -686,9 +721,9 @@
         }
       }
     },
-    "642dab91df05e05f47f118b443e9820647aff18f0bd4fe5d2f322bb0000cbd27": {
+    "f55487f2cd9c261991d6d5030c9c777e01b59d46966c68ba55e694e3d39c2c72": {
       "address": "0x6810fD465DA51C947BB82fC128cB2BD23c51736c",
-      "txHash": "0x3d1cd2397b338146ebac4abd7fc1c640d7a45b0a744688559b808535dd2241b2",
+      "txHash": "0x444123ece9f163ba497331f27f3ccd823857f336b612a3d82b1a6e2d7add750f",
       "layout": {
         "storage": [
           {
@@ -738,7 +773,7 @@
             "slot": "101",
             "type": "t_string_storage",
             "contract": "DP",
-            "src": "contracts/DP.sol:35"
+            "src": "contracts/DP.sol:34"
           },
           {
             "label": "_symbol",
@@ -746,7 +781,7 @@
             "slot": "102",
             "type": "t_string_storage",
             "contract": "DP",
-            "src": "contracts/DP.sol:36"
+            "src": "contracts/DP.sol:35"
           },
           {
             "label": "_decimals",
@@ -754,7 +789,7 @@
             "slot": "103",
             "type": "t_uint256",
             "contract": "DP",
-            "src": "contracts/DP.sol:37"
+            "src": "contracts/DP.sol:36"
           },
           {
             "label": "_tTotal",
@@ -762,7 +797,7 @@
             "slot": "104",
             "type": "t_uint256",
             "contract": "DP",
-            "src": "contracts/DP.sol:38"
+            "src": "contracts/DP.sol:37"
           },
           {
             "label": "_rTotal",
@@ -770,7 +805,7 @@
             "slot": "105",
             "type": "t_uint256",
             "contract": "DP",
-            "src": "contracts/DP.sol:39"
+            "src": "contracts/DP.sol:38"
           },
           {
             "label": "_tOwned",
@@ -778,7 +813,7 @@
             "slot": "106",
             "type": "t_mapping(t_address,t_uint256)",
             "contract": "DP",
-            "src": "contracts/DP.sol:41"
+            "src": "contracts/DP.sol:40"
           },
           {
             "label": "_rOwned",
@@ -786,7 +821,7 @@
             "slot": "107",
             "type": "t_mapping(t_address,t_uint256)",
             "contract": "DP",
-            "src": "contracts/DP.sol:42"
+            "src": "contracts/DP.sol:41"
           },
           {
             "label": "_isExcludedFromReflection",
@@ -794,7 +829,7 @@
             "slot": "108",
             "type": "t_mapping(t_address,t_bool)",
             "contract": "DP",
-            "src": "contracts/DP.sol:44"
+            "src": "contracts/DP.sol:43"
           },
           {
             "label": "_excludedFromReflection",
@@ -802,7 +837,7 @@
             "slot": "109",
             "type": "t_array(t_address)dyn_storage",
             "contract": "DP",
-            "src": "contracts/DP.sol:45"
+            "src": "contracts/DP.sol:44"
           },
           {
             "label": "_isPairAddress",
@@ -810,7 +845,7 @@
             "slot": "110",
             "type": "t_mapping(t_address,t_bool)",
             "contract": "DP",
-            "src": "contracts/DP.sol:47"
+            "src": "contracts/DP.sol:46"
           },
           {
             "label": "_isExchnageRouterAddress",
@@ -818,7 +853,7 @@
             "slot": "111",
             "type": "t_mapping(t_address,t_bool)",
             "contract": "DP",
-            "src": "contracts/DP.sol:48"
+            "src": "contracts/DP.sol:47"
           },
           {
             "label": "_pairToRouter",
@@ -826,7 +861,7 @@
             "slot": "112",
             "type": "t_mapping(t_address,t_address)",
             "contract": "DP",
-            "src": "contracts/DP.sol:49"
+            "src": "contracts/DP.sol:48"
           },
           {
             "label": "_allowances",
@@ -834,7 +869,7 @@
             "slot": "113",
             "type": "t_mapping(t_address,t_mapping(t_address,t_uint256))",
             "contract": "DP",
-            "src": "contracts/DP.sol:51"
+            "src": "contracts/DP.sol:50"
           },
           {
             "label": "_nextSellIsLP",
@@ -842,7 +877,7 @@
             "slot": "114",
             "type": "t_mapping(t_address,t_bool)",
             "contract": "DP",
-            "src": "contracts/DP.sol:52"
+            "src": "contracts/DP.sol:51"
           },
           {
             "label": "_tokenReceivedInLastLimitPeriod",
@@ -850,7 +885,7 @@
             "slot": "115",
             "type": "t_mapping(t_address,t_mapping(t_uint256,t_uint256))",
             "contract": "DP",
-            "src": "contracts/DP.sol:53"
+            "src": "contracts/DP.sol:52"
           },
           {
             "label": "_pairUnsyncAmount",
@@ -858,7 +893,7 @@
             "slot": "116",
             "type": "t_mapping(t_address,t_uint256)",
             "contract": "DP",
-            "src": "contracts/DP.sol:55"
+            "src": "contracts/DP.sol:54"
           },
           {
             "label": "outOfSyncPairs",
@@ -866,7 +901,7 @@
             "slot": "117",
             "type": "t_array(t_address)dyn_storage",
             "contract": "DP",
-            "src": "contracts/DP.sol:56"
+            "src": "contracts/DP.sol:55"
           },
           {
             "label": "reflectionPercentage",
@@ -874,7 +909,7 @@
             "slot": "118",
             "type": "t_uint256",
             "contract": "DP",
-            "src": "contracts/DP.sol:58"
+            "src": "contracts/DP.sol:57"
           },
           {
             "label": "burnPercentage",
@@ -882,7 +917,7 @@
             "slot": "119",
             "type": "t_uint256",
             "contract": "DP",
-            "src": "contracts/DP.sol:59"
+            "src": "contracts/DP.sol:58"
           },
           {
             "label": "tReflectionTotal",
@@ -890,7 +925,7 @@
             "slot": "120",
             "type": "t_uint256",
             "contract": "DP",
-            "src": "contracts/DP.sol:61"
+            "src": "contracts/DP.sol:60"
           },
           {
             "label": "tBurnTotal",
@@ -898,7 +933,7 @@
             "slot": "121",
             "type": "t_uint256",
             "contract": "DP",
-            "src": "contracts/DP.sol:62"
+            "src": "contracts/DP.sol:61"
           },
           {
             "label": "burnAddress",
@@ -906,23 +941,23 @@
             "slot": "122",
             "type": "t_address",
             "contract": "DP",
-            "src": "contracts/DP.sol:64"
+            "src": "contracts/DP.sol:63"
           },
           {
             "label": "uniswapV2Router",
             "offset": 0,
             "slot": "123",
-            "type": "t_contract(IUniswapV2Router02)3696",
+            "type": "t_contract(IUniswapV2Router02)3695",
             "contract": "DP",
-            "src": "contracts/DP.sol:66"
+            "src": "contracts/DP.sol:65"
           },
           {
             "label": "uniswapV2Pair",
             "offset": 0,
             "slot": "124",
-            "type": "t_contract(IUniswapV2Pair)3303",
+            "type": "t_contract(IUniswapV2Pair)3302",
             "contract": "DP",
-            "src": "contracts/DP.sol:67"
+            "src": "contracts/DP.sol:66"
           }
         ],
         "types": {
@@ -946,11 +981,11 @@
             "label": "bool",
             "numberOfBytes": "1"
           },
-          "t_contract(IUniswapV2Pair)3303": {
+          "t_contract(IUniswapV2Pair)3302": {
             "label": "contract IUniswapV2Pair",
             "numberOfBytes": "20"
           },
-          "t_contract(IUniswapV2Router02)3696": {
+          "t_contract(IUniswapV2Router02)3695": {
             "label": "contract IUniswapV2Router02",
             "numberOfBytes": "20"
           },

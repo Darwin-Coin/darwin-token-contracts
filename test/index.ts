@@ -322,7 +322,7 @@ describe("DP", function () {
 
     });
 
-    it.only("It should currectly store the unsynced amount of tokens on consecutive sells", async function () {
+    it("It should currectly store the unsynced amount of tokens on consecutive sells", async function () {
         const tokensToAddLiqidity = BigNumber.from(1).mul(decimalPoints)
         const ethToAddLiquidity = ethers.utils.parseEther("1")
 

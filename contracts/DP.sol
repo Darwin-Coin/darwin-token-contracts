@@ -3,7 +3,6 @@ pragma solidity ^0.8.0;
 // SPDX-License-Identifier: Unlicensed
 
 import "@openzeppelin/contracts-upgradeable/interfaces/IERC20Upgradeable.sol";
-import "hardhat/console.sol";
 import "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
 import "@openzeppelin/contracts-upgradeable/utils/ContextUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
@@ -53,7 +52,7 @@ contract DP is IDP, OwnableUpgradeable {
     mapping(address => mapping(uint256 => uint256)) private _tokenReceivedInLastLimitPeriod;
 
     mapping(address => uint256) private _pairUnsyncAmount;
-    address[] public outOfSyncPairs;
+    address[] private outOfSyncPairs;
 
     uint256 public reflectionPercentage;
     uint256 public burnPercentage;
@@ -95,9 +94,6 @@ contract DP is IDP, OwnableUpgradeable {
 
         // Create a uniswap pair for this new token
         uniswapV2Pair = IUniswapV2Pair(IUniswapV2Factory(uniswapV2Router.factory()).createPair(address(this), uniswapV2Router.WETH()));
-
-        // exclude wallets from sell limit
-        // _isExcludedFromSellLimit[_msgSender()] = true;
 
         // add exchange wallets
         registerPair(uniswapV2RouterAddress, address(uniswapV2Pair));
@@ -291,12 +287,12 @@ contract DP is IDP, OwnableUpgradeable {
     }
 
     function unRegisterPair(address pairAddress) public onlyOwner {
-        require(_isPairAddress[pairAddress], "DiP::unRegisterPair: not found");
+        require(_isPairAddress[pairAddress], "DiP::unRegisterPair: pair not found");
 
         _isPairAddress[pairAddress] = false;
         _pairToRouter[pairAddress] = address(0);
 
-        excludeFromReflectionSafe(pairAddress);
+        includeInReflectionSafe(pairAddress);
 
         emit ExchangedRemoved(pairAddress);
     }
