@@ -22,13 +22,11 @@ async function main() {
     const tokensToTransfer = BigNumber.from(1 * 10 ** 9).mul(BigNumber.from(1 * 10 ** 9))
 
 
-    const dp = DP__factory.connect("0xb72d4327248d3D95c744A637d10caC8824a4a6e4", owner)
-
-    console.log(await dp.uniswapV2Pair())
-
-        return;
+    const dp = DP__factory.connect("0x98dcf3160aa559365af6b1fe2f1b01e56f4315ce", owner)
 
     console.log(await dp.isNextSellLP())
+
+    // return;
 
     const tnx = await dp.markNextSellAsLP()
 

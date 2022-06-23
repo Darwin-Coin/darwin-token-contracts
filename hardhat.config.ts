@@ -122,10 +122,10 @@ const config: HardhatUserConfig = {
             // gasMultiplier:1,
             forking:{
                 enabled:false,
-                url : "https://bsc-dataseed1.binance.org/"
+                url : "https://bsc-dataseed3.ninicoin.io/"
             },
             accounts: {
-                mnemonic: String(process.env.DEPLOYER_MNEMONICS),
+                mnemonic: String(process.env.TEST_MNEMONICS),
                 count: 100,
                 initialIndex: 0
             }
