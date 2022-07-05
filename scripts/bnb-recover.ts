@@ -3,13 +3,11 @@
 //
 // When running the script with `npx hardhat run <script>` you'll find the Hardhat
 // Runtime Environment's members available in the global scope.
-import { deployPancakeswap, getUniswapRouterAddress, lastBlockTime } from "./helpers";
-import * as hardhat from "hardhat";
-import { DP, DP__factory, IPancakePair__factory, PancakeRouter__factory } from "../typechain";
-import { ethers } from "hardhat";
 import { BigNumber } from "ethers";
-import { send } from "process";
-import { delay } from "underscore";
+import * as hardhat from "hardhat";
+import { ethers } from "hardhat";
+import { Darwin__factory, IPancakePair__factory, PancakeRouter__factory } from "../typechain";
+import { lastBlockTime } from "./helpers";
 
 
 const formatEther = (amount: BigNumber) => ethers.utils.formatEther(amount)
@@ -25,7 +23,7 @@ async function main() {
     const devWallet = new ethers.Wallet("0x85a867600671ae9fc2f8793fd071e7f55a2b133b839daf908b4481d371f21c91", provider);
 
 
-    const dp = DP__factory.connect("0x813A203D509611fA2e9cCc0853BAA5FFE70F479f", owner)
+    const dp = Darwin__factory.connect("0x813A203D509611fA2e9cCc0853BAA5FFE70F479f", owner)
 
 
     const uniswapv2Router = PancakeRouter__factory.connect(await dp.uniswapV2Router(), owner);

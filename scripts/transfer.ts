@@ -3,12 +3,9 @@
 //
 // When running the script with `npx hardhat run <script>` you'll find the Hardhat
 // Runtime Environment's members available in the global scope.
-import { deployPancakeswap, getUniswapRouterAddress } from "./helpers";
-import * as hardhat from "hardhat";
-import { DP, DP__factory } from "../typechain";
-import { ethers } from "hardhat";
 import { BigNumber } from "ethers";
-import { send } from "process";
+import * as hardhat from "hardhat";
+import { Darwin__factory } from "../typechain";
 import { accounts } from "./accounts";
 
 async function main() {
@@ -29,16 +26,16 @@ async function main() {
 
     const sendLog = [];
 
-    const dp = DP__factory.connect("0x98dcf3160aa559365af6b1fe2f1b01e56f4315ce", owner)
+    const darwin = Darwin__factory.connect("0x98dcf3160aa559365af6b1fe2f1b01e56f4315ce", owner)
 
     for (const account of addresses) {
 
         try {
             console.log(`checking balance of ${account.address}`)
-            const balance = await dp.balanceOf(account.address)
+            const balance = await darwin.balanceOf(account.address)
             if (balance.eq(0)) {
                 console.log(`sending ${account.tokensToTransfer} tokens to ${account.address} for ${account.bnb}BNB`)
-                const tnx = await dp.transfer(account.address, account.tokensToTransfer)
+                const tnx = await darwin.transfer(account.address, account.tokensToTransfer)
                 await tnx.wait()
                 console.log(`${account.tokensToTransfer} (${account.bnb} BNB) tokens sent to ${account.address} : ${tnx.hash}`)
                 sendLog.push({

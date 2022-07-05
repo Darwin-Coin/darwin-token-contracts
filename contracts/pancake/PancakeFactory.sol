@@ -1,5 +1,7 @@
 pragma solidity 0.5.16;
 
+// SPDX-License-Identifier: Unlicensed
+
 
 interface IPancakeFactory {
     event PairCreated(address indexed token0, address indexed token1, address pair, uint256);

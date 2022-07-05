@@ -1,21 +1,19 @@
 import { SignerWithAddress } from "@nomiclabs/hardhat-ethers/signers";
+import { expect } from "chai";
 import { BigNumber } from "ethers";
 import { ethers } from "hardhat";
 import { hoursToSeconds, lastBlockTime, setNetworkTimeStamp } from "../scripts/helpers";
-import { DP, IUniswapV2Factory__factory, IUniswapV2Pair, IUniswapV2Pair__factory, IUniswapV2Router02, IUniswapV2Router02__factory } from "../typechain";
+import { Darwin, IUniswapV2Pair, IUniswapV2Router02 } from "../typechain";
 import { IPancakePair__factory } from "../typechain/factories/IPancakePair__factory";
-import { IPancakeRouter02__factory } from "../typechain/factories/IPancakeRouter02__factory";
 import { PancakeRouter__factory } from "../typechain/factories/PancakeRouter__factory";
-import { PancakeRouter } from "../typechain/PancakeRouter";
 import { deploy } from "./utils";
-import { expect } from "chai";
 
 
 const decimalPoints = BigNumber.from((10 ** 9))
 
-describe("DP", function () {
+describe("Darwin", function () {
 
-    let dp: DP
+    let dp: Darwin
     let uniswapv2Router: IUniswapV2Router02
     let uniswapPair: IUniswapV2Pair
 

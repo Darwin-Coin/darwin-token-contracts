@@ -4,8 +4,7 @@ pragma solidity ^0.8.0;
 
 import "@openzeppelin/contracts-upgradeable/interfaces/IERC20Upgradeable.sol";
 
-interface IDP is IERC20Upgradeable{
-
+interface IDarwin is IERC20Upgradeable {
     event ExchangeAdded(address account);
     event ExchangedRemoved(address account);
 
@@ -14,5 +13,4 @@ interface IDP is IERC20Upgradeable{
 
     event ExcludedFromReflection(address account, bool isExcluded);
     event ExcludedFromSellLimit(address account, bool isExcluded);
-    
 }

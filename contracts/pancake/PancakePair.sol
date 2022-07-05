@@ -1,5 +1,7 @@
 pragma solidity 0.5.16;
 
+// SPDX-License-Identifier: Unlicensed
+
 import "hardhat/console.sol";
 
 interface IPancakePair {
@@ -46,7 +48,14 @@ interface IPancakePair {
 
     event Mint(address indexed sender, uint256 amount0, uint256 amount1);
     event Burn(address indexed sender, uint256 amount0, uint256 amount1, address indexed to);
-    event Swap(address indexed sender, uint256 amount0In, uint256 amount1In, uint256 amount0Out, uint256 amount1Out, address indexed to);
+    event Swap(
+        address indexed sender,
+        uint256 amount0In,
+        uint256 amount1In,
+        uint256 amount0Out,
+        uint256 amount1Out,
+        address indexed to
+    );
     event Sync(uint112 reserve0, uint112 reserve1);
 
     function MINIMUM_LIQUIDITY() external pure returns (uint256);
@@ -246,7 +255,11 @@ contract PancakeERC20 is IPancakeERC20 {
     ) external {
         require(deadline >= block.timestamp, "Pancake: EXPIRED");
         bytes32 digest = keccak256(
-            abi.encodePacked("\x19\x01", DOMAIN_SEPARATOR, keccak256(abi.encode(PERMIT_TYPEHASH, owner, spender, value, nonces[owner]++, deadline)))
+            abi.encodePacked(
+                "\x19\x01",
+                DOMAIN_SEPARATOR,
+                keccak256(abi.encode(PERMIT_TYPEHASH, owner, spender, value, nonces[owner]++, deadline))
+            )
         );
         address recoveredAddress = ecrecover(digest, v, r, s);
         require(recoveredAddress != address(0) && recoveredAddress == owner, "Pancake: INVALID_SIGNATURE");
@@ -400,7 +413,14 @@ contract PancakePair is IPancakePair, PancakeERC20 {
 
     event Mint(address indexed sender, uint256 amount0, uint256 amount1);
     event Burn(address indexed sender, uint256 amount0, uint256 amount1, address indexed to);
-    event Swap(address indexed sender, uint256 amount0In, uint256 amount1In, uint256 amount0Out, uint256 amount1Out, address indexed to);
+    event Swap(
+        address indexed sender,
+        uint256 amount0In,
+        uint256 amount1In,
+        uint256 amount0Out,
+        uint256 amount1Out,
+        address indexed to
+    );
     event Sync(uint112 reserve0, uint112 reserve1);
 
     constructor() public {
@@ -537,8 +557,10 @@ contract PancakePair is IPancakePair, PancakeERC20 {
             uint256 balance0Adjusted = balance0.mul(1000).sub(amount0In.mul(2));
             uint256 balance1Adjusted = balance1.mul(1000).sub(amount1In.mul(2));
 
-            
-            require(balance0Adjusted.mul(balance1Adjusted) >= uint256(_reserve0).mul(_reserve1).mul(1000**2), "Pancake: K");
+            require(
+                balance0Adjusted.mul(balance1Adjusted) >= uint256(_reserve0).mul(_reserve1).mul(1000**2),
+                "Pancake: K"
+            );
         }
 
         _update(balance0, balance1, _reserve0, _reserve1);

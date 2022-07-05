@@ -5,12 +5,10 @@
 // Runtime Environment's members available in the global scope.
 // import { ethers, upgrades } = require("hardhat"); // from "hardhat";
 
-import { HardhatUpgrades } from "@openzeppelin/hardhat-upgrades"
-import { ethers, upgrades } from "hardhat";
-import hardhat from "hardhat"
-import { getUniswapRouterAddress } from "./helpers";
 import { BigNumber } from "ethers";
-import { DP } from "../typechain";
+import hardhat, { ethers } from "hardhat";
+import { Darwin } from "../typechain";
+import { getUniswapRouterAddress } from "./helpers";
 
 const weiInGewi = BigNumber.from(1 * 10 ** 9)
 const usdInBNB = 223.91;
@@ -25,13 +23,13 @@ async function main() {
   console.log(`owner: ${owner.address} with ${ethers.utils.formatEther(await owner.getBalance())} ETH`)
   console.log(`dev wallet: ${devWallet}`);
 
-  const DPContract = await hardhat.ethers.getContractFactory("DP")
+  const DPContract = await hardhat.ethers.getContractFactory("Darwin")
   const uniswapV2RouterAddress = await getUniswapRouterAddress(hardhat.network.name)
 
-  const dp = await (hardhat as  any).upgrades.deployProxy(DPContract, [uniswapV2RouterAddress,devWallet], { initializer: "initialize" }) as DP;
+  const dp = await (hardhat as  any).upgrades.deployProxy(DPContract, [uniswapV2RouterAddress,devWallet], { initializer: "initialize" }) as Darwin;
 
 
-    console.log(`DP deployed at:${dp.address} by ${owner.address}`)
+    console.log(`Darwin deployed at:${dp.address} by ${owner.address}`)
 
     let amount = BigNumber.from(10000 * 10 ** 9)
 

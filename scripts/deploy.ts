@@ -3,10 +3,10 @@
 //
 // When running the script with `npx hardhat run <script>` you'll find the Hardhat
 // Runtime Environment's members available in the global scope.
-import { deployPancakeswap, getUniswapRouterAddress } from "./helpers";
 import * as hardhat from "hardhat";
-import { DP } from "../typechain";
 import { ethers } from "hardhat";
+import { Darwin } from "../typechain";
+import { getUniswapRouterAddress } from "./helpers";
 
 
 async function main() {
@@ -18,14 +18,14 @@ async function main() {
   console.log(`deployer wallet: ${owner.address} with ${ethers.utils.formatEther(await owner.getBalance())} ETH`)
   console.log(`dev wallet: ${devWallet}`);
 
-  const DPContract = await hardhat.ethers.getContractFactory("DP")
+  const DarwinContract = await hardhat.ethers.getContractFactory("Darwin")
   const uniswapV2RouterAddress = await getUniswapRouterAddress(hardhat.network.name)
 
-  const dp = await hardhat.upgrades.deployProxy(DPContract, [uniswapV2RouterAddress,devWallet], { initializer: "initialize" }) as DP;
+  const dp = await hardhat.upgrades.deployProxy(DarwinContract, [uniswapV2RouterAddress,devWallet], { initializer: "initialize" }) as Darwin;
 
   await dp.deployed()
 
-  console.log(`DP deployed at: ${dp.address} by ${owner.address}`)
+  console.log(`Darwin deployed at: ${dp.address} by ${owner.address}`)
 }
 
 // We recommend this pattern to be able to use async/await everywhere

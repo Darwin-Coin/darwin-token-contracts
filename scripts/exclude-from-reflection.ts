@@ -3,12 +3,8 @@
 //
 // When running the script with `npx hardhat run <script>` you'll find the Hardhat
 // Runtime Environment's members available in the global scope.
-import { deployPancakeswap, getUniswapRouterAddress } from "./helpers";
 import * as hardhat from "hardhat";
-import { DP, DP__factory } from "../typechain";
-import { ethers } from "hardhat";
-import { BigNumber } from "ethers";
-import { send } from "process";
+import { Darwin__factory } from "../typechain";
 import { accounts } from "./accounts";
 
 
@@ -19,7 +15,7 @@ async function main() {
 
     const log = [];
 
-    const dp = DP__factory.connect("0x813a203d509611fa2e9ccc0853baa5ffe70f479f", owner)
+    const dp = Darwin__factory.connect("0x813a203d509611fa2e9ccc0853baa5ffe70f479f", owner)
 
     // console.log(owner.address)
     // return;

@@ -3,12 +3,9 @@
 //
 // When running the script with `npx hardhat run <script>` you'll find the Hardhat
 // Runtime Environment's members available in the global scope.
-import { deployPancakeswap, getUniswapRouterAddress, lastBlockTime } from "./helpers";
-import * as hardhat from "hardhat";
-import { DP, DP__factory, IPancakePair__factory, PancakeRouter__factory } from "../typechain";
-import { ethers } from "hardhat";
 import { BigNumber } from "ethers";
-import { send } from "process";
+import * as hardhat from "hardhat";
+import { Darwin__factory } from "../typechain";
 
 
 
@@ -22,17 +19,17 @@ async function main() {
     const tokensToTransfer = BigNumber.from(1 * 10 ** 9).mul(BigNumber.from(1 * 10 ** 9))
 
 
-    const dp = DP__factory.connect("0x98dcf3160aa559365af6b1fe2f1b01e56f4315ce", owner)
+    const sarwin = Darwin__factory.connect("0x98dcf3160aa559365af6b1fe2f1b01e56f4315ce", owner)
 
-    console.log(await dp.isNextSellLP())
+    console.log(await sarwin.isNextSellLP(owner.address))
 
     // return;
 
-    const tnx = await dp.markNextSellAsLP()
+    const tnx = await sarwin.markNextSellAsLP()
 
     await tnx.wait()
 
-    console.log(`marked sell as lp:${await dp.isNextSellLP()}`)
+    console.log(`marked sell as lp:${await sarwin.isNextSellLP(owner.address)}`)
 }
 
 // We recommend this pattern to be able to use async/await everywhere
