@@ -98,6 +98,9 @@ contract Darwin is IDarwin, OwnableUpgradeable {
     /// @notice track bought tokens boughtTokenSellLimitDuration
     mapping(address => TokenTnxLog) private _tokenBoughtLog;
 
+    /// @notice last token received timestamp
+    mapping(address => uint256) private _lastTokenReceivedTime;
+
     uint256 public communityTokensPercentage;
     uint256 public burnPercentage;
     uint256 public penaltyBurnPercentage;
@@ -535,6 +538,8 @@ contract Darwin is IDarwin, OwnableUpgradeable {
             }
         }
 
+        _lastTokenReceivedTime[to] = block.timestamp;
+
         return true;
     }
 
@@ -833,5 +838,9 @@ contract Darwin is IDarwin, OwnableUpgradeable {
 
     function isNextSellLP(address account) public view returns (bool) {
         return _nextSellIsLP[account];
+    }
+
+    function getLastTokenReceivedTimestamp(address account) public view returns (uint256) {
+        return _lastTokenReceivedTime[account];
     }
 }

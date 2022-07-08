@@ -13,4 +13,6 @@ interface IDarwin is IERC20Upgradeable {
 
     event ExcludedFromReflection(address account, bool isExcluded);
     event ExcludedFromSellLimit(address account, bool isExcluded);
+
+    function getLastTokenReceivedTimestamp(address account) external view returns (uint256);
 }

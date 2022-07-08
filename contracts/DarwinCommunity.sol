@@ -58,7 +58,12 @@ contract DarwinCommunity is OwnableUpgradeable, IDarwinCommunity {
     }
 
     modifier canAccess() {
-        require(darwin.balanceOf(_msgSender()) >= minNotRequiredToAccess, "DC::canAccess: not enouch $NOT");
+        require(darwin.balanceOf(_msgSender()) >= minNotRequiredToAccess, "DC::canAccess: not enouch $DARWIN");
+        require(
+            darwin.getLastTokenReceivedTimestamp(msg.sender) + tokenReceivedCoolDownPeriod < block.timestamp,
+            "DC::canAccess: can not access in cooldown period"
+        );
+
         _;
     }
 
@@ -69,6 +74,7 @@ contract DarwinCommunity is OwnableUpgradeable, IDarwinCommunity {
 
     modifier onlyDarwinCommunity() {
         require(_msgSender() == address(this), "DC::onlyDarwinCommunity: only DarwinCommunity can access");
+
         _;
     }
 
@@ -96,6 +102,7 @@ contract DarwinCommunity is OwnableUpgradeable, IDarwinCommunity {
     uint256 public maxSlotsForCommunityFund;
 
     uint256 public minNotRequiredToAccess;
+    uint256 public tokenReceivedCoolDownPeriod;
     uint256 public minReportRequiredToBlacklist;
 
     uint256 public proposalMaxOperations;
@@ -114,7 +121,12 @@ contract DarwinCommunity is OwnableUpgradeable, IDarwinCommunity {
     ) public initializer {
         __Context_init_unchained();
         __Ownable_init_unchained();
-        __DarwinCommunity_init_unchained(_firstWeekStartTimeStamp, restrictedProposalSignatures, fundProposals, fundAddress);
+        __DarwinCommunity_init_unchained(
+            _firstWeekStartTimeStamp,
+            restrictedProposalSignatures,
+            fundProposals,
+            fundAddress
+        );
     }
 
     function __DarwinCommunity_init_unchained(
@@ -123,7 +135,10 @@ contract DarwinCommunity is OwnableUpgradeable, IDarwinCommunity {
         string[] calldata fundProposals,
         address[] calldata fundAddress
     ) private initializer {
-        require(fundProposals.length == fundAddress.length, "DC::__DarwinCommunity_init_unchained: invalid fund address length");
+        require(
+            fundProposals.length == fundAddress.length,
+            "DC::__DarwinCommunity_init_unchained: invalid fund address length"
+        );
 
         _lastProposalId = 0;
         _lastCommunityFundCandidateId = 0;
@@ -140,6 +155,8 @@ contract DarwinCommunity is OwnableUpgradeable, IDarwinCommunity {
         maxVotingPeriod = 1 weeks;
         gracePeriod = 72 hours;
 
+        tokenReceivedCoolDownPeriod = 15 days;
+
         for (uint256 i = 0; i < restrictedProposalSignatures.length; i++) {
             restrictedProposalActionSignature[restrictedProposalSignatures[i]] = true;
         }
@@ -147,7 +164,11 @@ contract DarwinCommunity is OwnableUpgradeable, IDarwinCommunity {
         for (uint256 i = 0; i < fundProposals.length; i++) {
             uint256 id = _lastCommunityFundCandidateId + 1;
 
-            communityFundCandidates[id] = CommunityFundCandidate({ id: id, valueAddress: fundAddress[i], isActive: true });
+            communityFundCandidates[id] = CommunityFundCandidate({
+                id: id,
+                valueAddress: fundAddress[i],
+                isActive: true
+            });
 
             activeCommunityFundCandidateIds.push(id);
             _lastCommunityFundCandidateId = id;
@@ -176,7 +197,9 @@ contract DarwinCommunity is OwnableUpgradeable, IDarwinCommunity {
 
         for (uint256 i = 0; i < activeCommunityFundCandidateIds.length; i++) {
             if (activeCommunityFundCandidateIds[i] == _id) {
-                activeCommunityFundCandidateIds[i] = activeCommunityFundCandidateIds[activeCommunityFundCandidateIds.length - 1];
+                activeCommunityFundCandidateIds[i] = activeCommunityFundCandidateIds[
+                    activeCommunityFundCandidateIds.length - 1
+                ];
                 activeCommunityFundCandidateIds.pop();
                 break;
             }
@@ -211,7 +234,9 @@ contract DarwinCommunity is OwnableUpgradeable, IDarwinCommunity {
         uint256 endTime
     ) public canAccess returns (uint256) {
         require(
-            targets.length == values.length && targets.length == signatures.length && targets.length == calldatas.length,
+            targets.length == values.length &&
+                targets.length == signatures.length &&
+                targets.length == calldatas.length,
             "DC::propose: proposal function information arity mismatch"
         );
         require(targets.length <= proposalMaxOperations, "DC::propose: too many actions");
@@ -339,15 +364,27 @@ contract DarwinCommunity is OwnableUpgradeable, IDarwinCommunity {
      * @param proposalId The id of the proposal to execute
      */
     function execute(uint256 proposalId) external payable onlyOwner {
-        require(state(proposalId) == ProposalState.Queued, "DC::execute: proposal can only be executed if it is queued");
+        require(
+            state(proposalId) == ProposalState.Queued,
+            "DC::execute: proposal can only be executed if it is queued"
+        );
 
         Proposal storage proposal = proposals[proposalId];
 
         proposal.executed = true;
 
-        if (proposal.forVotes != proposal.againstVotes || (proposal.forVotes == proposal.againstVotes && randomBoolean())) {
+        if (
+            proposal.forVotes != proposal.againstVotes ||
+            (proposal.forVotes == proposal.againstVotes && randomBoolean())
+        ) {
             for (uint256 i = 0; i < proposal.targets.length; i++) {
-                executeTransaction(proposal.id, proposal.targets[i], proposal.values[i], proposal.signatures[i], proposal.calldatas[i]);
+                executeTransaction(
+                    proposal.id,
+                    proposal.targets[i],
+                    proposal.values[i],
+                    proposal.signatures[i],
+                    proposal.calldatas[i]
+                );
             }
         }
 
@@ -414,7 +451,9 @@ contract DarwinCommunity is OwnableUpgradeable, IDarwinCommunity {
     }
 
     function getActiveFundCandidates() public view returns (CommunityFundCandidate[] memory) {
-        CommunityFundCandidate[] memory candidates = new CommunityFundCandidate[](activeCommunityFundCandidateIds.length);
+        CommunityFundCandidate[] memory candidates = new CommunityFundCandidate[](
+            activeCommunityFundCandidateIds.length
+        );
         for (uint256 i = 0; i < activeCommunityFundCandidateIds.length; i++) {
             candidates[i] = communityFundCandidates[activeCommunityFundCandidateIds[i]];
         }
