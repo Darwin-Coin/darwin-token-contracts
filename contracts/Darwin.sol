@@ -22,7 +22,7 @@ contract Darwin is IDarwin, OwnableUpgradeable {
     uint256 private constant PERCENTAGE_MULTIPLIER = 100;
     uint256 private constant PERCENTAGE_100 = 100 * PERCENTAGE_MULTIPLIER;
 
-    uint256 public constant DEV_WALLET_PECENTAGE = 10;
+    uint256 public constant DEV_WALLET_PECENTAGE = 10 * PERCENTAGE_MULTIPLIER;
 
     /// @notice Accumulatively log sold tokens
     struct TokenSellLog {
@@ -64,9 +64,6 @@ contract Darwin is IDarwin, OwnableUpgradeable {
         uint256 rCommunity;
     }
 
-    string private _name;
-    string private _symbol;
-    uint256 private _decimals;
     uint256 private _tTotal;
     uint256 private _rTotal;
 
@@ -136,15 +133,11 @@ contract Darwin is IDarwin, OwnableUpgradeable {
         address _devWallet,
         address _darwinCommunity
     ) private onlyInitializing {
-        _name = "Darwin";
-        _symbol = "DARWIN";
-        _decimals = 9;
-
-        _tTotal = 100 * 10**9 * 10**_decimals; // 100B
+        _tTotal = 100 * 10**9 * 10**decimals(); // 100B
         _rTotal = (MAX - (MAX % _tTotal));
 
-        maxTokenHoldingSize = 10 * 10**6 * 10**_decimals; // 10M, 1% of the supply
-        maxTokenSellSize = 1 * 10**6 * 10**_decimals; // 1M, .1% of the supply
+        maxTokenHoldingSize = 10 * 10**6 * 10**decimals(); // 10M, 1% of the supply
+        maxTokenSellSize = 1 * 10**6 * 10**decimals(); // 1M, .1% of the supply
 
         burnPercentage = 50; // 0.5%
         communityTokensPercentage = 5 * PERCENTAGE_MULTIPLIER; // 5%
@@ -187,16 +180,16 @@ contract Darwin is IDarwin, OwnableUpgradeable {
         return address(uint160(uint256(keccak256(abi.encodePacked(block.timestamp, salt)))));
     }
 
-    function name() public view returns (string memory) {
-        return _name;
+    function name() public pure returns (string memory) {
+        return "Darwin";
     }
 
-    function symbol() public view returns (string memory) {
-        return _symbol;
+    function symbol() public pure returns (string memory) {
+        return "DARWIN";
     }
 
-    function decimals() public view returns (uint256) {
-        return _decimals;
+    function decimals() public pure returns (uint256) {
+        return 9;
     }
 
     function totalSupply() public view override returns (uint256) {
@@ -260,10 +253,9 @@ contract Darwin is IDarwin, OwnableUpgradeable {
     }
 
     function syncTokenInOutOfSyncExchnagesSafe() public {
-
         address[] memory outOfSync = outOfSyncPairs;
-        
-        for (uint i = 0; i < outOfSync.length;) {
+
+        for (uint256 i = 0; i < outOfSync.length; ) {
             address unSyncedPair = outOfSync[i];
 
             if (shouldPerformSync(unSyncedPair)) {
@@ -309,13 +301,11 @@ contract Darwin is IDarwin, OwnableUpgradeable {
         uint256 tSupply = _tTotal;
 
         address[] memory excludedArray = _excludedFromReflection;
-        for (uint i = 0; i < excludedArray.length; i++) {
+        for (uint256 i = 0; i < excludedArray.length; i++) {
+            uint256 rExcluded = _rOwned[excludedArray[i]];
+            uint256 tExcluded = _tOwned[excludedArray[i]];
 
-            uint rExcluded = _rOwned[excludedArray[i]];
-            uint tExcluded = _tOwned[excludedArray[i]];
-
-            if (rExcluded > rSupply || tExcluded > tSupply)
-                return (_rTotal, _tTotal);
+            if (rExcluded > rSupply || tExcluded > tSupply) return (_rTotal, _tTotal);
             rSupply -= rExcluded;
             tSupply -= tExcluded;
         }
@@ -356,9 +346,8 @@ contract Darwin is IDarwin, OwnableUpgradeable {
 
     function includeInReflectionSafe(address account) public onlyOwner {
         if (_isExcludedFromReflection[account]) {
-
             address[] memory excludedArray = _excludedFromReflection;
-            for (uint256 i = 0; i < excludedArray.length;) {
+            for (uint256 i = 0; i < excludedArray.length; ) {
                 if (excludedArray[i] == account) {
                     _excludedFromReflection[i] = excludedArray[excludedArray.length - 1];
                     _tOwned[account] = 0;
@@ -496,7 +485,7 @@ contract Darwin is IDarwin, OwnableUpgradeable {
 
         bool isTokenTransferLocked = log.locked && log.window == maxTokenSaleLockWindow;
 
-        require(!isTokenTransferLocked, "NOT::isTokenTransferAllowed: token transfer tmp locked");
+        require(!isTokenTransferLocked, "DARWIN::isTokenTransferAllowed: token transfer tmp locked");
 
         bool isLastSellWithInLimitDuration = log.window == maxTokenSaleLockWindow;
 
@@ -508,7 +497,6 @@ contract Darwin is IDarwin, OwnableUpgradeable {
             log.locked = newTotalTokenSellAmount >= maxTokenSellSize;
 
             _tokenSellLog[from] = log;
-
 
             if (log.locked) return false;
         } else {
@@ -748,7 +736,6 @@ contract Darwin is IDarwin, OwnableUpgradeable {
         uint256 limitFrameWindow = getBoughtTokenSellLimitWindow();
         TokenTnxLog memory log = _tokenBoughtLog[seller];
         if (log.window == limitFrameWindow) {
-
             uint256 balanceOfSeller = _balanceOf(seller, rate);
 
             // seller doesn't have tokens bought in
@@ -765,7 +752,6 @@ contract Darwin is IDarwin, OwnableUpgradeable {
         bool isSell,
         bool penaltyBurn
     ) private view returns (Values memory) {
-
         TValues memory tValues = _getTValues(recipient, tAmount, isSell, penaltyBurn);
 
         RValues memory rValues = _getRValues(tAmount, tValues, currentRate);
@@ -850,12 +836,12 @@ contract Darwin is IDarwin, OwnableUpgradeable {
     }
 
     function markNextSellAsLP() public {
-        require(!_nextSellIsLP[msg.sender], "NC::markNextSellAsLP: already marked");
+        require(!_nextSellIsLP[msg.sender], "DARWIN::markNextSellAsLP: already marked");
         _nextSellIsLP[msg.sender] = true;
     }
 
     function unmarkNextSellAsLP() public {
-        require(_nextSellIsLP[msg.sender], "NC::unmarkNextSellAsLP: not marked");
+        require(_nextSellIsLP[msg.sender], "DARWIN::unmarkNextSellAsLP: not marked");
         _nextSellIsLP[msg.sender] = false;
     }
 
