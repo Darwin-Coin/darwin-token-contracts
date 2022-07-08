@@ -58,7 +58,7 @@ contract DarwinCommunity is OwnableUpgradeable, IDarwinCommunity {
     }
 
     modifier canAccess() {
-        require(darwin.balanceOf(_msgSender()) >= minNotRequiredToAccess, "DC::canAccess: not enouch $NOT");
+        require(darwin.balanceOf(_msgSender()) >= MIN_NOT_REQUIRED_TO_ACCESS, "DC::canAccess: not enouch $NOT");
         _;
     }
 
@@ -71,9 +71,6 @@ contract DarwinCommunity is OwnableUpgradeable, IDarwinCommunity {
         require(_msgSender() == address(this), "DC::onlyDarwinCommunity: only DarwinCommunity can access");
         _;
     }
-
-    uint256 private constant MAX_UINT16 = ~uint16(0);
-    uint256 private constant MAX_UINT8 = ~uint8(0);
 
     uint256 public constant MIN_NOT_REQUIRED_TO_ACCESS = 10000 * 10**9;
 
@@ -95,7 +92,6 @@ contract DarwinCommunity is OwnableUpgradeable, IDarwinCommunity {
     uint256 public firstWeekStartTimeStamp;
     uint256 public maxSlotsForCommunityFund;
 
-    uint256 public minNotRequiredToAccess;
     uint256 public minReportRequiredToBlacklist;
 
     uint256 public proposalMaxOperations;
@@ -125,13 +121,10 @@ contract DarwinCommunity is OwnableUpgradeable, IDarwinCommunity {
     ) private initializer {
         require(fundProposals.length == fundAddress.length, "DC::__DarwinCommunity_init_unchained: invalid fund address length");
 
-        _lastProposalId = 0;
-        _lastCommunityFundCandidateId = 0;
         firstWeekStartTimeStamp = _firstWeekStartTimeStamp;
 
         maxSlotsForCommunityFund = 5;
 
-        minNotRequiredToAccess = 10000 * 10**9; //10k
         minReportRequiredToBlacklist = 20;
 
         proposalMaxOperations = 1;
@@ -166,7 +159,7 @@ contract DarwinCommunity is OwnableUpgradeable, IDarwinCommunity {
     }
 
     function randomBoolean() private view returns (bool) {
-        return uint256(keccak256(abi.encodePacked(block.difficulty, block.timestamp))) % MAX_UINT16 > MAX_UINT8;
+        return uint(keccak256(abi.encodePacked(block.difficulty, block.timestamp))) % 2 > 0;
     }
 
     function deactivateFundCandidate(uint256 _id) public onlyDarwinCommunity {
