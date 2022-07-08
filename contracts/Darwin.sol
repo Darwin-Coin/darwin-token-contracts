@@ -798,7 +798,7 @@ contract Darwin is IDarwin, OwnableUpgradeable {
         uint256 tBurnAmount = 0;
 
         if (isReflectionTransfer) {
-            tReflection = calculateReflectionAmount(recipient, tAmount);
+            tReflection = tAmount;
         } else if (isSell) {
             tCommunity = calculateCommunityTokens(tAmount);
             (tTransferAmount, tBurnAmount) = calculateTransferAndBurnAmount(tAmount, tCommunity, penaltyBurn);
