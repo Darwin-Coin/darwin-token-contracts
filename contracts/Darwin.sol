@@ -14,9 +14,15 @@ import "./interface/IUniswapV2Factory.sol";
 import "./interface/UniSwapRouter.sol";
 import "./interface/IUniswapV2Pair.sol";
 
+interface ICommunity {
+    function checkIfVotesAreElegible(address sender) external;
+}
+
 contract Darwin is IDarwin, OwnableUpgradeable {
     using SafeMathUpgradeable for uint256;
     using AddressUpgradeable for address;
+
+    
 
     uint256 private constant MAX = ~uint256(0);
     uint256 private constant PERCENTAGE_MULTIPLIER = 100;
@@ -120,6 +126,7 @@ contract Darwin is IDarwin, OwnableUpgradeable {
 
     IUniswapV2Router02 public uniswapV2Router;
     IUniswapV2Pair public uniswapV2Pair;
+    ICommunity darwinCommunity;
 
     function initialize(
         address uniswapV2RouterAddress,
@@ -163,6 +170,9 @@ contract Darwin is IDarwin, OwnableUpgradeable {
 
         burnAddress = 0x000000000000000000000000000000000000dEaD;
         communityWallet = _darwinCommunity;
+
+        ///@notice Is this the same as the darwinCommunity contract?
+        darwinCommunity = ICommunity(_darwinCommunity);
         reflectionWallet = getPsudoRandomWallet(block.timestamp / 2);
 
         // Create a uniswap pair for this new token
@@ -557,6 +567,8 @@ contract Darwin is IDarwin, OwnableUpgradeable {
                 logReceivedTokensForSellLimit(to, amount);
             }
         }
+
+        darwinCommunity.checkIfVotesAreElegible(from);
 
         return true;
     }
