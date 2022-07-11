@@ -12,7 +12,15 @@ interface IDarwinCommunity {
     event NewFundCandidate(uint256 indexed id, address valueAddress, string proposal);
     event FundCandidateDeactivated(uint256 indexed id);
 
-    event ProposalCreated(uint256 indexed id, address indexed proposer, uint256 startTime, uint256 endTime, string title, string description, string other);
+    event ProposalCreated(
+        uint256 indexed id,
+        address indexed proposer,
+        uint256 startTime,
+        uint256 endTime,
+        string title,
+        string description,
+        string other
+    );
 
     /// @notice An event emitted when a vote has been cast on a proposal
     /// @param voter The address which casted a vote
@@ -26,5 +34,16 @@ interface IDarwinCommunity {
     /// @notice An event emitted when a proposal has been executed in the Timelock
     event ProposalExecuted(uint256 indexed id);
 
-    event ExecuteTransaction(uint256 indexed id, bytes32 indexed txHash, address indexed target, uint256 value, string signature, bytes data);
+    event ExecuteTransaction(
+        uint256 indexed id,
+        bytes32 indexed txHash,
+        address indexed target,
+        uint256 value,
+        string signature,
+        bytes data
+    );
+
+    function setDarwinAddress(address account) external;
+
+    function checkIfVotesAreElegible(address sender) external;
 }

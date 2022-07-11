@@ -1,12 +1,12 @@
 import * as dotenv from "dotenv";
 
-import { HardhatUserConfig, task } from "hardhat/config";
 import "@nomiclabs/hardhat-etherscan";
 import "@nomiclabs/hardhat-waffle";
+import { } from "@openzeppelin/hardhat-upgrades";
 import "@typechain/hardhat";
 import "hardhat-gas-reporter";
+import { HardhatUserConfig, task } from "hardhat/config";
 import "solidity-coverage";
-import { ethers } from "hardhat";
 
 require('@openzeppelin/hardhat-upgrades');
 
@@ -118,7 +118,7 @@ const config: HardhatUserConfig = {
             }
         },
         hardhat: {
-            loggingEnabled: true,
+            loggingEnabled: false,
             // gasMultiplier:1,
             forking:{
                 enabled:false,

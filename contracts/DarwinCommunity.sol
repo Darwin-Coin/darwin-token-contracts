@@ -173,8 +173,8 @@ contract DarwinCommunity is OwnableUpgradeable, IDarwinCommunity {
         }
     }
 
-    function setDarwinAddress(address account) public {
-        if (account == address(0)) {
+    function setDarwinAddress(address account) public override {
+        if (address(darwin) == address(0)) {
             require(msg.sender == owner(), "DC::setDarwinAddress: only owner initialize");
         } else {
             require(msg.sender == address(this), "DC::setDarwinAddress: private access only");
@@ -479,7 +479,7 @@ contract DarwinCommunity is OwnableUpgradeable, IDarwinCommunity {
      * @notice Checks if the balance of a seller has dipped below the minimum required to vote, and removes votes cast if so
      * @param sender Address of a seller of darwin tokens
      */
-    function checkIfVotesAreElegible(address sender) external {
+    function checkIfVotesAreElegible(address sender) external override {
         require(msg.sender == address(darwin), "Caller isn't darwin token");
 
         if (darwin.balanceOf(sender) >= MIN_DARWIN_REQUIRED_TO_ACCESS) {

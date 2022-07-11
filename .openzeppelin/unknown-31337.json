@@ -1,0 +1,897 @@
+{
+  "manifestVersion": "3.2",
+  "admin": {
+    "address": "0x426F6F9e2339f614c4f13B551d74AA2401032dAC",
+    "txHash": "0x0ae486ff9a04b696c9dd8d2ea71702cc3f104c75651301586114899f4994bd32"
+  },
+  "proxies": [
+    {
+      "address": "0xe71D0b5cb4258b06EEB33186496cFD1e8568106a",
+      "txHash": "0x2383a66485f45e73a84212f004dda96510e1953d01d446aabcadb4a04a37b130",
+      "kind": "transparent"
+    },
+    {
+      "address": "0x63849CC67165CD00fb3E4D01200Ac56eD3234b39",
+      "txHash": "0x1ce4d27ab1d7e64894159ef3a6b57d77ba0710d24298d76cb3e2578e6ebeee5e",
+      "kind": "transparent"
+    },
+    {
+      "address": "0xaCFD4F95E9ffBA646838040440B0b90ea76fc7AB",
+      "txHash": "0xcfd365d01c8ff186f86996cc8f961fba13aa4f3198492d2701362f37cc23525a",
+      "kind": "transparent"
+    },
+    {
+      "address": "0x1277E1FaEfb22C760f466BAac48dE40a2Bfb75aE",
+      "txHash": "0xbfaed77987e2a57ce0e0f41bc782fdfd2bbb03e9752282c1d5f8f7fbc259cb0c",
+      "kind": "transparent"
+    },
+    {
+      "address": "0xa03C6dea9A99B3366993E2AA264e640A4d49B85b",
+      "txHash": "0x805771ea85ebbedc14d9adc46ebb0d21dbee619a426d1d9d3fba93f746bc75e9",
+      "kind": "transparent"
+    },
+    {
+      "address": "0xEe995E6410fee5a0658FB40cAF11cc6aa80DA313",
+      "txHash": "0x513dbb7294a9e689863628c9e1d30dfa4f4f656f23cbbe0646aa3ca54ab524c6",
+      "kind": "transparent"
+    },
+    {
+      "address": "0x6D20C0c71723Df777Ed39D0aFD986605ed05F9E8",
+      "txHash": "0x5ea75096c6513204153233a4d95370b92e6ebc35248848c1e8c95fd35321f0ea",
+      "kind": "transparent"
+    },
+    {
+      "address": "0x31e5a72cDAd508288F97e015A3abDC511223D778",
+      "txHash": "0x8680e54549aeb88c5c0f9e983ed386df5fd459333ef1279a043a3455aea537de",
+      "kind": "transparent"
+    },
+    {
+      "address": "0x24a01427B2f0B4323949d69A561B32b1fa4a69fB",
+      "txHash": "0xd4995f572e9d0635c91c8357cb7bfe44db57b51d6a616b07c5472e2689220528",
+      "kind": "transparent"
+    },
+    {
+      "address": "0x1F1FC5aE22b52DEdc2f511B1Fe350D18537CC6F3",
+      "txHash": "0xb20e6086168fe5019f2c85325fb76b355a7e55ba14d9ae0525535550fed70070",
+      "kind": "transparent"
+    }
+  ],
+  "impls": {
+    "923a9d54bbec94057bf2c4b74c2ae742f2b2d1024a2bf3bfd966a3473976f4a3": {
+      "address": "0x4A119c9875b25aAedaA9f3c1ceaD8dEFE7474b47",
+      "txHash": "0xfdb9854c663e4509bccd9162521d87129811b09d63035ad37872a86e1599c8e7",
+      "layout": {
+        "storage": [
+          {
+            "label": "_initialized",
+            "offset": 0,
+            "slot": "0",
+            "type": "t_uint8",
+            "contract": "Initializable",
+            "src": "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol:62",
+            "retypedFrom": "bool"
+          },
+          {
+            "label": "_initializing",
+            "offset": 1,
+            "slot": "0",
+            "type": "t_bool",
+            "contract": "Initializable",
+            "src": "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol:67"
+          },
+          {
+            "label": "__gap",
+            "offset": 0,
+            "slot": "1",
+            "type": "t_array(t_uint256)50_storage",
+            "contract": "ContextUpgradeable",
+            "src": "@openzeppelin/contracts-upgradeable/utils/ContextUpgradeable.sol:36"
+          },
+          {
+            "label": "_owner",
+            "offset": 0,
+            "slot": "51",
+            "type": "t_address",
+            "contract": "OwnableUpgradeable",
+            "src": "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol:22"
+          },
+          {
+            "label": "__gap",
+            "offset": 0,
+            "slot": "52",
+            "type": "t_array(t_uint256)49_storage",
+            "contract": "OwnableUpgradeable",
+            "src": "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol:87"
+          },
+          {
+            "label": "communityFundCandidates",
+            "offset": 0,
+            "slot": "101",
+            "type": "t_mapping(t_uint256,t_struct(CommunityFundCandidate)5001_storage)",
+            "contract": "DarwinCommunity",
+            "src": "contracts/DarwinCommunity.sol:83"
+          },
+          {
+            "label": "activeCommunityFundCandidateIds",
+            "offset": 0,
+            "slot": "102",
+            "type": "t_array(t_uint256)dyn_storage",
+            "contract": "DarwinCommunity",
+            "src": "contracts/DarwinCommunity.sol:84"
+          },
+          {
+            "label": "voteReceipts",
+            "offset": 0,
+            "slot": "103",
+            "type": "t_mapping(t_uint256,t_mapping(t_address,t_struct(Receipt)4965_storage))",
+            "contract": "DarwinCommunity",
+            "src": "contracts/DarwinCommunity.sol:87"
+          },
+          {
+            "label": "proposals",
+            "offset": 0,
+            "slot": "104",
+            "type": "t_mapping(t_uint256,t_struct(Proposal)4994_storage)",
+            "contract": "DarwinCommunity",
+            "src": "contracts/DarwinCommunity.sol:90"
+          },
+          {
+            "label": "restrictedProposalActionSignature",
+            "offset": 0,
+            "slot": "105",
+            "type": "t_mapping(t_uint256,t_bool)",
+            "contract": "DarwinCommunity",
+            "src": "contracts/DarwinCommunity.sol:93"
+          },
+          {
+            "label": "usersVotes",
+            "offset": 0,
+            "slot": "106",
+            "type": "t_mapping(t_address,t_array(t_uint256)dyn_storage)",
+            "contract": "DarwinCommunity",
+            "src": "contracts/DarwinCommunity.sol:95"
+          },
+          {
+            "label": "_lastCommunityFundCandidateId",
+            "offset": 0,
+            "slot": "107",
+            "type": "t_uint256",
+            "contract": "DarwinCommunity",
+            "src": "contracts/DarwinCommunity.sol:97"
+          },
+          {
+            "label": "_lastProposalId",
+            "offset": 0,
+            "slot": "108",
+            "type": "t_uint256",
+            "contract": "DarwinCommunity",
+            "src": "contracts/DarwinCommunity.sol:98"
+          },
+          {
+            "label": "firstWeekStartTimeStamp",
+            "offset": 0,
+            "slot": "109",
+            "type": "t_uint256",
+            "contract": "DarwinCommunity",
+            "src": "contracts/DarwinCommunity.sol:100"
+          },
+          {
+            "label": "maxSlotsForCommunityFund",
+            "offset": 0,
+            "slot": "110",
+            "type": "t_uint256",
+            "contract": "DarwinCommunity",
+            "src": "contracts/DarwinCommunity.sol:101"
+          },
+          {
+            "label": "minNotRequiredToAccess",
+            "offset": 0,
+            "slot": "111",
+            "type": "t_uint256",
+            "contract": "DarwinCommunity",
+            "src": "contracts/DarwinCommunity.sol:103"
+          },
+          {
+            "label": "tokenReceivedCoolDownPeriod",
+            "offset": 0,
+            "slot": "112",
+            "type": "t_uint256",
+            "contract": "DarwinCommunity",
+            "src": "contracts/DarwinCommunity.sol:104"
+          },
+          {
+            "label": "minReportRequiredToBlacklist",
+            "offset": 0,
+            "slot": "113",
+            "type": "t_uint256",
+            "contract": "DarwinCommunity",
+            "src": "contracts/DarwinCommunity.sol:105"
+          },
+          {
+            "label": "proposalMaxOperations",
+            "offset": 0,
+            "slot": "114",
+            "type": "t_uint256",
+            "contract": "DarwinCommunity",
+            "src": "contracts/DarwinCommunity.sol:107"
+          },
+          {
+            "label": "minVotingDelay",
+            "offset": 0,
+            "slot": "115",
+            "type": "t_uint256",
+            "contract": "DarwinCommunity",
+            "src": "contracts/DarwinCommunity.sol:108"
+          },
+          {
+            "label": "minVotingPeriod",
+            "offset": 0,
+            "slot": "116",
+            "type": "t_uint256",
+            "contract": "DarwinCommunity",
+            "src": "contracts/DarwinCommunity.sol:109"
+          },
+          {
+            "label": "maxVotingPeriod",
+            "offset": 0,
+            "slot": "117",
+            "type": "t_uint256",
+            "contract": "DarwinCommunity",
+            "src": "contracts/DarwinCommunity.sol:110"
+          },
+          {
+            "label": "gracePeriod",
+            "offset": 0,
+            "slot": "118",
+            "type": "t_uint256",
+            "contract": "DarwinCommunity",
+            "src": "contracts/DarwinCommunity.sol:111"
+          },
+          {
+            "label": "darwin",
+            "offset": 0,
+            "slot": "119",
+            "type": "t_contract(IDarwin)6487",
+            "contract": "DarwinCommunity",
+            "src": "contracts/DarwinCommunity.sol:113"
+          }
+        ],
+        "types": {
+          "t_address": {
+            "label": "address",
+            "numberOfBytes": "20"
+          },
+          "t_array(t_address)dyn_storage": {
+            "label": "address[]",
+            "numberOfBytes": "32"
+          },
+          "t_array(t_bytes_storage)dyn_storage": {
+            "label": "bytes[]",
+            "numberOfBytes": "32"
+          },
+          "t_array(t_string_storage)dyn_storage": {
+            "label": "string[]",
+            "numberOfBytes": "32"
+          },
+          "t_array(t_uint256)49_storage": {
+            "label": "uint256[49]",
+            "numberOfBytes": "1568"
+          },
+          "t_array(t_uint256)50_storage": {
+            "label": "uint256[50]",
+            "numberOfBytes": "1600"
+          },
+          "t_array(t_uint256)dyn_storage": {
+            "label": "uint256[]",
+            "numberOfBytes": "32"
+          },
+          "t_bool": {
+            "label": "bool",
+            "numberOfBytes": "1"
+          },
+          "t_bytes_storage": {
+            "label": "bytes",
+            "numberOfBytes": "32"
+          },
+          "t_contract(IDarwin)6487": {
+            "label": "contract IDarwin",
+            "numberOfBytes": "20"
+          },
+          "t_mapping(t_address,t_array(t_uint256)dyn_storage)": {
+            "label": "mapping(address => uint256[])",
+            "numberOfBytes": "32"
+          },
+          "t_mapping(t_address,t_struct(Receipt)4965_storage)": {
+            "label": "mapping(address => struct DarwinCommunity.Receipt)",
+            "numberOfBytes": "32"
+          },
+          "t_mapping(t_uint256,t_bool)": {
+            "label": "mapping(uint256 => bool)",
+            "numberOfBytes": "32"
+          },
+          "t_mapping(t_uint256,t_mapping(t_address,t_struct(Receipt)4965_storage))": {
+            "label": "mapping(uint256 => mapping(address => struct DarwinCommunity.Receipt))",
+            "numberOfBytes": "32"
+          },
+          "t_mapping(t_uint256,t_struct(CommunityFundCandidate)5001_storage)": {
+            "label": "mapping(uint256 => struct DarwinCommunity.CommunityFundCandidate)",
+            "numberOfBytes": "32"
+          },
+          "t_mapping(t_uint256,t_struct(Proposal)4994_storage)": {
+            "label": "mapping(uint256 => struct DarwinCommunity.Proposal)",
+            "numberOfBytes": "32"
+          },
+          "t_string_storage": {
+            "label": "string",
+            "numberOfBytes": "32"
+          },
+          "t_struct(CommunityFundCandidate)5001_storage": {
+            "label": "struct DarwinCommunity.CommunityFundCandidate",
+            "members": [
+              {
+                "label": "id",
+                "type": "t_uint256",
+                "offset": 0,
+                "slot": "0"
+              },
+              {
+                "label": "valueAddress",
+                "type": "t_address",
+                "offset": 0,
+                "slot": "1"
+              },
+              {
+                "label": "isActive",
+                "type": "t_bool",
+                "offset": 20,
+                "slot": "1"
+              }
+            ],
+            "numberOfBytes": "64"
+          },
+          "t_struct(Proposal)4994_storage": {
+            "label": "struct DarwinCommunity.Proposal",
+            "members": [
+              {
+                "label": "id",
+                "type": "t_uint256",
+                "offset": 0,
+                "slot": "0"
+              },
+              {
+                "label": "proposer",
+                "type": "t_address",
+                "offset": 0,
+                "slot": "1"
+              },
+              {
+                "label": "targets",
+                "type": "t_array(t_address)dyn_storage",
+                "offset": 0,
+                "slot": "2"
+              },
+              {
+                "label": "values",
+                "type": "t_array(t_uint256)dyn_storage",
+                "offset": 0,
+                "slot": "3"
+              },
+              {
+                "label": "signatures",
+                "type": "t_array(t_string_storage)dyn_storage",
+                "offset": 0,
+                "slot": "4"
+              },
+              {
+                "label": "calldatas",
+                "type": "t_array(t_bytes_storage)dyn_storage",
+                "offset": 0,
+                "slot": "5"
+              },
+              {
+                "label": "startTime",
+                "type": "t_uint256",
+                "offset": 0,
+                "slot": "6"
+              },
+              {
+                "label": "endTime",
+                "type": "t_uint256",
+                "offset": 0,
+                "slot": "7"
+              },
+              {
+                "label": "forVotes",
+                "type": "t_uint256",
+                "offset": 0,
+                "slot": "8"
+              },
+              {
+                "label": "againstVotes",
+                "type": "t_uint256",
+                "offset": 0,
+                "slot": "9"
+              },
+              {
+                "label": "canceled",
+                "type": "t_bool",
+                "offset": 0,
+                "slot": "10"
+              },
+              {
+                "label": "executed",
+                "type": "t_bool",
+                "offset": 1,
+                "slot": "10"
+              }
+            ],
+            "numberOfBytes": "352"
+          },
+          "t_struct(Receipt)4965_storage": {
+            "label": "struct DarwinCommunity.Receipt",
+            "members": [
+              {
+                "label": "hasVoted",
+                "type": "t_bool",
+                "offset": 0,
+                "slot": "0"
+              },
+              {
+                "label": "inSupport",
+                "type": "t_bool",
+                "offset": 1,
+                "slot": "0"
+              }
+            ],
+            "numberOfBytes": "32"
+          },
+          "t_uint256": {
+            "label": "uint256",
+            "numberOfBytes": "32"
+          },
+          "t_uint8": {
+            "label": "uint8",
+            "numberOfBytes": "1"
+          }
+        }
+      }
+    },
+    "453991941152237c9cb674ecfb3000d62aaab32aa29ef3467e4ebf0a0f4c7ad7": {
+      "address": "0xc3D726a3bA3e72eB3928c11D31cAF3E754726adC",
+      "txHash": "0x2bed8ac62f725297d8715a6537e010cf23fb4e59be5b2d1db48aebb36e269cc8",
+      "layout": {
+        "storage": [
+          {
+            "label": "_initialized",
+            "offset": 0,
+            "slot": "0",
+            "type": "t_uint8",
+            "contract": "Initializable",
+            "src": "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol:62",
+            "retypedFrom": "bool"
+          },
+          {
+            "label": "_initializing",
+            "offset": 1,
+            "slot": "0",
+            "type": "t_bool",
+            "contract": "Initializable",
+            "src": "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol:67"
+          },
+          {
+            "label": "__gap",
+            "offset": 0,
+            "slot": "1",
+            "type": "t_array(t_uint256)50_storage",
+            "contract": "ContextUpgradeable",
+            "src": "@openzeppelin/contracts-upgradeable/utils/ContextUpgradeable.sol:36"
+          },
+          {
+            "label": "_owner",
+            "offset": 0,
+            "slot": "51",
+            "type": "t_address",
+            "contract": "OwnableUpgradeable",
+            "src": "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol:22"
+          },
+          {
+            "label": "__gap",
+            "offset": 0,
+            "slot": "52",
+            "type": "t_array(t_uint256)49_storage",
+            "contract": "OwnableUpgradeable",
+            "src": "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol:87"
+          },
+          {
+            "label": "_tTotal",
+            "offset": 0,
+            "slot": "101",
+            "type": "t_uint256",
+            "contract": "Darwin",
+            "src": "contracts/Darwin.sol:75"
+          },
+          {
+            "label": "_rTotal",
+            "offset": 0,
+            "slot": "102",
+            "type": "t_uint256",
+            "contract": "Darwin",
+            "src": "contracts/Darwin.sol:76"
+          },
+          {
+            "label": "_tOwned",
+            "offset": 0,
+            "slot": "103",
+            "type": "t_mapping(t_address,t_uint256)",
+            "contract": "Darwin",
+            "src": "contracts/Darwin.sol:78"
+          },
+          {
+            "label": "_rOwned",
+            "offset": 0,
+            "slot": "104",
+            "type": "t_mapping(t_address,t_uint256)",
+            "contract": "Darwin",
+            "src": "contracts/Darwin.sol:79"
+          },
+          {
+            "label": "_isExcludedFromReflection",
+            "offset": 0,
+            "slot": "105",
+            "type": "t_mapping(t_address,t_bool)",
+            "contract": "Darwin",
+            "src": "contracts/Darwin.sol:81"
+          },
+          {
+            "label": "_isExcludedFromSellLimit",
+            "offset": 0,
+            "slot": "106",
+            "type": "t_mapping(t_address,t_bool)",
+            "contract": "Darwin",
+            "src": "contracts/Darwin.sol:82"
+          },
+          {
+            "label": "_isExcludedFromHoldingLimit",
+            "offset": 0,
+            "slot": "107",
+            "type": "t_mapping(t_address,t_bool)",
+            "contract": "Darwin",
+            "src": "contracts/Darwin.sol:83"
+          },
+          {
+            "label": "_excludedFromReflection",
+            "offset": 0,
+            "slot": "108",
+            "type": "t_array(t_address)dyn_storage",
+            "contract": "Darwin",
+            "src": "contracts/Darwin.sol:85"
+          },
+          {
+            "label": "_isPairAddress",
+            "offset": 0,
+            "slot": "109",
+            "type": "t_mapping(t_address,t_bool)",
+            "contract": "Darwin",
+            "src": "contracts/Darwin.sol:87"
+          },
+          {
+            "label": "_isExchnageRouterAddress",
+            "offset": 0,
+            "slot": "110",
+            "type": "t_mapping(t_address,t_bool)",
+            "contract": "Darwin",
+            "src": "contracts/Darwin.sol:88"
+          },
+          {
+            "label": "_pairToRouter",
+            "offset": 0,
+            "slot": "111",
+            "type": "t_mapping(t_address,t_address)",
+            "contract": "Darwin",
+            "src": "contracts/Darwin.sol:89"
+          },
+          {
+            "label": "_allowances",
+            "offset": 0,
+            "slot": "112",
+            "type": "t_mapping(t_address,t_mapping(t_address,t_uint256))",
+            "contract": "Darwin",
+            "src": "contracts/Darwin.sol:91"
+          },
+          {
+            "label": "_nextSellIsLP",
+            "offset": 0,
+            "slot": "113",
+            "type": "t_mapping(t_address,t_bool)",
+            "contract": "Darwin",
+            "src": "contracts/Darwin.sol:92"
+          },
+          {
+            "label": "_pairUnsyncAmount",
+            "offset": 0,
+            "slot": "114",
+            "type": "t_mapping(t_address,t_uint256)",
+            "contract": "Darwin",
+            "src": "contracts/Darwin.sol:94"
+          },
+          {
+            "label": "outOfSyncPairs",
+            "offset": 0,
+            "slot": "115",
+            "type": "t_array(t_address)dyn_storage",
+            "contract": "Darwin",
+            "src": "contracts/Darwin.sol:95"
+          },
+          {
+            "label": "_tokenSellLog",
+            "offset": 0,
+            "slot": "116",
+            "type": "t_mapping(t_address,t_struct(TokenSellLog)2230_storage)",
+            "contract": "Darwin",
+            "src": "contracts/Darwin.sol:98"
+          },
+          {
+            "label": "_tokenReceivedLog",
+            "offset": 0,
+            "slot": "117",
+            "type": "t_mapping(t_address,t_struct(TokenTnxLog)2235_storage)",
+            "contract": "Darwin",
+            "src": "contracts/Darwin.sol:101"
+          },
+          {
+            "label": "_tokenBoughtLog",
+            "offset": 0,
+            "slot": "118",
+            "type": "t_mapping(t_address,t_struct(TokenTnxLog)2235_storage)",
+            "contract": "Darwin",
+            "src": "contracts/Darwin.sol:104"
+          },
+          {
+            "label": "_lastTokenReceivedTime",
+            "offset": 0,
+            "slot": "119",
+            "type": "t_mapping(t_address,t_uint256)",
+            "contract": "Darwin",
+            "src": "contracts/Darwin.sol:107"
+          },
+          {
+            "label": "communityTokensPercentage",
+            "offset": 0,
+            "slot": "120",
+            "type": "t_uint256",
+            "contract": "Darwin",
+            "src": "contracts/Darwin.sol:109"
+          },
+          {
+            "label": "burnPercentage",
+            "offset": 0,
+            "slot": "121",
+            "type": "t_uint256",
+            "contract": "Darwin",
+            "src": "contracts/Darwin.sol:110"
+          },
+          {
+            "label": "penaltyBurnPercentage",
+            "offset": 0,
+            "slot": "122",
+            "type": "t_uint256",
+            "contract": "Darwin",
+            "src": "contracts/Darwin.sol:111"
+          },
+          {
+            "label": "boughtTokenSellLimitDuration",
+            "offset": 0,
+            "slot": "123",
+            "type": "t_uint256",
+            "contract": "Darwin",
+            "src": "contracts/Darwin.sol:113"
+          },
+          {
+            "label": "receivedTokenSellLimitDuration",
+            "offset": 0,
+            "slot": "124",
+            "type": "t_uint256",
+            "contract": "Darwin",
+            "src": "contracts/Darwin.sol:114"
+          },
+          {
+            "label": "maxTokenSaleLimitDuration",
+            "offset": 0,
+            "slot": "125",
+            "type": "t_uint256",
+            "contract": "Darwin",
+            "src": "contracts/Darwin.sol:115"
+          },
+          {
+            "label": "maxTokenSaleLimitLockDuration",
+            "offset": 0,
+            "slot": "126",
+            "type": "t_uint256",
+            "contract": "Darwin",
+            "src": "contracts/Darwin.sol:117"
+          },
+          {
+            "label": "tReflectionTotal",
+            "offset": 0,
+            "slot": "127",
+            "type": "t_uint256",
+            "contract": "Darwin",
+            "src": "contracts/Darwin.sol:119"
+          },
+          {
+            "label": "tBurnTotal",
+            "offset": 0,
+            "slot": "128",
+            "type": "t_uint256",
+            "contract": "Darwin",
+            "src": "contracts/Darwin.sol:120"
+          },
+          {
+            "label": "maxTokenSellSize",
+            "offset": 0,
+            "slot": "129",
+            "type": "t_uint256",
+            "contract": "Darwin",
+            "src": "contracts/Darwin.sol:122"
+          },
+          {
+            "label": "maxTokenHoldingSize",
+            "offset": 0,
+            "slot": "130",
+            "type": "t_uint256",
+            "contract": "Darwin",
+            "src": "contracts/Darwin.sol:123"
+          },
+          {
+            "label": "burnAddress",
+            "offset": 0,
+            "slot": "131",
+            "type": "t_address",
+            "contract": "Darwin",
+            "src": "contracts/Darwin.sol:125"
+          },
+          {
+            "label": "reflectionWallet",
+            "offset": 0,
+            "slot": "132",
+            "type": "t_address",
+            "contract": "Darwin",
+            "src": "contracts/Darwin.sol:126"
+          },
+          {
+            "label": "uniswapV2Router",
+            "offset": 0,
+            "slot": "133",
+            "type": "t_contract(IUniswapV2Router02)7275",
+            "contract": "Darwin",
+            "src": "contracts/Darwin.sol:128"
+          },
+          {
+            "label": "uniswapV2Pair",
+            "offset": 0,
+            "slot": "134",
+            "type": "t_contract(IUniswapV2Pair)6882",
+            "contract": "Darwin",
+            "src": "contracts/Darwin.sol:129"
+          },
+          {
+            "label": "darwinCommunity",
+            "offset": 0,
+            "slot": "135",
+            "type": "t_contract(IDarwinCommunity)6577",
+            "contract": "Darwin",
+            "src": "contracts/Darwin.sol:130"
+          }
+        ],
+        "types": {
+          "t_address": {
+            "label": "address",
+            "numberOfBytes": "20"
+          },
+          "t_array(t_address)dyn_storage": {
+            "label": "address[]",
+            "numberOfBytes": "32"
+          },
+          "t_array(t_uint256)49_storage": {
+            "label": "uint256[49]",
+            "numberOfBytes": "1568"
+          },
+          "t_array(t_uint256)50_storage": {
+            "label": "uint256[50]",
+            "numberOfBytes": "1600"
+          },
+          "t_bool": {
+            "label": "bool",
+            "numberOfBytes": "1"
+          },
+          "t_contract(IDarwinCommunity)6577": {
+            "label": "contract IDarwinCommunity",
+            "numberOfBytes": "20"
+          },
+          "t_contract(IUniswapV2Pair)6882": {
+            "label": "contract IUniswapV2Pair",
+            "numberOfBytes": "20"
+          },
+          "t_contract(IUniswapV2Router02)7275": {
+            "label": "contract IUniswapV2Router02",
+            "numberOfBytes": "20"
+          },
+          "t_mapping(t_address,t_address)": {
+            "label": "mapping(address => address)",
+            "numberOfBytes": "32"
+          },
+          "t_mapping(t_address,t_bool)": {
+            "label": "mapping(address => bool)",
+            "numberOfBytes": "32"
+          },
+          "t_mapping(t_address,t_mapping(t_address,t_uint256))": {
+            "label": "mapping(address => mapping(address => uint256))",
+            "numberOfBytes": "32"
+          },
+          "t_mapping(t_address,t_struct(TokenSellLog)2230_storage)": {
+            "label": "mapping(address => struct Darwin.TokenSellLog)",
+            "numberOfBytes": "32"
+          },
+          "t_mapping(t_address,t_struct(TokenTnxLog)2235_storage)": {
+            "label": "mapping(address => struct Darwin.TokenTnxLog)",
+            "numberOfBytes": "32"
+          },
+          "t_mapping(t_address,t_uint256)": {
+            "label": "mapping(address => uint256)",
+            "numberOfBytes": "32"
+          },
+          "t_struct(TokenSellLog)2230_storage": {
+            "label": "struct Darwin.TokenSellLog",
+            "members": [
+              {
+                "label": "window",
+                "type": "t_uint256",
+                "offset": 0,
+                "slot": "0"
+              },
+              {
+                "label": "amount",
+                "type": "t_uint256",
+                "offset": 0,
+                "slot": "1"
+              },
+              {
+                "label": "locked",
+                "type": "t_bool",
+                "offset": 0,
+                "slot": "2"
+              }
+            ],
+            "numberOfBytes": "96"
+          },
+          "t_struct(TokenTnxLog)2235_storage": {
+            "label": "struct Darwin.TokenTnxLog",
+            "members": [
+              {
+                "label": "window",
+                "type": "t_uint256",
+                "offset": 0,
+                "slot": "0"
+              },
+              {
+                "label": "amount",
+                "type": "t_uint256",
+                "offset": 0,
+                "slot": "1"
+              }
+            ],
+            "numberOfBytes": "64"
+          },
+          "t_uint256": {
+            "label": "uint256",
+            "numberOfBytes": "32"
+          },
+          "t_uint8": {
+            "label": "uint8",
+            "numberOfBytes": "1"
+          }
+        }
+      }
+    }
+  }
+}
