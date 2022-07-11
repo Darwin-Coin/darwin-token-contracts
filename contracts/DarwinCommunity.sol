@@ -78,10 +78,7 @@ contract DarwinCommunity is OwnableUpgradeable, IDarwinCommunity {
         _;
     }
 
-    uint256 private constant MAX_UINT16 = ~uint16(0);
-    uint256 private constant MAX_UINT8 = ~uint8(0);
-
-    uint256 public constant MIN_NOT_REQUIRED_TO_ACCESS = 10000 * 10**9;
+    uint256 public constant MIN_DARWIN_REQUIRED_TO_ACCESS = 10000 * 10**9;
 
     mapping(uint256 => CommunityFundCandidate) private communityFundCandidates;
     uint256[] private activeCommunityFundCandidateIds;
@@ -94,6 +91,8 @@ contract DarwinCommunity is OwnableUpgradeable, IDarwinCommunity {
 
     /// @notice Restricted proposal actions, only owner can create proposals with these signature
     mapping(uint256 => bool) private restrictedProposalActionSignature;
+
+    mapping(address => uint256[]) private usersVotes;
 
     uint256 public _lastCommunityFundCandidateId;
     uint256 public _lastProposalId;
@@ -140,13 +139,10 @@ contract DarwinCommunity is OwnableUpgradeable, IDarwinCommunity {
             "DC::__DarwinCommunity_init_unchained: invalid fund address length"
         );
 
-        _lastProposalId = 0;
-        _lastCommunityFundCandidateId = 0;
         firstWeekStartTimeStamp = _firstWeekStartTimeStamp;
 
         maxSlotsForCommunityFund = 5;
 
-        minNotRequiredToAccess = 10000 * 10**9; //10k
         minReportRequiredToBlacklist = 20;
 
         proposalMaxOperations = 1;
@@ -187,7 +183,7 @@ contract DarwinCommunity is OwnableUpgradeable, IDarwinCommunity {
     }
 
     function randomBoolean() private view returns (bool) {
-        return uint256(keccak256(abi.encodePacked(block.difficulty, block.timestamp))) % MAX_UINT16 > MAX_UINT8;
+        return uint256(keccak256(abi.encodePacked(block.difficulty, block.timestamp))) % 2 > 0;
     }
 
     function deactivateFundCandidate(uint256 _id) public onlyDarwinCommunity {
@@ -349,6 +345,8 @@ contract DarwinCommunity is OwnableUpgradeable, IDarwinCommunity {
 
         require(receipt.hasVoted == false, "DC::castVoteInternal: voter already voted");
 
+        usersVotes[voter].push(proposalId);
+
         receipt.hasVoted = true;
         receipt.inSupport = inSupport;
 
@@ -475,5 +473,50 @@ contract DarwinCommunity is OwnableUpgradeable, IDarwinCommunity {
 
     function isProposalSignatureRestricted(string calldata signature) public view returns (bool) {
         return restrictedProposalActionSignature[uint256(keccak256(bytes(signature)))];
+    }
+
+    /**
+     * @notice Checks if the balance of a seller has dipped below the minimum required to vote, and removes votes cast if so
+     * @param sender Address of a seller of darwin tokens
+     */
+    function checkIfVotesAreElegible(address sender) external {
+        require(msg.sender == address(darwin), "Caller isn't darwin token");
+
+        if (darwin.balanceOf(sender) >= MIN_DARWIN_REQUIRED_TO_ACCESS) {
+            return;
+        }
+
+        uint256[] storage votes = usersVotes[sender];
+
+        if (votes.length == 0) {
+            return;
+        }
+
+        for (uint256 i = votes.length; i > 0; ) {
+            uint256 proposalId = votes[i - 1];
+            Receipt storage receipt = voteReceipts[proposalId][sender];
+
+            Proposal storage proposal = proposals[proposalId];
+
+            if (state(proposalId) == ProposalState.Active) {
+                if (receipt.inSupport) {
+                    proposal.forVotes -= 1;
+                } else {
+                    proposal.againstVotes -= 1;
+                }
+            }
+
+            delete voteReceipts[proposalId][sender];
+
+            votes.pop();
+
+            if (i > 0) {
+                unchecked {
+                    ++i;
+                }
+            } else {
+                break;
+            }
+        }
     }
 }
