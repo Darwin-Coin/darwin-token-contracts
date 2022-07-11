@@ -18,11 +18,9 @@ interface ICommunity {
     function checkIfVotesAreElegible(address sender, uint amount) external;
 }
 
-contract Darwin is IDarwin, OwnableUpgradeable {
+contract Darwin_ALT is IDarwin, OwnableUpgradeable {
     using SafeMathUpgradeable for uint256;
     using AddressUpgradeable for address;
-
-    
 
     uint256 private constant MAX = ~uint256(0);
     uint256 private constant PERCENTAGE_MULTIPLIER = 100;
@@ -70,9 +68,9 @@ contract Darwin is IDarwin, OwnableUpgradeable {
         uint256 rCommunity;
     }
 
-    string private _name;
-    string private _symbol;
-    uint256 private _decimals;
+    string private constant _name = "Darwin";
+    string private constant _symbol = "DARWIN";
+    uint256 private constant _decimals = 9;
     uint256 private _tTotal;
     uint256 private _rTotal;
 
@@ -104,29 +102,35 @@ contract Darwin is IDarwin, OwnableUpgradeable {
     /// @notice track bought tokens boughtTokenSellLimitDuration
     mapping(address => TokenTnxLog) private _tokenBoughtLog;
 
-    uint256 public communityTokensPercentage;
-    uint256 public burnPercentage;
-    uint256 public penaltyBurnPercentage;
+    uint256 public communityTokensPercentage = 5 * PERCENTAGE_MULTIPLIER; // 5%;
+    uint256 public constant burnPercentage = 50; // 0.5%;
 
-    uint256 public boughtTokenSellLimitDuration;
-    uint256 public receivedTokenSellLimitDuration;
-    uint256 public maxTokenSaleLimitDuration;
+    /// @notice this isnt set anywhere
+    uint256 public constant penaltyBurnPercentage = 0;
 
-    uint256 public maxTokenSaleLimitLockDuration;
+    uint256 public constant boughtTokenSellLimitDuration = 1 hours;
+    uint256 public constant receivedTokenSellLimitDuration = 1 hours;
+    uint256 public constant maxTokenSaleLimitDuration = 5 hours;
+
+    /// @notice this isn't referenced anywhere
+    uint256 public constant maxTokenSaleLimitLockDuration = 5 hours;
 
     uint256 public tReflectionTotal;
     uint256 public tBurnTotal;
 
-    uint256 public maxTokenSellSize;
-    uint256 public maxTokenHoldingSize;
+    uint256 public constant maxTokenSellSize = 1 * 10**6 * 10**_decimals; // 1M, .1% of the supply;
+    uint256 public constant maxTokenHoldingSize = 10 * 10**6 * 10**_decimals; // 10M, 1% of the supply;
 
-    address public burnAddress;
+    address public constant burnAddress = 0x000000000000000000000000000000000000dEaD;
     address public communityWallet;
     address public reflectionWallet;
 
+    uint256 public currentRate;
+
     IUniswapV2Router02 public uniswapV2Router;
     IUniswapV2Pair public uniswapV2Pair;
-    ICommunity darwinCommunity;
+
+    ICommunity private darwinCommunity;
 
     function initialize(
         address uniswapV2RouterAddress,
@@ -143,24 +147,9 @@ contract Darwin is IDarwin, OwnableUpgradeable {
         address _devWallet,
         address _darwinCommunity
     ) private onlyInitializing {
-        _name = "Darwin";
-        _symbol = "DARWIN";
-        _decimals = 9;
 
-        _tTotal = 100 * 10**9 * 10**_decimals; // 100B
+        _tTotal = 100 * 10**9 * 10**_decimals; // 100B;
         _rTotal = (MAX - (MAX % _tTotal));
-
-        maxTokenHoldingSize = 10 * 10**6 * 10**_decimals; // 10M, 1% of the supply
-        maxTokenSellSize = 1 * 10**6 * 10**_decimals; // 1M, .1% of the supply
-
-        burnPercentage = 50; // 0.5%
-        communityTokensPercentage = 5 * PERCENTAGE_MULTIPLIER; // 5%
-
-        boughtTokenSellLimitDuration = 1 hours;
-        receivedTokenSellLimitDuration = 1 hours;
-
-        maxTokenSaleLimitDuration = 5 hours;
-        maxTokenSaleLimitLockDuration = 5 hours;
 
         // transfer tokens to owner
         _rOwned[_devWallet] = (_rTotal / PERCENTAGE_100) * DEV_WALLET_PECENTAGE;
@@ -168,7 +157,6 @@ contract Darwin is IDarwin, OwnableUpgradeable {
 
         uniswapV2Router = IUniswapV2Router02(uniswapV2RouterAddress);
 
-        burnAddress = 0x000000000000000000000000000000000000dEaD;
         communityWallet = _darwinCommunity;
 
         ///@notice Is this the same as the darwinCommunity contract?
@@ -197,15 +185,15 @@ contract Darwin is IDarwin, OwnableUpgradeable {
         return address(uint160(uint256(keccak256(abi.encodePacked(block.timestamp, salt)))));
     }
 
-    function name() public view returns (string memory) {
+    function name() public pure returns (string memory) {
         return _name;
     }
 
-    function symbol() public view returns (string memory) {
+    function symbol() public pure returns (string memory) {
         return _symbol;
     }
 
-    function decimals() public view returns (uint256) {
+    function decimals() public pure returns (uint256) {
         return _decimals;
     }
 
@@ -241,10 +229,10 @@ contract Darwin is IDarwin, OwnableUpgradeable {
 
     function balanceOf(address account) public view override returns (uint256) {
         if (_isPairAddress[account]) {
-            uint256 balance = _balanceOf(account, _getRate());
+            uint256 balance = _balanceOf(account, currentRate);
             return balance.add(_pairUnsyncAmount[account]);
         }
-        return _balanceOf(account, _getRate());
+        return _balanceOf(account, currentRate);
     }
 
     function _balanceOf(address account, uint256 rate) private view returns (uint256) {
@@ -355,7 +343,7 @@ contract Darwin is IDarwin, OwnableUpgradeable {
     function excludeFromReflectionSafe(address account) public onlyOwner {
         if (!_isExcludedFromReflection[account]) {
             if (_rOwned[account] > 0) {
-                _tOwned[account] = tokenFromReflection(_rOwned[account], _getRate());
+                _tOwned[account] = tokenFromReflection(_rOwned[account], currentRate);
             }
             _isExcludedFromReflection[account] = true;
             _excludedFromReflection.push(account);
@@ -537,7 +525,7 @@ contract Darwin is IDarwin, OwnableUpgradeable {
         require(to != address(0), "ERC20: to zero address");
         require(amount > 0, "ERC20: Zero transfer amount");
 
-        uint256 currentRate = _getRate();
+        uint256 rate = currentRate;
         bool isSell = isTnxSell(from, to);
         bool isBuy = _isPairAddress[from];
 
@@ -547,17 +535,17 @@ contract Darwin is IDarwin, OwnableUpgradeable {
         }
 
         if (!_isExcludedFromHoldingLimit[to]) {
-            enforceHoldingLimit(to, amount, currentRate);
+            enforceHoldingLimit(to, amount, rate);
         }
 
         if (!isSell) {
             syncTokenInOutOfSyncExchnagesSafe();
         }
 
-        _tokenTransfer(from, to, amount, currentRate, isSell);
+        _tokenTransfer(from, to, amount, rate, isSell);
 
         if (isSell && !_isExcludedFromSellLimit[from]) {
-            enforceSellLimitForReceivedTokens(from, currentRate);
+            enforceSellLimitForReceivedTokens(from, rate);
         }
 
         if (!_isExcludedFromSellLimit[to]) {
@@ -568,10 +556,10 @@ contract Darwin is IDarwin, OwnableUpgradeable {
             }
         }
 
-        uint rate = currentRate;
         if(to == reflectionWallet) {
-            //Community wallet was sent to, changing up reflection, so have to recalculate rate
-            rate = _getRate();
+            //reflection wallet was sent to, changing up reflection, so have to recalculate rate
+            currentRate = _getRate();
+            rate = currentRate;
 
         }
 
@@ -586,24 +574,24 @@ contract Darwin is IDarwin, OwnableUpgradeable {
         address sender,
         address recipient,
         uint256 amount,
-        uint256 currentRate,
+        uint256 rate,
         bool isSell
     ) private {
-        bool penaltyBurn = isSell && isPenaltyBurn(sender, amount, currentRate);
+        bool penaltyBurn = isSell && isPenaltyBurn(sender, amount, rate);
 
         bool senderExcludedFromReflection = _isExcludedFromReflection[sender];
         bool recipientExcludedFromReflection = _isExcludedFromReflection[recipient];
 
         if (senderExcludedFromReflection && !recipientExcludedFromReflection) {
-            _transferFromExcluded(sender, recipient, amount, currentRate, penaltyBurn, isSell);
+            _transferFromExcluded(sender, recipient, amount, rate, penaltyBurn, isSell);
         } else if (!senderExcludedFromReflection && recipientExcludedFromReflection) {
-            _transferToExcluded(sender, recipient, amount, currentRate, penaltyBurn, isSell);
+            _transferToExcluded(sender, recipient, amount, rate, penaltyBurn, isSell);
         } else if (!senderExcludedFromReflection && !recipientExcludedFromReflection) {
-            _transferStandard(sender, recipient, amount, currentRate, penaltyBurn, isSell);
+            _transferStandard(sender, recipient, amount, rate, penaltyBurn, isSell);
         } else if (senderExcludedFromReflection && recipientExcludedFromReflection) {
-            _transferBothExcluded(sender, recipient, amount, currentRate, penaltyBurn, isSell);
+            _transferBothExcluded(sender, recipient, amount, rate, penaltyBurn, isSell);
         } else {
-            _transferStandard(sender, recipient, amount, currentRate, penaltyBurn, isSell);
+            _transferStandard(sender, recipient, amount, rate, penaltyBurn, isSell);
         }
     }
 
@@ -611,11 +599,11 @@ contract Darwin is IDarwin, OwnableUpgradeable {
         address sender,
         address recipient,
         uint256 tAmount,
-        uint256 currentRate,
+        uint256 rate,
         bool penaltyBurn,
         bool isSell
     ) private {
-        Values memory values = _getValues(recipient, tAmount, currentRate, isSell, penaltyBurn);
+        Values memory values = _getValues(recipient, tAmount, rate, isSell, penaltyBurn);
 
         _tOwned[sender] -= tAmount;
         _rOwned[sender] -= values.rAmount;
@@ -630,11 +618,11 @@ contract Darwin is IDarwin, OwnableUpgradeable {
         address sender,
         address recipient,
         uint256 tAmount,
-        uint256 currentRate,
+        uint256 rate,
         bool penaltyBurn,
         bool isSell
     ) private {
-        Values memory values = _getValues(recipient, tAmount, currentRate, isSell, penaltyBurn);
+        Values memory values = _getValues(recipient, tAmount, rate, isSell, penaltyBurn);
 
         _rOwned[sender] -= values.rAmount;
         _tOwned[recipient] += values.tTransferAmount;
@@ -649,11 +637,11 @@ contract Darwin is IDarwin, OwnableUpgradeable {
         address sender,
         address recipient,
         uint256 tAmount,
-        uint256 currentRate,
+        uint256 rate,
         bool penaltyBurn,
         bool isSell
     ) private {
-        Values memory values = _getValues(recipient, tAmount, currentRate, isSell, penaltyBurn);
+        Values memory values = _getValues(recipient, tAmount, rate, isSell, penaltyBurn);
 
         _rOwned[sender] -= values.rAmount;
         _rOwned[recipient] += values.rTransferAmount;
@@ -667,11 +655,11 @@ contract Darwin is IDarwin, OwnableUpgradeable {
         address sender,
         address recipient,
         uint256 tAmount,
-        uint256 currentRate,
+        uint256 rate,
         bool penaltyBurn,
         bool isSell
     ) private {
-        Values memory values = _getValues(recipient, tAmount, currentRate, isSell, penaltyBurn);
+        Values memory values = _getValues(recipient, tAmount, rate, isSell, penaltyBurn);
 
         _tOwned[sender] -= tAmount;
         _rOwned[sender] -= values.rAmount;
@@ -781,14 +769,14 @@ contract Darwin is IDarwin, OwnableUpgradeable {
     function _getValues(
         address recipient,
         uint256 tAmount,
-        uint256 currentRate,
+        uint256 rate,
         bool isSell,
         bool penaltyBurn
     ) private view returns (Values memory) {
 
         TValues memory tValues = _getTValues(recipient, tAmount, isSell, penaltyBurn);
 
-        RValues memory rValues = _getRValues(tAmount, tValues, currentRate);
+        RValues memory rValues = _getRValues(tAmount, tValues, rate);
 
         return
             Values({
@@ -838,15 +826,15 @@ contract Darwin is IDarwin, OwnableUpgradeable {
     function _getRValues(
         uint256 tAmount,
         TValues memory tValues,
-        uint256 currentRate
+        uint256 rate
     ) private pure returns (RValues memory) {
         return
             RValues({
-                rAmount: tAmount * currentRate,
-                rTransferAmount: tValues.tTransferAmount * currentRate,
-                rBurnAmount: tValues.tBurnAmount * currentRate,
-                rReflection: tValues.tReflection * currentRate,
-                rCommunity: tValues.tCommunity * currentRate
+                rAmount: tAmount * rate,
+                rTransferAmount: tValues.tTransferAmount * rate,
+                rBurnAmount: tValues.tBurnAmount * rate,
+                rReflection: tValues.tReflection * rate,
+                rCommunity: tValues.tCommunity * rate
             });
     }
 
@@ -854,7 +842,7 @@ contract Darwin is IDarwin, OwnableUpgradeable {
         uint256 tAmount,
         uint256 tCommunity,
         bool penaltyBurn
-    ) private view returns (uint256, uint256) {
+    ) private pure returns (uint256, uint256) {
         uint256 tBurnAmount = (tAmount * (penaltyBurn ? penaltyBurnPercentage : burnPercentage)) / PERCENTAGE_100;
         uint256 tTransferAmount = tAmount - tBurnAmount - tCommunity;
 

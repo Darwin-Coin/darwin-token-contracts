@@ -440,55 +440,45 @@ contract DarwinCommunity is OwnableUpgradeable, IDarwinCommunity {
      * @notice Checks if the balance of a seller has dipped below the minimum required to vote, and removes votes cast if so
      * @param sender Address of a seller of darwin tokens
     */
-    function checkIfVotesAreElegible(address sender) external {
+    function checkIfVotesAreElegible(address sender, uint amount) external {
 
         require(msg.sender == address(darwin), "Caller isn't darwin token");
 
-        if(darwin.balanceOf(sender) >= MIN_DARWIN_REQUIRED_TO_ACCESS) {
+        if(amount >= MIN_DARWIN_REQUIRED_TO_ACCESS) {
             return;
         }
 
-        uint[] storage votes = usersVotes[sender];
+        uint[] memory votes = usersVotes[sender];
 
         if(votes.length == 0) {
             return;
         }
         
-        for(uint i = votes.length; i > 0; ) {
+        for(uint i = 0; i < votes.length; ) {
 
-            uint proposalId = votes[i - 1];
-            Receipt storage receipt = voteReceipts[proposalId][sender];
-
-            Proposal storage proposal = proposals[proposalId];
+            uint proposalId = votes[i];
 
             if(state(proposalId) == ProposalState.Active) {
 
-                if(receipt.inSupport) {
+                if(voteReceipts[proposalId][sender].inSupport) {
 
-                    proposal.forVotes -= 1;
+                    proposals[proposalId].forVotes -= 1;
 
                 } else {
-                    proposal.againstVotes -= 1;
+                    proposals[proposalId].againstVotes -= 1;
                 }
 
             }
 
             delete voteReceipts[proposalId][sender];
 
-            votes.pop();
-
-            if(i > 0) {
-                unchecked {
-                    ++i;
-                }
-            } else {
-                break;
+            unchecked {
+                ++i;
             }
             
-
         } 
 
-
+        delete usersVotes[sender];
 
     }
 }
