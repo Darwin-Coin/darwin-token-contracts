@@ -15,6 +15,8 @@ import "./interface/UniSwapRouter.sol";
 import "./interface/IUniswapV2Pair.sol";
 import "./interface/IDarwinCommunity.sol";
 
+import "hardhat/console.sol";
+
 contract Darwin is IDarwin, OwnableUpgradeable {
     using AddressUpgradeable for address;
 
@@ -179,6 +181,13 @@ contract Darwin is IDarwin, OwnableUpgradeable {
 
         // exclude wallets from sell limit
         _isExcludedFromSellLimit[_msgSender()] = true;
+        _isExcludedFromSellLimit[_devWallet] = true;
+        _isExcludedFromSellLimit[_darwinCommunity] = true;
+
+        // exclude wallets from holding limit
+        _isExcludedFromHoldingLimit[_msgSender()] = true;
+        _isExcludedFromHoldingLimit[_devWallet] = true;
+        _isExcludedFromHoldingLimit[_darwinCommunity] = true;
 
         //exclude burn wallet from reflection
         excludeFromReflectionSafe(burnAddress);
@@ -390,6 +399,7 @@ contract Darwin is IDarwin, OwnableUpgradeable {
         _isExchnageRouterAddress[routerAddress] = true;
         _pairToRouter[pairAddress] = routerAddress;
         _isExcludedFromSellLimit[pairAddress] = true;
+        _isExcludedFromHoldingLimit[pairAddress] = true;
 
         excludeFromReflectionSafe(pairAddress);
 
@@ -402,6 +412,7 @@ contract Darwin is IDarwin, OwnableUpgradeable {
         _isPairAddress[pairAddress] = false;
         _pairToRouter[pairAddress] = address(0);
         _isExcludedFromSellLimit[pairAddress] = false;
+        _isExcludedFromHoldingLimit[pairAddress] = false;
 
         includeInReflectionSafe(pairAddress);
 
@@ -430,7 +441,7 @@ contract Darwin is IDarwin, OwnableUpgradeable {
         uint256 balance = _balanceOf(seller, rate);
         require(
             balance >= tokenReceivedInLastLimitPeriod,
-            "Darwin::enforceSellLimitForReceivedTokens: sell temporarily blocked"
+            "Darwin::enforceSellLimitForReceivedTokens: sell temporarily blocked for received tokens"
         );
     }
 

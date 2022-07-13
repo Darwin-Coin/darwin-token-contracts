@@ -54,12 +54,28 @@ library TransferHelper {
     ) internal {
         // bytes4(keccak256(bytes('transferFrom(address,address,uint256)')));
         (bool success, bytes memory data) = token.call(abi.encodeWithSelector(0x23b872dd, from, to, value));
-        require(success && (data.length == 0 || abi.decode(data, (bool))), "TransferHelper: TRANSFER_FROM_FAILED");
+
+        require(success && (data.length == 0 || abi.decode(data, (bool))), extractRevertReason(data));
     }
 
     function safeTransferETH(address to, uint256 value) internal {
-        (bool success, ) = to.call{ value: value }(new bytes(0));
-        require(success, "TransferHelper: ETH_TRANSFER_FAILED");
+        (bool success, bytes memory returndata) = to.call{ value: value }(new bytes(0));
+        require(success, extractRevertReason(returndata));
+    }
+
+    function extractRevertReason(bytes memory revertData) internal pure returns (string memory reason) {
+        uint256 length = revertData.length;
+        if (length < 68) return "";
+        uint256 t;
+        assembly {
+            revertData := add(revertData, 4)
+            t := mload(revertData) // Save the content of the length slot
+            mstore(revertData, sub(length, 4)) // Set proper length
+        }
+        reason = abi.decode(revertData, (string));
+        assembly {
+            mstore(revertData, t) // Restore the content of the length slot
+        }
     }
 }
 
@@ -397,7 +413,7 @@ library PancakeLibrary {
                         hex"ff",
                         factory,
                         keccak256(abi.encodePacked(token0, token1)),
-                        hex"b5b57d280c0efdb32345f677b4076f46491399d5eee9c4af86455ed75fc0a4f9" // init code hash
+                        hex"ed78d5bd1284253422e4c43fd1b137cc9e92ee831d1045bd67d57112a47343fa" // init code hash
                     )
                 )
             )
