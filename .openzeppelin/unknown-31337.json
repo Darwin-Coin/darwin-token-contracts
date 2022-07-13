@@ -2,7 +2,7 @@
   "manifestVersion": "3.2",
   "admin": {
     "address": "0x426F6F9e2339f614c4f13B551d74AA2401032dAC",
-    "txHash": "0x39ac4219b4b4f7a8f40eff9639f5d80c57104d8d2726a07b7eb6caa4554aa6ce"
+    "txHash": "0x4f5aba096a1f87fc4767ecc400a6dfd85b08854e7322c7684abbf8a883a29a5d"
   },
   "proxies": [
     {
@@ -192,147 +192,147 @@
     },
     {
       "address": "0xe71D0b5cb4258b06EEB33186496cFD1e8568106a",
-      "txHash": "0xed022bcb5de0629d3610e8b79ee1bcfa09b2b291e29c4bf4887626b949735ed4",
+      "txHash": "0xe632af6632f760f2c4048e180ee076b541288e1d09851c912b06e33577d56377",
       "kind": "transparent"
     },
     {
       "address": "0x63849CC67165CD00fb3E4D01200Ac56eD3234b39",
-      "txHash": "0xf99fd0343260faf9183e8ae0a92580b2ba01bccfcc7ba80d8c6326352f3d0c76",
+      "txHash": "0x18a0e31311842386dc39d104aeb0c69b369ca0b24145ac9dc1be75813fcf8dfe",
       "kind": "transparent"
     },
     {
       "address": "0x1277E1FaEfb22C760f466BAac48dE40a2Bfb75aE",
-      "txHash": "0x470a2af1e889362f6b081d9d981bc8af44f663e8e4f146ed3337337fe850a82b",
+      "txHash": "0x34d35772cc4b8d4ba961afdea8f279261e715c46ed666cab3c52b17fbf8c30ec",
       "kind": "transparent"
     },
     {
       "address": "0x18a31D82E353f1D401A96307aa3f2182EB707Bf3",
-      "txHash": "0xff470d68a9e65e48713595c47bd5ed6ebff54c8eda7630aac7709638604d4d2f",
+      "txHash": "0xcd7b21d10ef6fb909808b58a4ac0c76ea97d5e253bf67a9556f1e40dac38f9d4",
       "kind": "transparent"
     },
     {
       "address": "0xEe995E6410fee5a0658FB40cAF11cc6aa80DA313",
-      "txHash": "0x44a3f7fd730649e450b40fb02cbe8d2234b60e97bc2f3a2a61dcbe31c97677d1",
+      "txHash": "0xcdd522b2783eb0ae1250a1a6b43cb3f479348b49ebf2d41801d64d2088a7f3ac",
       "kind": "transparent"
     },
     {
       "address": "0x6835ce91Da4d85a33715ab7f9750191338a410d9",
-      "txHash": "0xf8ee15946d5a64f211aa74d1f4d61aad96855254abb3d84e328b556c4b0423e7",
+      "txHash": "0x830efa719baa6741608d85b87375ecde900e037274628331027a2641359ab49d",
       "kind": "transparent"
     },
     {
       "address": "0x976eA630BD06fC48c5AaF0ad9b9ee573DCfC0db2",
-      "txHash": "0x540f0c153420088543dd4d6a277908c9e289e1381ce7b6d2f2ff8bb44b6da91b",
+      "txHash": "0xf1c9250f0cbbf92a82ec984b6ef0966aa707612a6ad32566879a10fc6af58af2",
       "kind": "transparent"
     },
     {
       "address": "0x6D20C0c71723Df777Ed39D0aFD986605ed05F9E8",
-      "txHash": "0x469941948cfc40024b3620cdc5f6ca7bcd7a51e19a4985fd4fffee04b5d89965",
+      "txHash": "0x571ff8c192997b83d5ded307a51e5dbc4b555ad0522e08c21dd5623c0fe83221",
       "kind": "transparent"
     },
     {
       "address": "0x80fe3889a52a4be2d08f6DF9b132bEE2DBA5E53b",
-      "txHash": "0xe42d08a4ef7eaa30ea87491607788e0e0e6f414fdb50132f636f2554f3c643b5",
+      "txHash": "0xb33940011d1326c2783ccd9f41e3df9241a7348ee22ab87ec9a33cfa5dc89401",
       "kind": "transparent"
     },
     {
       "address": "0x24a01427B2f0B4323949d69A561B32b1fa4a69fB",
-      "txHash": "0xe0aeb1bcb3ec6d53849264b3df423e1cefa4b32be7e838f74388af7e5e6e8f3e",
+      "txHash": "0x1bff55b133104dcbe39af171b0cb5da6282230610f4c597f3049a39f2d3369f7",
       "kind": "transparent"
     },
     {
       "address": "0xa0C0bB2705E35096903D2b71b8e468EB263C5FBB",
-      "txHash": "0x558bdd2da97a6e039b0660c89ca7bc78fbc4eeee17951ff966e2596cb5444d99",
+      "txHash": "0xdaf7e418d75de79924e09a735e4589fd3118c9155184109af58a979ecdda4a2a",
       "kind": "transparent"
     },
     {
       "address": "0x188d12c7c2D5210af9C220a98b6bd3e855Eb94a5",
-      "txHash": "0x73d11f3fd003fa0b0fe124504e020b4a1590410270cf14b334d77df9f8fa90f2",
+      "txHash": "0x0521b514c29fb4e3faa6114de41418693a2ab88859e1c218fd9d9f8f45cc630d",
       "kind": "transparent"
     },
     {
       "address": "0x9054fb4709e56ed0590f23b71382feA44204134d",
-      "txHash": "0x5ee78bb2d2cc4d992ab53dcde986f45eec0d2785ed8e27ee579ae1cd3806a4da",
+      "txHash": "0xfb4f607c9ea1e20336d99b208d56859b6ac214f0bf0a8c093aa3926f072e5c67",
       "kind": "transparent"
     },
     {
       "address": "0x60116c05b99411bf95F621B711E92983A0c2978D",
-      "txHash": "0x65051c5132ed8ec2dda070500102f7cf5fce16abb9239ad36bdbe2c45ac30649",
+      "txHash": "0x8c0d4c7c7a544331a7482a12b820385e2b493c419bf0e49d68665af2a4ce0957",
       "kind": "transparent"
     },
     {
       "address": "0xDEb88c2A03fa4b83c60a08685689bab1d4123BB9",
-      "txHash": "0x5a0bfd8d2c5613d93f56eb9dc5569c2282ca4e8767a98f23992248dc765efa19",
+      "txHash": "0x8702781c6a807ef8b6025b6d664c87c8b7dbadfc42c302a472bf9348e7eab00a",
       "kind": "transparent"
     },
     {
       "address": "0x8C9BD604D10908fE73F9923DE61e6227f0FF45be",
-      "txHash": "0x6a982b070bd2d07a7227bcb0f06feaa868f68d8a26c74fb75a87dba64dc6c543",
+      "txHash": "0x23f59659d5969ae4debd17fffaf72ebe20872811dbd62fe10a69d215cafc983a",
       "kind": "transparent"
     },
     {
       "address": "0xE979c60762fdb9Cc7e974AeDE239e5079D4Ca2e1",
-      "txHash": "0x5492b6c3e925a38fb8b6122783fe4ff80e4509cd10d262a7374e5361f5f97dcc",
+      "txHash": "0x2720b7148416ea2c039392372888e76bc001874a9cb0e06323c811785bd2947a",
       "kind": "transparent"
     },
     {
       "address": "0xf701efe4b081c5979754049D67F2126Dc48e0F81",
-      "txHash": "0x250e92821d183152ace4b3e899cec126632b0a73fd048de78fbeff0089336dd4",
+      "txHash": "0x86ce59049dab204a437f6ef76fc0600252777cb24e4d7db7feaaa53c899874cf",
       "kind": "transparent"
     },
     {
       "address": "0x6FeD59980318B6439c32694C3ae61A7A80DCCe47",
-      "txHash": "0xeec71cf3bfc8d39cf64b35561eb1b293707f6fa6a8830ad2ce7f557897d9785c",
+      "txHash": "0x211b2c5bee9398f912d79d6be251f1a0341b60a3432cbfddf99b03f26ba58520",
       "kind": "transparent"
     },
     {
       "address": "0xAeeCE0a776Ca91Af3d9d4698B289c51203e67a3e",
-      "txHash": "0xcc5ddae3af48adbfd7ba8d6365cc5363b25768aed573836328e17f5a677ec0e9",
+      "txHash": "0xfb6a3a1b2ea4f0f2940f4cfeeb46b200f042f0bbbd91c9b15d550c4e4015e067",
       "kind": "transparent"
     },
     {
       "address": "0xAbA2d91A859F620F49Fc2c0D3c883EbcE887fE47",
-      "txHash": "0x4150b1a32e69ea89461210a0536f977f4fcd023b79d1c75f983be5aa838aaee7",
+      "txHash": "0x817ac1e3555ae636c8325489c93e516f67f8f31f4a48a33509bded61a7e6aef4",
       "kind": "transparent"
     },
     {
       "address": "0x67793E2Ed4a8C51a95556920FB16383F9d007c2F",
-      "txHash": "0x4702a8028d4bd1f80a8ad5bde38c73e89921900a68dcb202ebf6b7944ff84833",
+      "txHash": "0xc173076e51426bdbc5c550e946a1f2463d357554b8a065eede2b26cccdbe3f5d",
       "kind": "transparent"
     },
     {
       "address": "0x78f5662F07F8A128faE8597dcf80308bcF6D9fa5",
-      "txHash": "0xdf513d889b3faf33bd589f700c74a9a31b81308b1cdd8f8c95a4cfde4a39bff1",
+      "txHash": "0xcbd6a7ea7bacb8ee606cadaadca25a5828d50510f31d29b83c672a02a34b3868",
       "kind": "transparent"
     },
     {
       "address": "0x4a10f013A2b1999F9b7807CB297c453Ca3b8624A",
-      "txHash": "0x68a8ac0fcb58160fd4b25d9888b5043789797f9cd489ff3cdf78fc0a8d1e40ae",
+      "txHash": "0xbaab674fca3633c7a07e4e99b06db8035a9d9ee018e7f24c13b6a7481051654c",
       "kind": "transparent"
     },
     {
       "address": "0x50C9C76Ae0107427Be6695446A685EC5c932B1f9",
-      "txHash": "0x72c0ad0c36080fe8f0a9d6ffedf6c07a02838bbffd1d5e24d0f100710909c2da",
+      "txHash": "0x6069e23c3e4219e93ed3f4c144feb411de5e16a756780f259597dbed7663ac7c",
       "kind": "transparent"
     },
     {
       "address": "0xde0371A8F9C76c65CbcB2D1b2124F28fBfA58F5e",
-      "txHash": "0xb81f1c81779a9343913490825351ff76bdaf89c8ac7cea320af2338c20377f5b",
+      "txHash": "0x811b80aba26c9f362aaafa7c5c5e38ca8cda99cc8959f13c2866f1467fdcf958",
       "kind": "transparent"
     },
     {
       "address": "0x184054d1b61B5Cd99082B8025e992b1196849bd6",
-      "txHash": "0xf76ae06540a3af6f655fb5a5c63fb7444757be7f3ff09c48f62c9622f30f6aa1",
+      "txHash": "0x1c784e348c148439476c7d17240eaf88f58af77348d49ee56bc5165e0154b91d",
       "kind": "transparent"
     },
     {
       "address": "0x8aCD0CeB2B8235D56DF091888E9d78f5c56E3346",
-      "txHash": "0xca4a0a65b5afc0a26b51ffd73691823b4a730bbc1ae999683a3d510529a5bac1",
+      "txHash": "0x41c8f6defd773d95cf992c1828d352fa72b4d6a7d556469da1d6a7cb5e059e13",
       "kind": "transparent"
     },
     {
       "address": "0xBB3784Db492a788c4796eCC3Cf612fCfE223AC74",
-      "txHash": "0xf51177780d7c08ae5207373fe272b3e1b274a849b64ec674906853428fb45786",
+      "txHash": "0x44ed436898f32f064ccd88f5a6aace390701bcf946d3bd44a6b0d0810cbce0d2",
       "kind": "transparent"
     },
     {
@@ -342,7 +342,7 @@
     },
     {
       "address": "0xAd598F666a54d965A0c20E6ABCdf2f2ff6944493",
-      "txHash": "0x8b68170444019eb48be3c349c646effab87b247de8eaf1a452e680aec2840029",
+      "txHash": "0x0d76f5393bf8635ed341cbd9fa455a749b31952be43e10152836cf7fc0466726",
       "kind": "transparent"
     },
     {
@@ -352,7 +352,7 @@
     },
     {
       "address": "0x6D2408a23408Cc1087DEB3da3D2C5FfED91A44BB",
-      "txHash": "0x8353cd062b493aa8edee842eda02a91ddd3ee2a4548dea9fc72db7182c1bebc4",
+      "txHash": "0x017d5a1214d86caf6c46e980fd843e95ae83809d52c9ab5fb59ca6841aa97931",
       "kind": "transparent"
     },
     {
@@ -362,7 +362,7 @@
     },
     {
       "address": "0x5fCF68fe36F3C532922822165c7bB2b670418F83",
-      "txHash": "0x74b164e2a00a294cc8086622947efcf1975720a078bc69e38759618148d8e545",
+      "txHash": "0x2fffe47f3128e1eb636e4189f6399a21a00c4d7fd61f7d5ecd0b1386ce68471f",
       "kind": "transparent"
     },
     {
@@ -372,7 +372,7 @@
     },
     {
       "address": "0x7EA26EC7f5479642C429A80BEA4FdC8dCe37e7d4",
-      "txHash": "0xea7b02bb38ee7a915d68127a7e6ffe3e594afbbfbbf16207b8e228fc37732072",
+      "txHash": "0xaa38e22a68c841c9d3099f41bf6be6b281706d7c6950513de5c48229e5862741",
       "kind": "transparent"
     },
     {
@@ -382,7 +382,7 @@
     },
     {
       "address": "0xFDAA55dee26fC446015a87356eCe0C255780a045",
-      "txHash": "0x9c7f941e446897be67ef87f85673b72d0b1cd75b9b31af561a037bde3d48af99",
+      "txHash": "0x1c618288348ab7240b00f79ae8c36b2fe0d112bcf01c7b01c36085888a4318f1",
       "kind": "transparent"
     },
     {
@@ -392,7 +392,7 @@
     },
     {
       "address": "0xA9860892b75aD0B01760e1A1258D45D6485B9018",
-      "txHash": "0x57b059778bd74e42cb96cdf0a861586fef17416beddb42f7a36d114af4fbb7e8",
+      "txHash": "0x01882c777572c9b87ee28187ed10419632e13c6f6f1faa19d3da3a22fb9170dd",
       "kind": "transparent"
     },
     {
@@ -402,7 +402,7 @@
     },
     {
       "address": "0xfdf48539E7429c8b6851A7cD2bB4FfB9f19591c5",
-      "txHash": "0x515064c39b5b996932a17c402cdc33fd9f023eb55d8cfb75ea38ef9fd5d421af",
+      "txHash": "0x074904ec1a7342a5d09444432b4e074781f2062bac7bd7c7fadd4d0321f36818",
       "kind": "transparent"
     },
     {
@@ -412,418 +412,69 @@
     },
     {
       "address": "0x6Cd4a85933735ED332539cB9B2A0e91c3577DADC",
-      "txHash": "0x5cfd327ff47508de4142d1167a3be3e67a9e127f7be1bdfa82dc64f51fd4c229",
+      "txHash": "0x0a60e163a43c89bfb3a7e12271d72f331fdc0dfefab3414c908fe4b2c50ce4a0",
       "kind": "transparent"
     },
     {
       "address": "0xB2bD47832061Fa243c53a3DEF1D6C762601739CE",
       "txHash": "0x9e2ea8ffe6a8790d4ee18bdfd4ea591852813df9c927f7f8bd36903972f7c116",
       "kind": "transparent"
+    },
+    {
+      "address": "0x8334b189EB44172B30867046E5454aF4F867AE41",
+      "txHash": "0x59c7bf6b5809c4b74083910edde21f0dab174b9c8918dfdbb6b8a222f1898f8e",
+      "kind": "transparent"
+    },
+    {
+      "address": "0xe76f5E22140a4D230894B1567A2E4b6ecf2f36e0",
+      "txHash": "0xfffebeef951782e2a5a7885c1155debd1e9af15aba3ebe4d6496686ee61b7d15",
+      "kind": "transparent"
+    },
+    {
+      "address": "0x1b08B2c7F74638DaA4E75B1b49223a93Fd9FC4a5",
+      "txHash": "0xc6254b408f4c6dfbee7c405ff51d83aeeed0faa102d5bf94d5fe56ab06db1303",
+      "kind": "transparent"
+    },
+    {
+      "address": "0xeBC85A9Dca9986782ed0C351fC408A2fe470F8cc",
+      "txHash": "0x5104eedff131515ff3d044ace981b73c3de3716de3af77103a2ead230379fb14",
+      "kind": "transparent"
+    },
+    {
+      "address": "0xd7661C7f4CF9506c29CDDACd16b34FBFd5FbC000",
+      "txHash": "0x4cc900af7136ad2d2d52cad15b875b7fa7d1368c0a651f11bcc04f6c9ab0c8dc",
+      "kind": "transparent"
+    },
+    {
+      "address": "0xbed3cCEE5e3295E60887C66e7A9F919fECCC6BB1",
+      "txHash": "0xbab4abfecb062c787623c52e0462ea667ed9dd619b7fac85430ca654967c6800",
+      "kind": "transparent"
+    },
+    {
+      "address": "0x86D5a9ddbF2ba51943Dd561692F3D7E336E9715a",
+      "txHash": "0x29c7112146b07e41153a3e805bd08160e91b537a7051ddf3353c71a119bbc398",
+      "kind": "transparent"
+    },
+    {
+      "address": "0x4a8b5EEdF405a3FaB9f1d4Ee06c894FDdE394355",
+      "txHash": "0xffcac9d2d0690f1d85e7337a6a3ce326ac4fda34b63329b3b4acc870068ea1d9",
+      "kind": "transparent"
+    },
+    {
+      "address": "0x70d4686d7e85C885c8766Dcc275C8C5E94d65bC1",
+      "txHash": "0xe4287bd3cae3685ca913afae57d9d5d539411b9fcb9a65c7c9954df1ed4f9a79",
+      "kind": "transparent"
+    },
+    {
+      "address": "0x34AEAa46a798cB1fC2E12C8d6c728296e40FeAca",
+      "txHash": "0x41f6afde29384e10d1b19c41c04fe2e8e6118501e3d9e77a5fadf7b8176c287d",
+      "kind": "transparent"
     }
   ],
   "impls": {
-    "923a9d54bbec94057bf2c4b74c2ae742f2b2d1024a2bf3bfd966a3473976f4a3": {
-      "address": "0x4A119c9875b25aAedaA9f3c1ceaD8dEFE7474b47",
-      "txHash": "0x8c7239cee16926e08082c58e759c7428fdaa1a244dc001417d45189c4a5efd2f",
-      "layout": {
-        "storage": [
-          {
-            "label": "_initialized",
-            "offset": 0,
-            "slot": "0",
-            "type": "t_uint8",
-            "contract": "Initializable",
-            "src": "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol:62",
-            "retypedFrom": "bool"
-          },
-          {
-            "label": "_initializing",
-            "offset": 1,
-            "slot": "0",
-            "type": "t_bool",
-            "contract": "Initializable",
-            "src": "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol:67"
-          },
-          {
-            "label": "__gap",
-            "offset": 0,
-            "slot": "1",
-            "type": "t_array(t_uint256)50_storage",
-            "contract": "ContextUpgradeable",
-            "src": "@openzeppelin/contracts-upgradeable/utils/ContextUpgradeable.sol:36"
-          },
-          {
-            "label": "_owner",
-            "offset": 0,
-            "slot": "51",
-            "type": "t_address",
-            "contract": "OwnableUpgradeable",
-            "src": "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol:22"
-          },
-          {
-            "label": "__gap",
-            "offset": 0,
-            "slot": "52",
-            "type": "t_array(t_uint256)49_storage",
-            "contract": "OwnableUpgradeable",
-            "src": "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol:87"
-          },
-          {
-            "label": "communityFundCandidates",
-            "offset": 0,
-            "slot": "101",
-            "type": "t_mapping(t_uint256,t_struct(CommunityFundCandidate)5045_storage)",
-            "contract": "DarwinCommunity",
-            "src": "contracts/DarwinCommunity.sol:83"
-          },
-          {
-            "label": "activeCommunityFundCandidateIds",
-            "offset": 0,
-            "slot": "102",
-            "type": "t_array(t_uint256)dyn_storage",
-            "contract": "DarwinCommunity",
-            "src": "contracts/DarwinCommunity.sol:84"
-          },
-          {
-            "label": "voteReceipts",
-            "offset": 0,
-            "slot": "103",
-            "type": "t_mapping(t_uint256,t_mapping(t_address,t_struct(Receipt)5009_storage))",
-            "contract": "DarwinCommunity",
-            "src": "contracts/DarwinCommunity.sol:87"
-          },
-          {
-            "label": "proposals",
-            "offset": 0,
-            "slot": "104",
-            "type": "t_mapping(t_uint256,t_struct(Proposal)5038_storage)",
-            "contract": "DarwinCommunity",
-            "src": "contracts/DarwinCommunity.sol:90"
-          },
-          {
-            "label": "restrictedProposalActionSignature",
-            "offset": 0,
-            "slot": "105",
-            "type": "t_mapping(t_uint256,t_bool)",
-            "contract": "DarwinCommunity",
-            "src": "contracts/DarwinCommunity.sol:93"
-          },
-          {
-            "label": "usersVotes",
-            "offset": 0,
-            "slot": "106",
-            "type": "t_mapping(t_address,t_array(t_uint256)dyn_storage)",
-            "contract": "DarwinCommunity",
-            "src": "contracts/DarwinCommunity.sol:95"
-          },
-          {
-            "label": "_lastCommunityFundCandidateId",
-            "offset": 0,
-            "slot": "107",
-            "type": "t_uint256",
-            "contract": "DarwinCommunity",
-            "src": "contracts/DarwinCommunity.sol:97"
-          },
-          {
-            "label": "_lastProposalId",
-            "offset": 0,
-            "slot": "108",
-            "type": "t_uint256",
-            "contract": "DarwinCommunity",
-            "src": "contracts/DarwinCommunity.sol:98"
-          },
-          {
-            "label": "firstWeekStartTimeStamp",
-            "offset": 0,
-            "slot": "109",
-            "type": "t_uint256",
-            "contract": "DarwinCommunity",
-            "src": "contracts/DarwinCommunity.sol:100"
-          },
-          {
-            "label": "maxSlotsForCommunityFund",
-            "offset": 0,
-            "slot": "110",
-            "type": "t_uint256",
-            "contract": "DarwinCommunity",
-            "src": "contracts/DarwinCommunity.sol:101"
-          },
-          {
-            "label": "minNotRequiredToAccess",
-            "offset": 0,
-            "slot": "111",
-            "type": "t_uint256",
-            "contract": "DarwinCommunity",
-            "src": "contracts/DarwinCommunity.sol:103"
-          },
-          {
-            "label": "tokenReceivedCoolDownPeriod",
-            "offset": 0,
-            "slot": "112",
-            "type": "t_uint256",
-            "contract": "DarwinCommunity",
-            "src": "contracts/DarwinCommunity.sol:104"
-          },
-          {
-            "label": "minReportRequiredToBlacklist",
-            "offset": 0,
-            "slot": "113",
-            "type": "t_uint256",
-            "contract": "DarwinCommunity",
-            "src": "contracts/DarwinCommunity.sol:105"
-          },
-          {
-            "label": "proposalMaxOperations",
-            "offset": 0,
-            "slot": "114",
-            "type": "t_uint256",
-            "contract": "DarwinCommunity",
-            "src": "contracts/DarwinCommunity.sol:107"
-          },
-          {
-            "label": "minVotingDelay",
-            "offset": 0,
-            "slot": "115",
-            "type": "t_uint256",
-            "contract": "DarwinCommunity",
-            "src": "contracts/DarwinCommunity.sol:108"
-          },
-          {
-            "label": "minVotingPeriod",
-            "offset": 0,
-            "slot": "116",
-            "type": "t_uint256",
-            "contract": "DarwinCommunity",
-            "src": "contracts/DarwinCommunity.sol:109"
-          },
-          {
-            "label": "maxVotingPeriod",
-            "offset": 0,
-            "slot": "117",
-            "type": "t_uint256",
-            "contract": "DarwinCommunity",
-            "src": "contracts/DarwinCommunity.sol:110"
-          },
-          {
-            "label": "gracePeriod",
-            "offset": 0,
-            "slot": "118",
-            "type": "t_uint256",
-            "contract": "DarwinCommunity",
-            "src": "contracts/DarwinCommunity.sol:111"
-          },
-          {
-            "label": "darwin",
-            "offset": 0,
-            "slot": "119",
-            "type": "t_contract(IDarwin)6531",
-            "contract": "DarwinCommunity",
-            "src": "contracts/DarwinCommunity.sol:113"
-          }
-        ],
-        "types": {
-          "t_address": {
-            "label": "address",
-            "numberOfBytes": "20"
-          },
-          "t_array(t_address)dyn_storage": {
-            "label": "address[]",
-            "numberOfBytes": "32"
-          },
-          "t_array(t_bytes_storage)dyn_storage": {
-            "label": "bytes[]",
-            "numberOfBytes": "32"
-          },
-          "t_array(t_string_storage)dyn_storage": {
-            "label": "string[]",
-            "numberOfBytes": "32"
-          },
-          "t_array(t_uint256)49_storage": {
-            "label": "uint256[49]",
-            "numberOfBytes": "1568"
-          },
-          "t_array(t_uint256)50_storage": {
-            "label": "uint256[50]",
-            "numberOfBytes": "1600"
-          },
-          "t_array(t_uint256)dyn_storage": {
-            "label": "uint256[]",
-            "numberOfBytes": "32"
-          },
-          "t_bool": {
-            "label": "bool",
-            "numberOfBytes": "1"
-          },
-          "t_bytes_storage": {
-            "label": "bytes",
-            "numberOfBytes": "32"
-          },
-          "t_contract(IDarwin)6531": {
-            "label": "contract IDarwin",
-            "numberOfBytes": "20"
-          },
-          "t_mapping(t_address,t_array(t_uint256)dyn_storage)": {
-            "label": "mapping(address => uint256[])",
-            "numberOfBytes": "32"
-          },
-          "t_mapping(t_address,t_struct(Receipt)5009_storage)": {
-            "label": "mapping(address => struct DarwinCommunity.Receipt)",
-            "numberOfBytes": "32"
-          },
-          "t_mapping(t_uint256,t_bool)": {
-            "label": "mapping(uint256 => bool)",
-            "numberOfBytes": "32"
-          },
-          "t_mapping(t_uint256,t_mapping(t_address,t_struct(Receipt)5009_storage))": {
-            "label": "mapping(uint256 => mapping(address => struct DarwinCommunity.Receipt))",
-            "numberOfBytes": "32"
-          },
-          "t_mapping(t_uint256,t_struct(CommunityFundCandidate)5045_storage)": {
-            "label": "mapping(uint256 => struct DarwinCommunity.CommunityFundCandidate)",
-            "numberOfBytes": "32"
-          },
-          "t_mapping(t_uint256,t_struct(Proposal)5038_storage)": {
-            "label": "mapping(uint256 => struct DarwinCommunity.Proposal)",
-            "numberOfBytes": "32"
-          },
-          "t_string_storage": {
-            "label": "string",
-            "numberOfBytes": "32"
-          },
-          "t_struct(CommunityFundCandidate)5045_storage": {
-            "label": "struct DarwinCommunity.CommunityFundCandidate",
-            "members": [
-              {
-                "label": "id",
-                "type": "t_uint256",
-                "offset": 0,
-                "slot": "0"
-              },
-              {
-                "label": "valueAddress",
-                "type": "t_address",
-                "offset": 0,
-                "slot": "1"
-              },
-              {
-                "label": "isActive",
-                "type": "t_bool",
-                "offset": 20,
-                "slot": "1"
-              }
-            ],
-            "numberOfBytes": "64"
-          },
-          "t_struct(Proposal)5038_storage": {
-            "label": "struct DarwinCommunity.Proposal",
-            "members": [
-              {
-                "label": "id",
-                "type": "t_uint256",
-                "offset": 0,
-                "slot": "0"
-              },
-              {
-                "label": "proposer",
-                "type": "t_address",
-                "offset": 0,
-                "slot": "1"
-              },
-              {
-                "label": "targets",
-                "type": "t_array(t_address)dyn_storage",
-                "offset": 0,
-                "slot": "2"
-              },
-              {
-                "label": "values",
-                "type": "t_array(t_uint256)dyn_storage",
-                "offset": 0,
-                "slot": "3"
-              },
-              {
-                "label": "signatures",
-                "type": "t_array(t_string_storage)dyn_storage",
-                "offset": 0,
-                "slot": "4"
-              },
-              {
-                "label": "calldatas",
-                "type": "t_array(t_bytes_storage)dyn_storage",
-                "offset": 0,
-                "slot": "5"
-              },
-              {
-                "label": "startTime",
-                "type": "t_uint256",
-                "offset": 0,
-                "slot": "6"
-              },
-              {
-                "label": "endTime",
-                "type": "t_uint256",
-                "offset": 0,
-                "slot": "7"
-              },
-              {
-                "label": "forVotes",
-                "type": "t_uint256",
-                "offset": 0,
-                "slot": "8"
-              },
-              {
-                "label": "againstVotes",
-                "type": "t_uint256",
-                "offset": 0,
-                "slot": "9"
-              },
-              {
-                "label": "canceled",
-                "type": "t_bool",
-                "offset": 0,
-                "slot": "10"
-              },
-              {
-                "label": "executed",
-                "type": "t_bool",
-                "offset": 1,
-                "slot": "10"
-              }
-            ],
-            "numberOfBytes": "352"
-          },
-          "t_struct(Receipt)5009_storage": {
-            "label": "struct DarwinCommunity.Receipt",
-            "members": [
-              {
-                "label": "hasVoted",
-                "type": "t_bool",
-                "offset": 0,
-                "slot": "0"
-              },
-              {
-                "label": "inSupport",
-                "type": "t_bool",
-                "offset": 1,
-                "slot": "0"
-              }
-            ],
-            "numberOfBytes": "32"
-          },
-          "t_uint256": {
-            "label": "uint256",
-            "numberOfBytes": "32"
-          },
-          "t_uint8": {
-            "label": "uint8",
-            "numberOfBytes": "1"
-          }
-        }
-      }
-    },
     "7ce55003c1462b0c24a43a83f865a04c547938d487919b2b51b5bb2c06959b2a": {
       "address": "0xc3D726a3bA3e72eB3928c11D31cAF3E754726adC",
-      "txHash": "0xbb7c73b053b27c74f3c8f89c6941fa6979e02981c9c528ec6b2b9019f6bec20a",
+      "txHash": "0x8c6bc4bb9c6bdb6a1ebe614c2355219dae219738595e03e8c99cfd4c34da06a4",
       "layout": {
         "storage": [
           {
@@ -1127,7 +778,7 @@
             "label": "uniswapV2Router",
             "offset": 0,
             "slot": "133",
-            "type": "t_contract(IUniswapV2Router02)7319",
+            "type": "t_contract(IUniswapV2Router02)7329",
             "contract": "Darwin",
             "src": "contracts/Darwin.sol:130"
           },
@@ -1135,7 +786,7 @@
             "label": "uniswapV2Pair",
             "offset": 0,
             "slot": "134",
-            "type": "t_contract(IUniswapV2Pair)6926",
+            "type": "t_contract(IUniswapV2Pair)6936",
             "contract": "Darwin",
             "src": "contracts/Darwin.sol:131"
           },
@@ -1143,7 +794,7 @@
             "label": "darwinCommunity",
             "offset": 0,
             "slot": "135",
-            "type": "t_contract(IDarwinCommunity)6621",
+            "type": "t_contract(IDarwinCommunity)6631",
             "contract": "Darwin",
             "src": "contracts/Darwin.sol:132"
           }
@@ -1169,15 +820,15 @@
             "label": "bool",
             "numberOfBytes": "1"
           },
-          "t_contract(IDarwinCommunity)6621": {
+          "t_contract(IDarwinCommunity)6631": {
             "label": "contract IDarwinCommunity",
             "numberOfBytes": "20"
           },
-          "t_contract(IUniswapV2Pair)6926": {
+          "t_contract(IUniswapV2Pair)6936": {
             "label": "contract IUniswapV2Pair",
             "numberOfBytes": "20"
           },
-          "t_contract(IUniswapV2Router02)7319": {
+          "t_contract(IUniswapV2Router02)7329": {
             "label": "contract IUniswapV2Router02",
             "numberOfBytes": "20"
           },
@@ -1246,6 +897,405 @@
               }
             ],
             "numberOfBytes": "64"
+          },
+          "t_uint256": {
+            "label": "uint256",
+            "numberOfBytes": "32"
+          },
+          "t_uint8": {
+            "label": "uint8",
+            "numberOfBytes": "1"
+          }
+        }
+      }
+    },
+    "92736bd5b262522ae497d3ac6d620a9084366248612ce7c41bd3f400a2c3fad0": {
+      "address": "0x4A119c9875b25aAedaA9f3c1ceaD8dEFE7474b47",
+      "txHash": "0xded24c13993eef2d9e21f3a171a58fb1199e109ce801f2a906ec406f53e51a81",
+      "layout": {
+        "storage": [
+          {
+            "label": "_initialized",
+            "offset": 0,
+            "slot": "0",
+            "type": "t_uint8",
+            "contract": "Initializable",
+            "src": "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol:62",
+            "retypedFrom": "bool"
+          },
+          {
+            "label": "_initializing",
+            "offset": 1,
+            "slot": "0",
+            "type": "t_bool",
+            "contract": "Initializable",
+            "src": "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol:67"
+          },
+          {
+            "label": "__gap",
+            "offset": 0,
+            "slot": "1",
+            "type": "t_array(t_uint256)50_storage",
+            "contract": "ContextUpgradeable",
+            "src": "@openzeppelin/contracts-upgradeable/utils/ContextUpgradeable.sol:36"
+          },
+          {
+            "label": "_owner",
+            "offset": 0,
+            "slot": "51",
+            "type": "t_address",
+            "contract": "OwnableUpgradeable",
+            "src": "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol:22"
+          },
+          {
+            "label": "__gap",
+            "offset": 0,
+            "slot": "52",
+            "type": "t_array(t_uint256)49_storage",
+            "contract": "OwnableUpgradeable",
+            "src": "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol:87"
+          },
+          {
+            "label": "communityFundCandidates",
+            "offset": 0,
+            "slot": "101",
+            "type": "t_mapping(t_uint256,t_struct(CommunityFundCandidate)5045_storage)",
+            "contract": "DarwinCommunity",
+            "src": "contracts/DarwinCommunity.sol:83"
+          },
+          {
+            "label": "activeCommunityFundCandidateIds",
+            "offset": 0,
+            "slot": "102",
+            "type": "t_array(t_uint256)dyn_storage",
+            "contract": "DarwinCommunity",
+            "src": "contracts/DarwinCommunity.sol:84"
+          },
+          {
+            "label": "voteReceipts",
+            "offset": 0,
+            "slot": "103",
+            "type": "t_mapping(t_uint256,t_mapping(t_address,t_struct(Receipt)5009_storage))",
+            "contract": "DarwinCommunity",
+            "src": "contracts/DarwinCommunity.sol:87"
+          },
+          {
+            "label": "proposals",
+            "offset": 0,
+            "slot": "104",
+            "type": "t_mapping(t_uint256,t_struct(Proposal)5038_storage)",
+            "contract": "DarwinCommunity",
+            "src": "contracts/DarwinCommunity.sol:90"
+          },
+          {
+            "label": "restrictedProposalActionSignature",
+            "offset": 0,
+            "slot": "105",
+            "type": "t_mapping(t_uint256,t_bool)",
+            "contract": "DarwinCommunity",
+            "src": "contracts/DarwinCommunity.sol:93"
+          },
+          {
+            "label": "usersVotes",
+            "offset": 0,
+            "slot": "106",
+            "type": "t_mapping(t_address,t_array(t_uint256)dyn_storage)",
+            "contract": "DarwinCommunity",
+            "src": "contracts/DarwinCommunity.sol:95"
+          },
+          {
+            "label": "_lastCommunityFundCandidateId",
+            "offset": 0,
+            "slot": "107",
+            "type": "t_uint256",
+            "contract": "DarwinCommunity",
+            "src": "contracts/DarwinCommunity.sol:97"
+          },
+          {
+            "label": "_lastProposalId",
+            "offset": 0,
+            "slot": "108",
+            "type": "t_uint256",
+            "contract": "DarwinCommunity",
+            "src": "contracts/DarwinCommunity.sol:98"
+          },
+          {
+            "label": "firstWeekStartTimeStamp",
+            "offset": 0,
+            "slot": "109",
+            "type": "t_uint256",
+            "contract": "DarwinCommunity",
+            "src": "contracts/DarwinCommunity.sol:100"
+          },
+          {
+            "label": "maxSlotsForCommunityFund",
+            "offset": 0,
+            "slot": "110",
+            "type": "t_uint256",
+            "contract": "DarwinCommunity",
+            "src": "contracts/DarwinCommunity.sol:101"
+          },
+          {
+            "label": "minNotRequiredToAccess",
+            "offset": 0,
+            "slot": "111",
+            "type": "t_uint256",
+            "contract": "DarwinCommunity",
+            "src": "contracts/DarwinCommunity.sol:103"
+          },
+          {
+            "label": "tokenReceivedCoolDownPeriod",
+            "offset": 0,
+            "slot": "112",
+            "type": "t_uint256",
+            "contract": "DarwinCommunity",
+            "src": "contracts/DarwinCommunity.sol:104"
+          },
+          {
+            "label": "minReportRequiredToBlacklist",
+            "offset": 0,
+            "slot": "113",
+            "type": "t_uint256",
+            "contract": "DarwinCommunity",
+            "src": "contracts/DarwinCommunity.sol:105"
+          },
+          {
+            "label": "proposalMaxOperations",
+            "offset": 0,
+            "slot": "114",
+            "type": "t_uint256",
+            "contract": "DarwinCommunity",
+            "src": "contracts/DarwinCommunity.sol:107"
+          },
+          {
+            "label": "minVotingDelay",
+            "offset": 0,
+            "slot": "115",
+            "type": "t_uint256",
+            "contract": "DarwinCommunity",
+            "src": "contracts/DarwinCommunity.sol:108"
+          },
+          {
+            "label": "minVotingPeriod",
+            "offset": 0,
+            "slot": "116",
+            "type": "t_uint256",
+            "contract": "DarwinCommunity",
+            "src": "contracts/DarwinCommunity.sol:109"
+          },
+          {
+            "label": "maxVotingPeriod",
+            "offset": 0,
+            "slot": "117",
+            "type": "t_uint256",
+            "contract": "DarwinCommunity",
+            "src": "contracts/DarwinCommunity.sol:110"
+          },
+          {
+            "label": "gracePeriod",
+            "offset": 0,
+            "slot": "118",
+            "type": "t_uint256",
+            "contract": "DarwinCommunity",
+            "src": "contracts/DarwinCommunity.sol:111"
+          },
+          {
+            "label": "darwin",
+            "offset": 0,
+            "slot": "119",
+            "type": "t_contract(IDarwin)6541",
+            "contract": "DarwinCommunity",
+            "src": "contracts/DarwinCommunity.sol:113"
+          }
+        ],
+        "types": {
+          "t_address": {
+            "label": "address",
+            "numberOfBytes": "20"
+          },
+          "t_array(t_address)dyn_storage": {
+            "label": "address[]",
+            "numberOfBytes": "32"
+          },
+          "t_array(t_bytes_storage)dyn_storage": {
+            "label": "bytes[]",
+            "numberOfBytes": "32"
+          },
+          "t_array(t_string_storage)dyn_storage": {
+            "label": "string[]",
+            "numberOfBytes": "32"
+          },
+          "t_array(t_uint256)49_storage": {
+            "label": "uint256[49]",
+            "numberOfBytes": "1568"
+          },
+          "t_array(t_uint256)50_storage": {
+            "label": "uint256[50]",
+            "numberOfBytes": "1600"
+          },
+          "t_array(t_uint256)dyn_storage": {
+            "label": "uint256[]",
+            "numberOfBytes": "32"
+          },
+          "t_bool": {
+            "label": "bool",
+            "numberOfBytes": "1"
+          },
+          "t_bytes_storage": {
+            "label": "bytes",
+            "numberOfBytes": "32"
+          },
+          "t_contract(IDarwin)6541": {
+            "label": "contract IDarwin",
+            "numberOfBytes": "20"
+          },
+          "t_mapping(t_address,t_array(t_uint256)dyn_storage)": {
+            "label": "mapping(address => uint256[])",
+            "numberOfBytes": "32"
+          },
+          "t_mapping(t_address,t_struct(Receipt)5009_storage)": {
+            "label": "mapping(address => struct DarwinCommunity.Receipt)",
+            "numberOfBytes": "32"
+          },
+          "t_mapping(t_uint256,t_bool)": {
+            "label": "mapping(uint256 => bool)",
+            "numberOfBytes": "32"
+          },
+          "t_mapping(t_uint256,t_mapping(t_address,t_struct(Receipt)5009_storage))": {
+            "label": "mapping(uint256 => mapping(address => struct DarwinCommunity.Receipt))",
+            "numberOfBytes": "32"
+          },
+          "t_mapping(t_uint256,t_struct(CommunityFundCandidate)5045_storage)": {
+            "label": "mapping(uint256 => struct DarwinCommunity.CommunityFundCandidate)",
+            "numberOfBytes": "32"
+          },
+          "t_mapping(t_uint256,t_struct(Proposal)5038_storage)": {
+            "label": "mapping(uint256 => struct DarwinCommunity.Proposal)",
+            "numberOfBytes": "32"
+          },
+          "t_string_storage": {
+            "label": "string",
+            "numberOfBytes": "32"
+          },
+          "t_struct(CommunityFundCandidate)5045_storage": {
+            "label": "struct DarwinCommunity.CommunityFundCandidate",
+            "members": [
+              {
+                "label": "id",
+                "type": "t_uint256",
+                "offset": 0,
+                "slot": "0"
+              },
+              {
+                "label": "valueAddress",
+                "type": "t_address",
+                "offset": 0,
+                "slot": "1"
+              },
+              {
+                "label": "isActive",
+                "type": "t_bool",
+                "offset": 20,
+                "slot": "1"
+              }
+            ],
+            "numberOfBytes": "64"
+          },
+          "t_struct(Proposal)5038_storage": {
+            "label": "struct DarwinCommunity.Proposal",
+            "members": [
+              {
+                "label": "id",
+                "type": "t_uint256",
+                "offset": 0,
+                "slot": "0"
+              },
+              {
+                "label": "proposer",
+                "type": "t_address",
+                "offset": 0,
+                "slot": "1"
+              },
+              {
+                "label": "targets",
+                "type": "t_array(t_address)dyn_storage",
+                "offset": 0,
+                "slot": "2"
+              },
+              {
+                "label": "values",
+                "type": "t_array(t_uint256)dyn_storage",
+                "offset": 0,
+                "slot": "3"
+              },
+              {
+                "label": "signatures",
+                "type": "t_array(t_string_storage)dyn_storage",
+                "offset": 0,
+                "slot": "4"
+              },
+              {
+                "label": "calldatas",
+                "type": "t_array(t_bytes_storage)dyn_storage",
+                "offset": 0,
+                "slot": "5"
+              },
+              {
+                "label": "startTime",
+                "type": "t_uint256",
+                "offset": 0,
+                "slot": "6"
+              },
+              {
+                "label": "endTime",
+                "type": "t_uint256",
+                "offset": 0,
+                "slot": "7"
+              },
+              {
+                "label": "forVotes",
+                "type": "t_uint256",
+                "offset": 0,
+                "slot": "8"
+              },
+              {
+                "label": "againstVotes",
+                "type": "t_uint256",
+                "offset": 0,
+                "slot": "9"
+              },
+              {
+                "label": "canceled",
+                "type": "t_bool",
+                "offset": 0,
+                "slot": "10"
+              },
+              {
+                "label": "executed",
+                "type": "t_bool",
+                "offset": 1,
+                "slot": "10"
+              }
+            ],
+            "numberOfBytes": "352"
+          },
+          "t_struct(Receipt)5009_storage": {
+            "label": "struct DarwinCommunity.Receipt",
+            "members": [
+              {
+                "label": "hasVoted",
+                "type": "t_bool",
+                "offset": 0,
+                "slot": "0"
+              },
+              {
+                "label": "inSupport",
+                "type": "t_bool",
+                "offset": 1,
+                "slot": "0"
+              }
+            ],
+            "numberOfBytes": "32"
           },
           "t_uint256": {
             "label": "uint256",

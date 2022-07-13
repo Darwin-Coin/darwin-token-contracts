@@ -151,6 +151,8 @@ contract DarwinCommunity is OwnableUpgradeable, IDarwinCommunity {
         maxVotingPeriod = 1 weeks;
         gracePeriod = 72 hours;
 
+        minNotRequiredToAccess = 10 * 1000 * 10**9; // 10k
+
         tokenReceivedCoolDownPeriod = 15 days;
 
         for (uint256 i = 0; i < restrictedProposalSignatures.length; i++) {
