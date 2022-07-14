@@ -13,22 +13,24 @@ import "./interface/IDarwin.sol";
 import "./interface/IUniswapV2Factory.sol";
 import "./interface/UniSwapRouter.sol";
 import "./interface/IUniswapV2Pair.sol";
-
-interface ICommunity {
-    function checkIfVotesAreElegible(address sender, uint amount) external;
-}
+import "./interface/IDarwinCommunity.sol";
 
 contract Darwin is IDarwin, OwnableUpgradeable {
-    using SafeMathUpgradeable for uint256;
     using AddressUpgradeable for address;
-
-    
 
     uint256 private constant MAX = ~uint256(0);
     uint256 private constant PERCENTAGE_MULTIPLIER = 100;
     uint256 private constant PERCENTAGE_100 = 100 * PERCENTAGE_MULTIPLIER;
 
     uint256 public constant DEV_WALLET_PECENTAGE = 10 * PERCENTAGE_MULTIPLIER;
+
+    modifier onlyDarwinCommunity() {
+        require(
+            msg.sender == address(darwinCommunity),
+            "Darwin::onlyDarwinCommunity: only accessible to darwin community"
+        );
+        _;
+    }
 
     /// @notice Accumulatively log sold tokens
     struct TokenSellLog {
@@ -101,6 +103,9 @@ contract Darwin is IDarwin, OwnableUpgradeable {
     /// @notice track bought tokens boughtTokenSellLimitDuration
     mapping(address => TokenTnxLog) private _tokenBoughtLog;
 
+    /// @notice last token received timestamp
+    mapping(address => uint256) private _lastTokenReceivedTime;
+
     uint256 public communityTokensPercentage;
     uint256 public burnPercentage;
     uint256 public penaltyBurnPercentage;
@@ -118,12 +123,11 @@ contract Darwin is IDarwin, OwnableUpgradeable {
     uint256 public maxTokenHoldingSize;
 
     address public burnAddress;
-    address public communityWallet;
     address public reflectionWallet;
 
     IUniswapV2Router02 public uniswapV2Router;
     IUniswapV2Pair public uniswapV2Pair;
-    ICommunity darwinCommunity;
+    IDarwinCommunity darwinCommunity;
 
     function initialize(
         address uniswapV2RouterAddress,
@@ -160,12 +164,9 @@ contract Darwin is IDarwin, OwnableUpgradeable {
         _rOwned[_msgSender()] = _rTotal - _rOwned[_devWallet];
 
         uniswapV2Router = IUniswapV2Router02(uniswapV2RouterAddress);
+        darwinCommunity = IDarwinCommunity(_darwinCommunity);
 
         burnAddress = 0x000000000000000000000000000000000000dEaD;
-        communityWallet = _darwinCommunity;
-
-        ///@notice Is this the same as the darwinCommunity contract?
-        darwinCommunity = ICommunity(_darwinCommunity);
         reflectionWallet = getPsudoRandomWallet(block.timestamp / 2);
 
         // Create a uniswap pair for this new token
@@ -218,24 +219,20 @@ contract Darwin is IDarwin, OwnableUpgradeable {
 
     function increaseAllowance(address spender, uint256 addedValue) public virtual returns (bool) {
         syncTokenInOutOfSyncExchnagesSafe();
-        _approve(_msgSender(), spender, _allowances[_msgSender()][spender].add(addedValue));
+        _approve(_msgSender(), spender, _allowances[_msgSender()][spender] + addedValue);
         return true;
     }
 
     function decreaseAllowance(address spender, uint256 subtractedValue) public virtual returns (bool) {
         syncTokenInOutOfSyncExchnagesSafe();
-        _approve(
-            _msgSender(),
-            spender,
-            _allowances[_msgSender()][spender].sub(subtractedValue, "ERC20: allowance below zero")
-        );
+        _approve(_msgSender(), spender, _allowances[_msgSender()][spender] - subtractedValue);
         return true;
     }
 
     function balanceOf(address account) public view override returns (uint256) {
         if (_isPairAddress[account]) {
             uint256 balance = _balanceOf(account, _getRate());
-            return balance.add(_pairUnsyncAmount[account]);
+            return balance + _pairUnsyncAmount[account];
         }
         return _balanceOf(account, _getRate());
     }
@@ -247,14 +244,14 @@ contract Darwin is IDarwin, OwnableUpgradeable {
 
     function tokenFromReflection(uint256 rAmount, uint256 rate) private view returns (uint256) {
         require(rAmount <= _rTotal, "Darwin::tokenFromReflection: rAmount must be less than total reflections");
-        return rAmount.div(rate);
+        return rAmount / rate;
     }
 
-    function getOutOfSyncedPairs() public view returns (address[] memory) {
+    function getOutOfSyncedPairs() public view override returns (address[] memory) {
         return outOfSyncPairs;
     }
 
-    function getOutOfSyncedAmount(address pair) public view returns (uint256) {
+    function getOutOfSyncedAmount(address pair) public view override returns (uint256) {
         return _pairUnsyncAmount[pair];
     }
 
@@ -262,7 +259,7 @@ contract Darwin is IDarwin, OwnableUpgradeable {
         return msg.sender != destinationExchnage && msg.sender != _pairToRouter[destinationExchnage];
     }
 
-    function syncTokenInOutOfSyncExchnagesSafe() public {
+    function syncTokenInOutOfSyncExchnagesSafe() public override {
         address[] memory outOfSync = outOfSyncPairs;
 
         for (uint256 i = 0; i < outOfSync.length; ) {
@@ -325,7 +322,7 @@ contract Darwin is IDarwin, OwnableUpgradeable {
 
     function _getRate() private view returns (uint256) {
         (uint256 rSupply, uint256 tSupply) = _getCurrentSupply();
-        return rSupply.div(tSupply);
+        return rSupply / tSupply;
     }
 
     function transfer(address recipient, uint256 amount) external override returns (bool) {
@@ -338,7 +335,7 @@ contract Darwin is IDarwin, OwnableUpgradeable {
         uint256 amount
     ) external override returns (bool) {
         _transfer(sender, recipient, amount);
-        _approve(sender, _msgSender(), _allowances[sender][_msgSender()].sub(amount, "ERC20: exceeds allowance"));
+        _approve(sender, _msgSender(), _allowances[sender][_msgSender()] - amount);
         return true;
     }
 
@@ -411,7 +408,7 @@ contract Darwin is IDarwin, OwnableUpgradeable {
         emit ExchangedRemoved(pairAddress);
     }
 
-    function isExchangeAddress(address account) public view returns (bool) {
+    function isExchangeAddress(address account) public view override returns (bool) {
         return _isPairAddress[account];
     }
 
@@ -462,7 +459,7 @@ contract Darwin is IDarwin, OwnableUpgradeable {
         uint256 amount,
         uint256 rate
     ) private view {
-        uint256 balance = _balanceOf(receiver, rate).add(amount);
+        uint256 balance = _balanceOf(receiver, rate) + amount;
         require(balance <= maxTokenHoldingSize, "Darwin::enforceHoldingLimit: receiver holding limit exceeded");
     }
 
@@ -556,11 +553,12 @@ contract Darwin is IDarwin, OwnableUpgradeable {
             }
         }
 
-        uint rate = currentRate;
-        if(to == reflectionWallet) {
+        _lastTokenReceivedTime[to] = block.timestamp;
+
+        uint256 rate = currentRate;
+        if (to == reflectionWallet) {
             //Community wallet was sent to, changing up reflection, so have to recalculate rate
             rate = _getRate();
-
         }
 
         ///@notice make call to darwinCommunity contract to see if votes are currently still valid
@@ -700,6 +698,7 @@ contract Darwin is IDarwin, OwnableUpgradeable {
         uint256 tCommunity,
         uint256 rCommunity
     ) private {
+        address communityWallet = address(darwinCommunity);
         _rOwned[communityWallet] += rCommunity;
 
         if (_isExcludedFromReflection[burnAddress]) {
@@ -760,7 +759,7 @@ contract Darwin is IDarwin, OwnableUpgradeable {
 
             // seller doesn't have tokens bought in
             // last TokenSellLimitWindow left after this sell
-            return balanceOfSeller.sub(amount) < log.amount;
+            return balanceOfSeller - amount < log.amount;
         }
         return false;
     }
@@ -867,5 +866,21 @@ contract Darwin is IDarwin, OwnableUpgradeable {
 
     function isNextSellLP(address account) public view returns (bool) {
         return _nextSellIsLP[account];
+    }
+
+    function getLastTokenReceivedTimestamp(address account) public view override returns (uint256) {
+        return _lastTokenReceivedTime[account];
+    }
+
+    function isExcludedFromReward(address account) public view override returns (bool) {
+        return _isExcludedFromReflection[account];
+    }
+
+    function isExcludedFromTxLimit(address account) public view override returns (bool) {
+        return _isExcludedFromSellLimit[account];
+    }
+
+    function isExcludedFromHoldingLimit(address account) public view override returns (bool) {
+        return _isExcludedFromHoldingLimit[account];
     }
 }
