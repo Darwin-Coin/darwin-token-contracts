@@ -5,7 +5,7 @@ import { BigNumber } from "ethers";
 
 import { ethers } from "hardhat";
 import { Darwin, DarwinCommunity } from "../../typechain";
-import { daysToSeconds, deploy, hoursToSeconds, lastBlockTime, NewProposalParams, now, weeksToSeconds } from "../utils";
+import { daysToSeconds, deploy, hoursToSeconds, lastBlockTime, NewProposalParams, setNetworkTimeStamp, weeksToSeconds } from "../utils";
 
 describe("NotCommunity", () => {
     let darwinComunity:DarwinCommunity
@@ -13,21 +13,29 @@ describe("NotCommunity", () => {
     let snapShotId: number;
 
     let owner: SignerWithAddress
-    let address0: SignerWithAddress
-    let address1: SignerWithAddress
-    let address2: SignerWithAddress
-
+    let devWallet: SignerWithAddress
+    
     let others: SignerWithAddress[]
 
-    before(async () => {
-        [owner, address0, address1, address2, ...others] = await ethers.getSigners()
-    })
-
+    let addressWith10kTokens : SignerWithAddress
+    let addresWithout10kTokens :SignerWithAddress
+    
     beforeEach(async () => {
+
+        [owner, ...others] = await ethers.getSigners()
+        
         let deployedContract = await deploy();
         darwinComunity = deployedContract.darwinCommunity
         darwin = deployedContract.darwin
         snapShotId = deployedContract.snapShotId;
+        devWallet = deployedContract.dev;
+        
+        addressWith10kTokens = others[0]
+        addresWithout10kTokens  = others[1]
+
+        await darwin.transfer(addressWith10kTokens.address, BigNumber.from(100000 * 10 ** 9));
+
+        await setNetworkTimeStamp( BigNumber.from(await lastBlockTime()).add(daysToSeconds(20)))
     })
 
     afterEach(async () => {
@@ -38,7 +46,7 @@ describe("NotCommunity", () => {
     let getProposalParams = async (): Promise<NewProposalParams> => {
 
         let functionSig = darwinComunity.interface.functions["newFundCandidate(address,string)"]
-        let calldata = ethers.utils.defaultAbiCoder.encode(functionSig.inputs, [address0.address, "Proposal Name 123"])
+        let calldata = ethers.utils.defaultAbiCoder.encode(functionSig.inputs, [darwinComunity.address, "Proposal Name 123"])
 
         return {
             targets: [darwinComunity.address],
@@ -53,29 +61,27 @@ describe("NotCommunity", () => {
     }
 
     let createNewProposal = (params: NewProposalParams, account = owner,) => {
-
-        return darwinComunity.connect(account).propose(params.targets, params.values, params.signatures, params.calldatas, params.title, params.description, params.other, params.endTime)
-
-        // let proposalId = await darwinComunity._lastProposalId()
-
-        // let proposal = await darwinComunity.getProposal(proposalId)
-
-        // proposal.calldatas.forEach((it, index) => {
-
-        //     let face = new ethers.utils.Interface([`function ${proposal.signatures[index]}`])
-        //     let f = face.getFunction(proposal.signatures[index])
-
-        //     console.log(ethers.utils.defaultAbiCoder.decode(f.inputs, it))
-        // })
+        return darwinComunity.connect(account).propose(
+            params.targets,
+            params.values, 
+            params.signatures, 
+            params.calldatas, 
+            params.title, 
+            params.description, 
+            params.other, 
+            params.endTime, 
+            {
+                from:account.address
+            })
     }
 
     describe("Create Proposals", () => {
 
         it("Account with no or less then 10k $NOT shouldn't be able to create proposal", async () => {
 
-            let result = createNewProposal(await getProposalParams(), address0)
+            let result =  createNewProposal(await getProposalParams(), addresWithout10kTokens)
 
-            await expect(result).to.be.revertedWith("NC::canAccess: not enouch $NOT");
+            await expect(result).to.be.revertedWith("DC::canAccess: not enouch $DARWIN");
         });
 
 
@@ -87,11 +93,10 @@ describe("NotCommunity", () => {
 
             let resultWithTooEarlyEndDate = createNewProposal(params)
 
-            await expect(resultWithTooEarlyEndDate).to.be.revertedWith("NC::propose: too early end time");
+            await expect(resultWithTooEarlyEndDate).to.be.revertedWith("DC::propose: too early end time");
         })
 
         it("proposals with too late end date should fail", async () => {
-
 
             let params = await getProposalParams();
 
@@ -99,7 +104,7 @@ describe("NotCommunity", () => {
 
             let resultWithTooLateEndDate = createNewProposal(params)
 
-            await expect(resultWithTooLateEndDate).to.be.revertedWith("NC::propose: too late end time");
+            await expect(resultWithTooLateEndDate).to.be.revertedWith("DC::propose: too late end time");
 
         })
 
@@ -183,14 +188,12 @@ describe("NotCommunity", () => {
 
 
     const createPropoal = async (endTime: number) => {
-        await darwin.transfer(address0.address, BigNumber.from(100000 * 10 ** 9))
-        await darwin.transfer(address1.address, BigNumber.from(100000 * 10 ** 9))
-
+       
         let params = await getProposalParams();
 
         params.endTime = endTime;
 
-        await createNewProposal(params, address0)
+        await createNewProposal(params, addressWith10kTokens)
 
         return await darwinComunity._lastProposalId();
     }
@@ -200,7 +203,7 @@ describe("NotCommunity", () => {
 
         it("owner should be cancel proposal", async () => {
 
-            let proposalId = await createPropoal(daysToSeconds(3).add(now()).toNumber());
+            let proposalId = await createPropoal(daysToSeconds(3).add(await lastBlockTime()).toNumber());
 
             await darwinComunity.cancel(proposalId);
 
@@ -211,14 +214,14 @@ describe("NotCommunity", () => {
 
         it("proposal owner should be cancel proposal", async () => {
 
-            let proposalId = await createPropoal(daysToSeconds(3).add(now()).toNumber());
+            let proposalId = await createPropoal(daysToSeconds(3).add(await lastBlockTime()).toNumber());
 
-            await darwinComunity.connect(address0).cancel(proposalId, {
-                from: address0.address
+            await darwinComunity.connect(addressWith10kTokens).cancel(proposalId, {
+                from: addressWith10kTokens.address
             });
 
-            let proposal = await darwinComunity.connect(address0).getProposal(proposalId, {
-                from: address0.address
+            let proposal = await darwinComunity.connect(addressWith10kTokens).getProposal(proposalId, {
+                from: addressWith10kTokens.address
             })
 
             expect(proposal.canceled).to.be.true;
@@ -227,19 +230,16 @@ describe("NotCommunity", () => {
 
         it("people other then proposal owner or owner should not be cancel proposal", async () => {
 
-            let proposalId = await createPropoal(daysToSeconds(3).add(now()).toNumber());
+            let proposalId = await createPropoal(daysToSeconds(3).add(await lastBlockTime()).toNumber());
 
-            let result = darwinComunity.connect(address1).cancel(proposalId, {
-                from: address1.address
+            let result = darwinComunity.connect(devWallet).cancel(proposalId, {
+                from: devWallet.address
             });
 
-            await expect(result).to.revertedWith("NC::cancel: cannot cancel proposal");
+            await expect(result).to.revertedWith("DC::cancel: cannot cancel proposal");
         })
 
     })
-
-
-
 
 
     describe("Proposal Voting", () => {
@@ -258,20 +258,18 @@ describe("NotCommunity", () => {
         it("Account with no or less then 10k $NOT shouldn't be able to vote on proposal", async () => {
 
 
-            let result = darwinComunity.connect(address2).castVote(proposalId, true, {
-                from: address2.address
+            let result = darwinComunity.connect(addresWithout10kTokens).castVote(proposalId, true, {
+                from: addresWithout10kTokens.address
             });
 
-            await expect(result).to.be.revertedWith("NC::canAccess: not enouch $NOT");
+            await expect(result).to.be.revertedWith("DC::canAccess: not enouch $DARWIN");
 
         });
 
-        it("Account with 10k $NOT shouldn be able to vote on proposal", async () => {
+        it("Account with 10k $NOT should be able to vote on proposal", async () => {
 
-            await darwin.transfer(address2.address, BigNumber.from(10000 * 10 ** 9))
-
-            await darwinComunity.connect(address2).castVote(proposalId, false, {
-                from: address2.address
+            await darwinComunity.connect(addressWith10kTokens).castVote(proposalId, false, {
+                from: addressWith10kTokens.address
             });
 
         });
@@ -317,7 +315,7 @@ describe("NotCommunity", () => {
 
             let result = darwinComunity.castVote(proposalId, true);
 
-            await expect(result).to.be.revertedWith("NC::castVoteInternal: voter already voted")
+            await expect(result).to.be.revertedWith("DC::castVoteInternal: voter already voted")
         });
 
         it("It shouldn't let vote on ended proposals", async () => {
@@ -327,7 +325,7 @@ describe("NotCommunity", () => {
 
             let result = darwinComunity.castVote(proposalId, true);
 
-            await expect(result).to.be.revertedWith("NC::castVoteInternal: voting is closed");
+            await expect(result).to.be.revertedWith("DC::castVoteInternal: voting is closed");
         });
 
     });
@@ -339,11 +337,11 @@ describe("NotCommunity", () => {
 
         it("it shouldn't let action to be performed before the proposal ends", async () => {
 
-            let proposalId = await createPropoal(daysToSeconds(4).add(now()).toNumber());
+            let proposalId = await createPropoal(daysToSeconds(4).add(await lastBlockTime()).toNumber());
 
             let result = darwinComunity.execute(proposalId);
 
-            await expect(result).to.revertedWith("NC::execute: proposal can only be executed if it is queued");
+            await expect(result).to.revertedWith("DC::execute: proposal can only be executed if it is queued");
         })
 
         it("it should revert if vote is not is favour", async () => {
@@ -361,7 +359,7 @@ describe("NotCommunity", () => {
 
             let result = darwinComunity.execute(proposalId);
 
-            await expect(result).to.revertedWith("NC::execute: proposal can only be executed if it is queued");
+            await expect(result).to.revertedWith("DC::execute: proposal can only be executed if it is queued");
         })
 
         it("it should call the correct function of vote was in favour", async () => {
@@ -406,7 +404,7 @@ describe("NotCommunity", () => {
             await darwinComunity.execute(proposalId);
             let result = darwinComunity.execute(proposalId);
 
-            expect(result).to.revertedWith("NC::execute: proposal can only be executed if it is queued")
+            expect(result).to.revertedWith("DC::execute: proposal can only be executed if it is queued")
         })
 
     });

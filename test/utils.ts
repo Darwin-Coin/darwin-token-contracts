@@ -26,7 +26,7 @@ export const deploy = async () => {
     const DarwinCommunity = await ethers.getContractFactory("DarwinCommunity")
     const Darwin = await ethers.getContractFactory("Darwin");
     const uniswapV2RouterAddress = await getUniswapRouterAddress(hardhat.network.name)
-    const darwinCommunity = await upgrades.deployProxy(DarwinCommunity, [firstCommunityFundWeekStartTimeStamp,[],[],[]], { initializer: "initialize" }) as DarwinCommunity;
+    const darwinCommunity = await upgrades.deployProxy(DarwinCommunity, [[],[],[]], { initializer: "initialize" }) as DarwinCommunity;
 
     await darwinCommunity.deployed()
 
