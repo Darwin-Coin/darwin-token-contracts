@@ -478,45 +478,45 @@ contract DarwinCommunity is OwnableUpgradeable, IDarwinCommunity {
     /**
      * @notice Checks if the balance of a seller has dipped below the minimum required to vote, and removes votes cast if so
      * @param sender Address of a seller of darwin tokens
-     */
-    function checkIfVotesAreElegible(address sender) external override {
+    */
+    function checkIfVotesAreElegible(address sender, uint amount) external override {
+
         require(msg.sender == address(darwin), "Caller isn't darwin token");
 
-        if (darwin.balanceOf(sender) >= MIN_DARWIN_REQUIRED_TO_ACCESS) {
+        if(amount >= MIN_DARWIN_REQUIRED_TO_ACCESS) {
             return;
         }
 
-        uint256[] storage votes = usersVotes[sender];
+        uint[] memory votes = usersVotes[sender];
 
         if (votes.length == 0) {
             return;
         }
+        
+        for(uint i = 0; i < votes.length; ) {
 
-        for (uint256 i = votes.length; i > 0; ) {
-            uint256 proposalId = votes[i - 1];
-            Receipt storage receipt = voteReceipts[proposalId][sender];
+            uint proposalId = votes[i];
 
-            Proposal storage proposal = proposals[proposalId];
+            if(state(proposalId) == ProposalState.Active) {
 
-            if (state(proposalId) == ProposalState.Active) {
-                if (receipt.inSupport) {
-                    proposal.forVotes -= 1;
+                if(voteReceipts[proposalId][sender].inSupport) {
+
+                    proposals[proposalId].forVotes -= 1;
+
                 } else {
-                    proposal.againstVotes -= 1;
+                    proposals[proposalId].againstVotes -= 1;
                 }
             }
 
             delete voteReceipts[proposalId][sender];
 
-            votes.pop();
-
-            if (i > 0) {
-                unchecked {
-                    ++i;
-                }
-            } else {
-                break;
+            unchecked {
+                ++i;
             }
-        }
+            
+        } 
+
+        delete usersVotes[sender];
+
     }
 }
