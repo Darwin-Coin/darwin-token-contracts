@@ -149,8 +149,8 @@ contract Darwin is IDarwin, OwnableUpgradeable {
         _tTotal = 100 * 10**9 * 10**decimals(); // 100B
         _rTotal = (MAX - (MAX % _tTotal));
 
-        maxTokenHoldingSize = 10 * 10**6 * 10**decimals(); // 10M, 1% of the supply
-        maxTokenSellSize = 1 * 10**6 * 10**decimals(); // 1M, .1% of the supply
+        maxTokenHoldingSize = _tTotal / 100; // 1% of the supply
+        maxTokenSellSize = _tTotal / 100 / 10; // .1% of the supply
 
         burnPercentage = 50; // 0.5%
         communityTokensPercentage = 5 * PERCENTAGE_MULTIPLIER; // 5%

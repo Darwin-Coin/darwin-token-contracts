@@ -38,6 +38,14 @@ describe("Darwin : Holding Limits", function () {
 
 
 
+    it("It should have correct holding limit", async function () {
+        const expectedHoldingLimit = (await darwin.totalSupply()).div(100) // 1% of the supply. 
+        const actualHoldingLimit = await darwin.maxTokenHoldingSize()
+
+
+        expect(expectedHoldingLimit).to.be.equal(actualHoldingLimit);
+
+    });
 
     it("It should enforce holding limit", async function () {
         const tokensToTransfer = (await darwin.maxTokenHoldingSize()).add(1)

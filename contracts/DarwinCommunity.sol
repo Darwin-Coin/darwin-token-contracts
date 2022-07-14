@@ -97,12 +97,8 @@ contract DarwinCommunity is OwnableUpgradeable, IDarwinCommunity {
     uint256 public _lastCommunityFundCandidateId;
     uint256 public _lastProposalId;
 
-    uint256 public firstWeekStartTimeStamp;
-    uint256 public maxSlotsForCommunityFund;
-
     uint256 public minNotRequiredToAccess;
     uint256 public tokenReceivedCoolDownPeriod;
-    uint256 public minReportRequiredToBlacklist;
 
     uint256 public proposalMaxOperations;
     uint256 public minVotingDelay;
@@ -113,37 +109,24 @@ contract DarwinCommunity is OwnableUpgradeable, IDarwinCommunity {
     IDarwin public darwin;
 
     function initialize(
-        uint256 _firstWeekStartTimeStamp,
         uint256[] calldata restrictedProposalSignatures,
         string[] calldata fundProposals,
         address[] calldata fundAddress
     ) public initializer {
         __Context_init_unchained();
         __Ownable_init_unchained();
-        __DarwinCommunity_init_unchained(
-            _firstWeekStartTimeStamp,
-            restrictedProposalSignatures,
-            fundProposals,
-            fundAddress
-        );
+        __DarwinCommunity_init_unchained(restrictedProposalSignatures, fundProposals, fundAddress);
     }
 
     function __DarwinCommunity_init_unchained(
-        uint256 _firstWeekStartTimeStamp,
         uint256[] calldata restrictedProposalSignatures,
         string[] calldata fundProposals,
         address[] calldata fundAddress
     ) private initializer {
         require(
             fundProposals.length == fundAddress.length,
-            "DC::__DarwinCommunity_init_unchained: invalid fund address length"
+            "DC::__DarwinCommunity_init_unchained: invalid fund candidate lists"
         );
-
-        firstWeekStartTimeStamp = _firstWeekStartTimeStamp;
-
-        maxSlotsForCommunityFund = 5;
-
-        minReportRequiredToBlacklist = 20;
 
         proposalMaxOperations = 1;
         minVotingDelay = 24 hours;
