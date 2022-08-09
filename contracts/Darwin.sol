@@ -846,6 +846,35 @@ contract Darwin is IDarwin, OwnableUpgradeable {
             });
     }
 
+    function getAmountToBurnBasedOnDesync(uint amountDarwin, address pair, uint burnAmount) internal view returns(uint) {
+
+        (uint reserveDarwin, uint reserveCurrent, ) = IUniswapV2Pair(pair).getReserves();
+
+        IUniswapV2Router01 router = IUniswapV2Router01(_pairToRouter[pair]);
+
+        uint expectedAmountOut = router.getAmountOut(amountDarwin, reserveDarwin, reserveCurrent);
+
+        //this could be the reserve amount after tokens have been removed from the sale, and after a sync occurs
+        ///@notice including the burn amount may need to be removed as this could already be applied to the _pairUnsyncAmount[pair]
+        uint reserveAfterSync = reserveCurrent - _pairUnsyncAmount[pair] - expectedAmountOut - burnAmount;
+
+        uint reserveDarwinAfterSale = reserveDarwin + amountDarwin;
+
+        uint syncAmountOut = router.getAmountOut(amountDarwin, reserveDarwinAfterSale, reserveAfterSync);
+
+        if(syncAmountOut > expectedAmountOut) {
+
+            //burn the difference of price impact and desync amount
+            return amountDarwin - (amountDarwin * (expectedAmountOut / syncAmountOut));
+
+        }
+
+        return 0;
+
+    }
+
+    
+
     function calculateTransferAndBurnAmount(
         uint256 tAmount,
         uint256 tCommunity,
