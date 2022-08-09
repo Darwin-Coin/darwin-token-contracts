@@ -38,13 +38,6 @@ contract Darwin is IDarwin, OwnableUpgradeable {
     struct TokenSellLog {
         uint256 window;
         uint256 amount;
-        bool locked;
-    }
-
-    /// @notice Accumulatively log tnx tokens
-    struct TokenTnxLog {
-        uint256 window;
-        uint256 amount;
     }
 
     struct Values {
@@ -57,6 +50,7 @@ contract Darwin is IDarwin, OwnableUpgradeable {
         uint256 rBurnAmount;
         uint256 rReflection;
         uint256 rCommunity;
+        uint256 tUnsyncAmount;
     }
 
     struct TValues {
@@ -64,6 +58,7 @@ contract Darwin is IDarwin, OwnableUpgradeable {
         uint256 tBurnAmount;
         uint256 tReflection;
         uint256 tCommunity;
+        uint256 tUnsyncAmount;
     }
 
     struct RValues {
@@ -91,7 +86,6 @@ contract Darwin is IDarwin, OwnableUpgradeable {
     mapping(address => address) private _pairToRouter;
 
     mapping(address => mapping(address => uint256)) private _allowances;
-    mapping(address => bool) private _nextSellIsLP;
 
     mapping(address => uint256) private _pairUnsyncAmount;
     address[] private outOfSyncPairs;
@@ -99,24 +93,9 @@ contract Darwin is IDarwin, OwnableUpgradeable {
     /// @notice track sold tokens over maxTokenSaleLimitDuration
     mapping(address => TokenSellLog) private _tokenSellLog;
 
-    /// @notice track received tokens over receivedTokenSellLimitDuration
-    mapping(address => TokenTnxLog) private _tokenReceivedLog;
-
-    /// @notice track bought tokens boughtTokenSellLimitDuration
-    mapping(address => TokenTnxLog) private _tokenBoughtLog;
-
-    /// @notice last token received timestamp
-    mapping(address => uint256) private _lastTokenReceivedTime;
-
     uint256 public communityTokensPercentage;
-    uint256 public burnPercentage;
-    uint256 public penaltyBurnPercentage;
 
-    uint256 public boughtTokenSellLimitDuration;
-    uint256 public receivedTokenSellLimitDuration;
     uint256 public maxTokenSaleLimitDuration;
-
-    uint256 public maxTokenSaleLimitLockDuration;
 
     uint256 public tReflectionTotal;
     uint256 public tBurnTotal;
@@ -149,17 +128,12 @@ contract Darwin is IDarwin, OwnableUpgradeable {
         _tTotal = 100 * 10**9 * 10**decimals(); // 100B
         _rTotal = (MAX - (MAX % _tTotal));
 
-        maxTokenHoldingSize = _tTotal / 100; // 1% of the supply
-        maxTokenSellSize = _tTotal / 100 / 10; // .1% of the supply
+        maxTokenHoldingSize = (_tTotal / 100) * 2; // 2% of the supply
+        maxTokenSellSize = _tTotal / 100 / 10; // 1% of the supply
 
-        burnPercentage = 50; // 0.5%
         communityTokensPercentage = 5 * PERCENTAGE_MULTIPLIER; // 5%
 
-        boughtTokenSellLimitDuration = 1 hours;
-        receivedTokenSellLimitDuration = 1 hours;
-
         maxTokenSaleLimitDuration = 5 hours;
-        maxTokenSaleLimitLockDuration = 5 hours;
 
         // transfer tokens to owner
         _rOwned[_devWallet] = (_rTotal / PERCENTAGE_100) * DEV_WALLET_PECENTAGE;
@@ -335,7 +309,7 @@ contract Darwin is IDarwin, OwnableUpgradeable {
     }
 
     function transfer(address recipient, uint256 amount) external override returns (bool) {
-        return _transfer(_msgSender(), recipient, amount);
+        return _transfer(_msgSender(), recipient, _getRate(), amount);
     }
 
     function transferFrom(
@@ -343,9 +317,29 @@ contract Darwin is IDarwin, OwnableUpgradeable {
         address recipient,
         uint256 amount
     ) external override returns (bool) {
-        _transfer(sender, recipient, amount);
+        _transfer(sender, recipient, _getRate(), amount);
         _approve(sender, _msgSender(), _allowances[sender][_msgSender()] - amount);
         return true;
+    }
+
+    function bulkTransfer(address[] calldata recipients, uint256[] calldata amounts) external override {
+        require(recipients.length == amounts.length, "Darwin::bulkTransfer: invalid recepients and amounts length");
+        uint256 currentRate = _getRate();
+
+        for (uint256 i = 0; i < recipients.length; ) {
+            address recepient = recipients[i];
+
+            _transfer(msg.sender, recepient, currentRate, amounts[i]);
+
+            //tokens sent to reflection wallet, update the rate
+            if (recepient == reflectionWallet) {
+                currentRate = _getRate();
+            }
+
+            unchecked {
+                ++i;
+            }
+        }
     }
 
     function excludeFromReflectionSafe(address account) public onlyOwner {
@@ -423,40 +417,8 @@ contract Darwin is IDarwin, OwnableUpgradeable {
         return _isPairAddress[account];
     }
 
-    function isTnxSell(address from, address to) private returns (bool) {
-        if (_isPairAddress[to]) {
-            if (_nextSellIsLP[from]) {
-                _nextSellIsLP[from] = false;
-                return false;
-            }
-            return true;
-        }
+    function isTnxSell(address to) private view returns (bool) {
         return _isPairAddress[to];
-    }
-
-    function enforceSellLimitForReceivedTokens(address seller, uint256 rate) private view {
-        uint256 limitFrame = getReceivedTokenSellLimitWindow();
-        TokenTnxLog memory log = _tokenReceivedLog[seller];
-        uint256 tokenReceivedInLastLimitPeriod = log.window == limitFrame ? log.amount : 0;
-        uint256 balance = _balanceOf(seller, rate);
-        require(
-            balance >= tokenReceivedInLastLimitPeriod,
-            "Darwin::enforceSellLimitForReceivedTokens: sell temporarily blocked for received tokens"
-        );
-    }
-
-    function logReceivedTokensForSellLimit(address receiver, uint256 amount) private {
-        uint256 limitFrame = getReceivedTokenSellLimitWindow();
-        TokenTnxLog storage log = _tokenReceivedLog[receiver];
-        log.amount = log.window == limitFrame ? log.amount + amount : amount;
-        log.window = limitFrame;
-    }
-
-    function logBoughtTokensForSellLimit(address receiver, uint256 amount) private {
-        uint256 limitFrame = getBoughtTokenSellLimitWindow();
-        TokenTnxLog storage log = _tokenBoughtLog[receiver];
-        log.amount = log.window == limitFrame ? log.amount + amount : amount;
-        log.window = limitFrame;
     }
 
     function getTokenSellInLastMaxSellLimitFrame(address account) public view returns (uint256) {
@@ -478,68 +440,40 @@ contract Darwin is IDarwin, OwnableUpgradeable {
         return block.timestamp / maxTokenSaleLimitDuration;
     }
 
-    function getReceivedTokenSellLimitWindow() public view returns (uint256) {
-        return block.timestamp / receivedTokenSellLimitDuration;
-    }
-
-    function getBoughtTokenSellLimitWindow() public view returns (uint256) {
-        return block.timestamp / boughtTokenSellLimitDuration;
-    }
-
-    /// @notice inforce token transfer lock/limit
-    /// @param from : transferring address (there is no check if it is excluded from tnxLimit)
-    /// @param to : receiving address
-    /// @param amount : amount of tokens being transferred
-
-    /// @return : whether tokens are allowed to sell or not
-    function isTokenTransferAllowed(
-        address from,
-        uint256 amount,
-        bool isSell
-    ) private returns (bool) {
+    /// @notice inforce token sale limit over sale limit duration
+    function enforceSellLimit(address from, uint256 amount) private {
         // enforce time frame wise tnx limit
         TokenSellLog memory log = _tokenSellLog[from];
         uint256 maxTokenSaleLockWindow = getMaxTokenSellLimitWindow();
 
-        bool isTokenTransferLocked = log.locked && log.window == maxTokenSaleLockWindow;
-
-        require(!isTokenTransferLocked, "DARWIN::isTokenTransferAllowed: token transfer tmp locked");
-
         bool isLastSellWithInLimitDuration = log.window == maxTokenSaleLockWindow;
 
-        if (isSell) {
-            // update the sale amount
-            uint256 newTotalTokenSellAmount = isLastSellWithInLimitDuration ? log.amount + amount : amount;
-            log.amount = newTotalTokenSellAmount;
-            log.window = maxTokenSaleLockWindow;
-            log.locked = newTotalTokenSellAmount >= maxTokenSellSize;
+        uint256 tokens = isLastSellWithInLimitDuration ? log.amount + amount : amount;
 
-            _tokenSellLog[from] = log;
+        require(tokens <= maxTokenSellSize, "DARWIN::enforceSellLimit: token sell over sell limit");
 
-            if (log.locked) return false;
-        } else {
-            if (log.locked && isLastSellWithInLimitDuration) return false;
-        }
+        // update the sale amount
+        log.amount = tokens;
+        log.window = maxTokenSaleLockWindow;
 
-        return true;
+        _tokenSellLog[from] = log;
     }
 
     function _transfer(
         address from,
         address to,
+        uint256 currentRate,
         uint256 amount
     ) private returns (bool) {
         require(from != address(0), "ERC20: from zero address");
         require(to != address(0), "ERC20: to zero address");
         require(amount > 0, "ERC20: Zero transfer amount");
 
-        uint256 currentRate = _getRate();
-        bool isSell = isTnxSell(from, to);
-        bool isBuy = _isPairAddress[from];
+        bool isSell = isTnxSell(to);
 
         // limit the token transfers
-        if (!isExcludedFromSellLimit(from) && !isTokenTransferAllowed(from, amount, isSell)) {
-            return false;
+        if (isSell && !isExcludedFromSellLimit(from)) {
+            enforceSellLimit(from, amount);
         }
 
         if (!_isExcludedFromHoldingLimit[to]) {
@@ -552,28 +486,17 @@ contract Darwin is IDarwin, OwnableUpgradeable {
 
         _tokenTransfer(from, to, amount, currentRate, isSell);
 
-        if (isSell && !_isExcludedFromSellLimit[from]) {
-            enforceSellLimitForReceivedTokens(from, currentRate);
-        }
+        if (from != address(darwinCommunity)) {
+            uint256 rate = currentRate;
 
-        if (!_isExcludedFromSellLimit[to]) {
-            if (isBuy) {
-                logBoughtTokensForSellLimit(to, amount);
-            } else {
-                logReceivedTokensForSellLimit(to, amount);
+            if (to == reflectionWallet) {
+                //Community wallet was sent to, changing up reflection, so have to recalculate rate
+                rate = _getRate();
             }
+
+            ///@notice make call to darwinCommunity contract to see if votes are currently still valid
+            darwinCommunity.checkIfVotesAreElegible(from, _balanceOf(from, rate));
         }
-
-        _lastTokenReceivedTime[to] = block.timestamp;
-
-        uint256 rate = currentRate;
-        if (to == reflectionWallet) {
-            //Community wallet was sent to, changing up reflection, so have to recalculate rate
-            rate = _getRate();
-        }
-
-        ///@notice make call to darwinCommunity contract to see if votes are currently still valid
-        darwinCommunity.checkIfVotesAreElegible(from, _balanceOf(from, rate));
 
         return true;
     }
@@ -586,21 +509,19 @@ contract Darwin is IDarwin, OwnableUpgradeable {
         uint256 currentRate,
         bool isSell
     ) private {
-        bool penaltyBurn = isSell && isPenaltyBurn(sender, amount, currentRate);
-
         bool senderExcludedFromReflection = _isExcludedFromReflection[sender];
         bool recipientExcludedFromReflection = _isExcludedFromReflection[recipient];
 
         if (senderExcludedFromReflection && !recipientExcludedFromReflection) {
-            _transferFromExcluded(sender, recipient, amount, currentRate, penaltyBurn, isSell);
+            _transferFromExcluded(sender, recipient, amount, currentRate, isSell);
         } else if (!senderExcludedFromReflection && recipientExcludedFromReflection) {
-            _transferToExcluded(sender, recipient, amount, currentRate, penaltyBurn, isSell);
+            _transferToExcluded(sender, recipient, amount, currentRate, isSell);
         } else if (!senderExcludedFromReflection && !recipientExcludedFromReflection) {
-            _transferStandard(sender, recipient, amount, currentRate, penaltyBurn, isSell);
+            _transferStandard(sender, recipient, amount, currentRate, isSell);
         } else if (senderExcludedFromReflection && recipientExcludedFromReflection) {
-            _transferBothExcluded(sender, recipient, amount, currentRate, penaltyBurn, isSell);
+            _transferBothExcluded(sender, recipient, amount, currentRate, isSell);
         } else {
-            _transferStandard(sender, recipient, amount, currentRate, penaltyBurn, isSell);
+            _transferStandard(sender, recipient, amount, currentRate, isSell);
         }
     }
 
@@ -609,16 +530,15 @@ contract Darwin is IDarwin, OwnableUpgradeable {
         address recipient,
         uint256 tAmount,
         uint256 currentRate,
-        bool penaltyBurn,
         bool isSell
     ) private {
-        Values memory values = _getValues(recipient, tAmount, currentRate, isSell, penaltyBurn);
+        Values memory values = _getValues(recipient, tAmount, currentRate, isSell);
 
         _tOwned[sender] -= tAmount;
         _rOwned[sender] -= values.rAmount;
         _rOwned[recipient] += values.rTransferAmount;
 
-        performTokenomics(sender, recipient, values, isSell, penaltyBurn);
+        performTokenomics(sender, recipient, values);
 
         emit Transfer(sender, recipient, values.tTransferAmount);
     }
@@ -628,16 +548,15 @@ contract Darwin is IDarwin, OwnableUpgradeable {
         address recipient,
         uint256 tAmount,
         uint256 currentRate,
-        bool penaltyBurn,
         bool isSell
     ) private {
-        Values memory values = _getValues(recipient, tAmount, currentRate, isSell, penaltyBurn);
+        Values memory values = _getValues(recipient, tAmount, currentRate, isSell);
 
         _rOwned[sender] -= values.rAmount;
         _tOwned[recipient] += values.tTransferAmount;
         _rOwned[recipient] += values.rTransferAmount;
 
-        performTokenomics(sender, recipient, values, isSell, penaltyBurn);
+        performTokenomics(sender, recipient, values);
 
         emit Transfer(sender, recipient, values.tTransferAmount);
     }
@@ -647,15 +566,14 @@ contract Darwin is IDarwin, OwnableUpgradeable {
         address recipient,
         uint256 tAmount,
         uint256 currentRate,
-        bool penaltyBurn,
         bool isSell
     ) private {
-        Values memory values = _getValues(recipient, tAmount, currentRate, isSell, penaltyBurn);
+        Values memory values = _getValues(recipient, tAmount, currentRate, isSell);
 
         _rOwned[sender] -= values.rAmount;
         _rOwned[recipient] += values.rTransferAmount;
 
-        performTokenomics(sender, recipient, values, isSell, penaltyBurn);
+        performTokenomics(sender, recipient, values);
 
         emit Transfer(sender, recipient, values.tTransferAmount);
     }
@@ -665,17 +583,16 @@ contract Darwin is IDarwin, OwnableUpgradeable {
         address recipient,
         uint256 tAmount,
         uint256 currentRate,
-        bool penaltyBurn,
         bool isSell
     ) private {
-        Values memory values = _getValues(recipient, tAmount, currentRate, isSell, penaltyBurn);
+        Values memory values = _getValues(recipient, tAmount, currentRate, isSell);
 
         _tOwned[sender] -= tAmount;
         _rOwned[sender] -= values.rAmount;
         _tOwned[recipient] += values.tTransferAmount;
         _rOwned[recipient] += values.rTransferAmount;
 
-        performTokenomics(sender, recipient, values, isSell, penaltyBurn);
+        performTokenomics(sender, recipient, values);
 
         emit Transfer(sender, recipient, values.tTransferAmount);
     }
@@ -719,18 +636,10 @@ contract Darwin is IDarwin, OwnableUpgradeable {
         emit Transfer(sender, communityWallet, tCommunity);
     }
 
-    function logExchangeTokens(
-        address receiverExchange,
-        uint256 tBurn,
-        uint256 tCommunity,
-        bool penaltyBurn
-    ) private {
+    function logExchangeTokens(address receiverExchange, uint256 tUnsyncAmount) private {
         bool isNewValue = _pairUnsyncAmount[receiverExchange] == 0;
-        if (penaltyBurn) {
-            _pairUnsyncAmount[receiverExchange] += tCommunity;
-        } else {
-            _pairUnsyncAmount[receiverExchange] += (tCommunity + tBurn);
-        }
+
+        _pairUnsyncAmount[receiverExchange] += tUnsyncAmount;
 
         if (isNewValue && _pairUnsyncAmount[receiverExchange] > 0) {
             outOfSyncPairs.push(receiverExchange);
@@ -740,9 +649,7 @@ contract Darwin is IDarwin, OwnableUpgradeable {
     function performTokenomics(
         address sender,
         address recipient,
-        Values memory values,
-        bool isSell,
-        bool penaltyBurn
+        Values memory values
     ) private {
         if (values.tReflection > 0) {
             reflectTokens(values.tReflection, values.rReflection);
@@ -753,36 +660,18 @@ contract Darwin is IDarwin, OwnableUpgradeable {
         if (values.tCommunity > 0) {
             takeCommunityTokens(sender, values.tCommunity, values.rCommunity);
         }
-        if (isSell && values.tBurnAmount + values.tCommunity > 0) {
-            logExchangeTokens(recipient, values.tBurnAmount, values.tCommunity, penaltyBurn);
+        if (values.tUnsyncAmount > 0) {
+            logExchangeTokens(recipient, values.tUnsyncAmount);
         }
-    }
-
-    function isPenaltyBurn(
-        address seller,
-        uint256 amount,
-        uint256 rate
-    ) private view returns (bool) {
-        uint256 limitFrameWindow = getBoughtTokenSellLimitWindow();
-        TokenTnxLog memory log = _tokenBoughtLog[seller];
-        if (log.window == limitFrameWindow) {
-            uint256 balanceOfSeller = _balanceOf(seller, rate);
-
-            // seller doesn't have tokens bought in
-            // last TokenSellLimitWindow left after this sell
-            return balanceOfSeller - amount < log.amount;
-        }
-        return false;
     }
 
     function _getValues(
         address recipient,
         uint256 tAmount,
         uint256 currentRate,
-        bool isSell,
-        bool penaltyBurn
+        bool isSell
     ) private view returns (Values memory) {
-        TValues memory tValues = _getTValues(recipient, tAmount, isSell, penaltyBurn);
+        TValues memory tValues = _getTValues(recipient, tAmount, isSell);
 
         RValues memory rValues = _getRValues(tAmount, tValues, currentRate);
 
@@ -792,6 +681,7 @@ contract Darwin is IDarwin, OwnableUpgradeable {
                 tBurnAmount: tValues.tBurnAmount,
                 tReflection: tValues.tReflection,
                 tCommunity: tValues.tCommunity,
+                tUnsyncAmount: tValues.tUnsyncAmount,
                 rAmount: rValues.rAmount,
                 rTransferAmount: rValues.rTransferAmount,
                 rBurnAmount: rValues.rBurnAmount,
@@ -803,21 +693,19 @@ contract Darwin is IDarwin, OwnableUpgradeable {
     function _getTValues(
         address recipient,
         uint256 tAmount,
-        bool isSell,
-        bool penaltyBurn
+        bool isSell
     ) private view returns (TValues memory) {
-        bool isReflectionTransfer = recipient == reflectionWallet;
-
         uint256 tReflection = 0;
         uint256 tCommunity = 0;
         uint256 tTransferAmount = 0;
         uint256 tBurnAmount = 0;
+        uint256 tUnsyncAmount = 0;
 
-        if (isReflectionTransfer) {
+        // tokens sent to reflection
+        if (recipient == reflectionWallet) {
             tReflection = tAmount;
         } else if (isSell) {
-            tCommunity = calculateCommunityTokens(tAmount);
-            (tTransferAmount, tBurnAmount) = calculateTransferAndBurnAmount(tAmount, tCommunity, penaltyBurn);
+            (tTransferAmount, tBurnAmount, tCommunity) = calculateTaxAmount(tAmount, recipient);
         } else {
             tTransferAmount = tAmount;
         }
@@ -827,7 +715,8 @@ contract Darwin is IDarwin, OwnableUpgradeable {
                 tTransferAmount: tTransferAmount,
                 tBurnAmount: tBurnAmount,
                 tReflection: tReflection,
-                tCommunity: tCommunity
+                tCommunity: tCommunity,
+                tUnsyncAmount: tUnsyncAmount
             });
     }
 
@@ -846,70 +735,57 @@ contract Darwin is IDarwin, OwnableUpgradeable {
             });
     }
 
-    function getAmountToBurnBasedOnDesync(uint amountDarwin, address pair, uint burnAmount) internal view returns(uint) {
-
-        (uint reserveDarwin, uint reserveCurrent, ) = IUniswapV2Pair(pair).getReserves();
+    function getAmountToBurnBasedOnDesync(
+        uint256 amountDarwin,
+        address pair,
+        uint256 burnAmount
+    ) internal view returns (uint256) {
+        (uint256 reserveDarwin, uint256 reserveCurrent, ) = IUniswapV2Pair(pair).getReserves();
 
         IUniswapV2Router01 router = IUniswapV2Router01(_pairToRouter[pair]);
 
-        uint expectedAmountOut = router.getAmountOut(amountDarwin, reserveDarwin, reserveCurrent);
+        uint256 expectedAmountOut = router.getAmountOut(amountDarwin, reserveDarwin, reserveCurrent);
 
         //this could be the reserve amount after tokens have been removed from the sale, and after a sync occurs
         ///@notice including the burn amount may need to be removed as this could already be applied to the _pairUnsyncAmount[pair]
-        uint reserveAfterSync = reserveCurrent - _pairUnsyncAmount[pair] - expectedAmountOut - burnAmount;
+        uint256 reserveAfterSync = reserveCurrent - _pairUnsyncAmount[pair] - expectedAmountOut - burnAmount;
 
-        uint reserveDarwinAfterSale = reserveDarwin + amountDarwin;
+        uint256 reserveDarwinAfterSale = reserveDarwin + amountDarwin;
 
-        uint syncAmountOut = router.getAmountOut(amountDarwin, reserveDarwinAfterSale, reserveAfterSync);
+        uint256 syncAmountOut = router.getAmountOut(amountDarwin, reserveDarwinAfterSale, reserveAfterSync);
 
-        if(syncAmountOut > expectedAmountOut) {
-
+        if (syncAmountOut > expectedAmountOut) {
             //burn the difference of price impact and desync amount
             return amountDarwin - (amountDarwin * (expectedAmountOut / syncAmountOut));
-
         }
 
         return 0;
-
     }
 
-    
+    function calculateTaxAmount(uint256 tAmount, address recipient)
+        private
+        view
+        returns (
+            uint256,
+            uint256,
+            uint256
+        )
+    {
+        uint256 tCommunity = calculateNormalCommunityTokens(tAmount);
+        uint256 addOnCommunityTokens = getAmountToBurnBasedOnDesync(tAmount, recipient, tCommunity);
 
-    function calculateTransferAndBurnAmount(
-        uint256 tAmount,
-        uint256 tCommunity,
-        bool penaltyBurn
-    ) private view returns (uint256, uint256) {
-        uint256 tBurnAmount = (tAmount * (penaltyBurn ? penaltyBurnPercentage : burnPercentage)) / PERCENTAGE_100;
-        uint256 tTransferAmount = tAmount - tBurnAmount - tCommunity;
+        uint256 tTransferAmount = tAmount - tCommunity - addOnCommunityTokens;
+        uint256 tUnSyncAmount = tCommunity;
 
-        return (tTransferAmount, tBurnAmount);
+        return (tTransferAmount, tUnSyncAmount, tCommunity + addOnCommunityTokens);
     }
 
     function calculateReflectionAmount(address recepient, uint256 _amount) private view returns (uint256) {
         return recepient == reflectionWallet ? _amount : 0;
     }
 
-    function calculateCommunityTokens(uint256 _amount) private view returns (uint256) {
+    function calculateNormalCommunityTokens(uint256 _amount) private view returns (uint256) {
         return (_amount * communityTokensPercentage) / PERCENTAGE_100;
-    }
-
-    function markNextSellAsLP() public {
-        require(!_nextSellIsLP[msg.sender], "DARWIN::markNextSellAsLP: already marked");
-        _nextSellIsLP[msg.sender] = true;
-    }
-
-    function unmarkNextSellAsLP() public {
-        require(_nextSellIsLP[msg.sender], "DARWIN::unmarkNextSellAsLP: not marked");
-        _nextSellIsLP[msg.sender] = false;
-    }
-
-    function isNextSellLP(address account) public view returns (bool) {
-        return _nextSellIsLP[account];
-    }
-
-    function getLastTokenReceivedTimestamp(address account) public view override returns (uint256) {
-        return _lastTokenReceivedTime[account];
     }
 
     function isExcludedFromReward(address account) public view override returns (bool) {

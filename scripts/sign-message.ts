@@ -51,9 +51,12 @@ async function main() {
 
     const signer = await ethers.getSigner(owner.address)
 
-    // let nonce = "FHOSEAES";
+    let nonce = "8YQCXU7R";
 
-    // let signedMessage = await signer.signMessage(nonce)
+    let signedMessage = await signer.signMessage(nonce)
+
+    console.log(signedMessage)
+    
 
     // let address =  ethers.utils.verifyMessage(nonce, signedMessage)
 
@@ -119,17 +122,17 @@ async function main() {
        
 
     {
-        let pollVote : PollVotePayload = {
-            pollId :"5869005e-c43e-4bb1-a57d-4e9a0d4a2ef5",
-            vote: "6d317c0e-583d-4155-9219-56be1258f5a1",
-            nonce: "WBKW0N8N",
-        }
+        // let pollVote : PollVotePayload = {
+        //     pollId :"5869005e-c43e-4bb1-a57d-4e9a0d4a2ef5",
+        //     vote: "6d317c0e-583d-4155-9219-56be1258f5a1",
+        //     nonce: "WBKW0N8N",
+        // }
 
-        let dataRaw =  JSON.stringify(pollVote)
+        // let dataRaw =  JSON.stringify(pollVote)
 
-        let signedMessage = await signer.signMessage(dataRaw)
+        // let signedMessage = await signer.signMessage(dataRaw)
 
-        console.log(dataRaw, signedMessage, signer.address) 
+        // console.log(dataRaw, signedMessage, signer.address) 
     }
 
         // let address = ethers.utils.verifyMessage(dataRaw, signedMessage)

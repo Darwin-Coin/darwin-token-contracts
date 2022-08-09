@@ -18,7 +18,7 @@ async function main() {
     const up = upgrades as HardhatUpgrades
     
     const [owner, address0, address1, ...others] = await hardhat.ethers.getSigners()
-    const devWallet = others.pop()!!;
+    const devWallet = owner;
     const DarwinCommunity = await ethers.getContractFactory("DarwinCommunity")
     const Darwin = await ethers.getContractFactory("Darwin");
 

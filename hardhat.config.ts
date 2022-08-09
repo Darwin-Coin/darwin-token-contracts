@@ -79,7 +79,7 @@ const config: HardhatUserConfig = {
         local: {
             url: "http://127.0.0.1:8545",
             accounts: {
-                mnemonic: String(process.env.DEPLOYER_MNEMONICS),
+                mnemonic: String(process.env.TEST_MNEMONICS),
                 count: 100,
                 initialIndex: 0
             }
@@ -87,7 +87,7 @@ const config: HardhatUserConfig = {
         localMainNetFork: {
             url: "http://127.0.0.1:8545",
             accounts: {
-                mnemonic: String(process.env.DEPLOYER_MNEMONICS),
+                mnemonic: String(process.env.TEST_MNEMONICS),
                 count: 100,
                 initialIndex: 0
             }
@@ -96,7 +96,7 @@ const config: HardhatUserConfig = {
         localBscTestNetFork: {
             url: "http://127.0.0.1:8545",
             accounts: {
-                mnemonic: String(process.env.DEPLOYER_MNEMONICS),
+                mnemonic: String(process.env.TEST_MNEMONICS),
                 count: 100,
                 initialIndex: 6
             }
@@ -105,7 +105,7 @@ const config: HardhatUserConfig = {
             url: "https://data-seed-prebsc-2-s1.binance.org:8545/",
             chainId: 97,
             accounts:{
-                mnemonic: String(process.env.DEPLOYER_MNEMONICS),
+                mnemonic: String(process.env.TEST_MNEMONICS),
                 count:1
             }
         },
