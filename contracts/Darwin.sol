@@ -418,7 +418,7 @@ contract Darwin is IDarwin, OwnableUpgradeable {
     }
 
     function isTnxSell(address to) private view returns (bool) {
-        return _isPairAddress[to];
+        return _isPairAddress[to] && msg.sender != owner() && msg.sender != address(darwinCommunity);
     }
 
     function getTokenSellInLastMaxSellLimitFrame(address account) public view returns (uint256) {

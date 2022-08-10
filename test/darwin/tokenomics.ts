@@ -48,7 +48,6 @@ describe("Darwin : Tokenomics", function () {
         const tokensToAddLiqidity = BigNumber.from(balanceOfOwnerBefore.div(200))
         const ethToAddLiquidity = ethers.utils.parseEther("100")
 
-        await darwin.markNextSellAsLP()
         await darwin.approve(uniswapv2Router.address, tokensToAddLiqidity)
 
     
@@ -81,7 +80,6 @@ describe("Darwin : Tokenomics", function () {
         const tokensToAddLiqidity = BigNumber.from(balanceOfOwnerBefore.div(2))
         const ethToAddLiquidity = ethers.utils.parseEther("500")
 
-        await darwin.markNextSellAsLP()
         await darwin.approve(uniswapv2Router.address, tokensToAddLiqidity)
 
         await uniswapv2Router.addLiquidityETH(
@@ -146,7 +144,6 @@ describe("Darwin : Tokenomics", function () {
         const tokensToAddLiqidity = BigNumber.from(1).mul(decimalPoints)
         const ethToAddLiquidity = ethers.utils.parseEther("1")
 
-        await darwin.markNextSellAsLP()
         await darwin.approve(uniswapv2Router.address, tokensToAddLiqidity)
 
         await uniswapv2Router.addLiquidityETH(
@@ -237,7 +234,6 @@ describe("Darwin : Tokenomics", function () {
         const tokensToAddLiqidity = BigNumber.from(1).mul(decimalPoints)
         const ethToAddLiquidity = ethers.utils.parseEther("1")
 
-        await darwin.markNextSellAsLP()
         await darwin.approve(uniswapv2Router.address, tokensToAddLiqidity)
 
         await uniswapv2Router.addLiquidityETH(
