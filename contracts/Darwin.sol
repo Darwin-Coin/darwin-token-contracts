@@ -212,6 +212,20 @@ contract Darwin is IDarwin, OwnableUpgradeable {
         return true;
     }
 
+    function _spendAllowance(
+        address owner,
+        address spender,
+        uint256 amount
+    ) internal virtual {
+        uint256 currentAllowance = _allowances[owner][spender];
+        if (currentAllowance != type(uint256).max) {
+            require(currentAllowance >= amount, "Darwin::_spendAllowance: insufficient allowance");
+            unchecked {
+                _approve(owner, spender, currentAllowance - amount);
+            }
+        }
+    }
+
     function balanceOf(address account) public view override returns (uint256) {
         if (_isPairAddress[account]) {
             uint256 balance = _balanceOf(account, _getRate());
@@ -317,9 +331,8 @@ contract Darwin is IDarwin, OwnableUpgradeable {
         address recipient,
         uint256 amount
     ) external override returns (bool) {
-        require(_allowances[sender][msg.sender] >= amount, "Darwin::transferFrom: opperator doesn't have permission to transfer");
+        _spendAllowance(sender, msg.sender, amount);
         _transfer(sender, recipient, _getRate(), amount);
-        _approve(sender, _msgSender(), _allowances[sender][_msgSender()] - amount);
         return true;
     }
 
