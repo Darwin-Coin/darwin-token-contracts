@@ -317,6 +317,7 @@ contract Darwin is IDarwin, OwnableUpgradeable {
         address recipient,
         uint256 amount
     ) external override returns (bool) {
+        require(_allowances[sender][msg.sender] >= amount, "Darwin::transferFrom: opperator doesn't have permission to transfer");
         _transfer(sender, recipient, _getRate(), amount);
         _approve(sender, _msgSender(), _allowances[sender][_msgSender()] - amount);
         return true;
