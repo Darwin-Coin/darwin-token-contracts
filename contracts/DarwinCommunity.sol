@@ -14,9 +14,6 @@ import "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
 import "@openzeppelin/contracts/proxy/transparent/ProxyAdmin.sol";
 import "hardhat/console.sol";
 
-error NoActiveFundCandidate();
-error InvalidWeek(uint256 expected, uint256 provided);
-
 contract DarwinCommunity is OwnableUpgradeable, IDarwinCommunity {
     using SafeMathUpgradeable for uint256;
 
@@ -34,6 +31,7 @@ contract DarwinCommunity is OwnableUpgradeable, IDarwinCommunity {
     struct Receipt {
         bool hasVoted;
         bool inSupport;
+        uint256 darwinAmount;
     }
 
     struct Proposal {
@@ -43,6 +41,7 @@ contract DarwinCommunity is OwnableUpgradeable, IDarwinCommunity {
         uint256[] values;
         string[] signatures;
         bytes[] calldatas;
+        uint256 darwinAmount;
         uint256 startTime;
         uint256 endTime;
         uint256 forVotes;
@@ -57,12 +56,10 @@ contract DarwinCommunity is OwnableUpgradeable, IDarwinCommunity {
         bool isActive;
     }
 
-    modifier canAccess() {
-        require(darwin.balanceOf(_msgSender()) >= minNotRequiredToAccess, "DC::canAccess: not enouch $DARWIN");
-        require(
-            darwin.getLastTokenReceivedTimestamp(msg.sender) + tokenReceivedCoolDownPeriod < block.timestamp,
-            "DC::canAccess: can not access in cooldown period"
-        );
+    modifier preAcces(address from, uint256 darwinAmount) {
+        require(darwin.balanceOf(_msgSender()) >= minDarwinRequiredToAccess, "DC::canAccess: not enouch $DARWIN");
+        require(minDarwinTransferToAccess <= darwinAmount, "DC::takeAccessFee: not enouch $DARWIN sent");
+        require(darwin.takeAccessFee(from, address(this), darwinAmount), "DC::takeAccessFee: not enouch $DARWIN sent");
 
         _;
     }
@@ -78,7 +75,7 @@ contract DarwinCommunity is OwnableUpgradeable, IDarwinCommunity {
         _;
     }
 
-    uint256 public constant MIN_DARWIN_REQUIRED_TO_ACCESS = 10000 * 10**9;
+    uint256 public minDarwinRequiredToAccess; //10k
 
     mapping(uint256 => CommunityFundCandidate) private communityFundCandidates;
     uint256[] private activeCommunityFundCandidateIds;
@@ -97,9 +94,9 @@ contract DarwinCommunity is OwnableUpgradeable, IDarwinCommunity {
     uint256 public _lastCommunityFundCandidateId;
     uint256 public _lastProposalId;
 
-    uint256 public minNotRequiredToAccess;
-    uint256 public tokenReceivedCoolDownPeriod;
+    uint256 public minDarwinTransferToAccess;
 
+    uint256 public proposalMinVotesCountForAction;
     uint256 public proposalMaxOperations;
     uint256 public minVotingDelay;
     uint256 public minVotingPeriod;
@@ -133,10 +130,10 @@ contract DarwinCommunity is OwnableUpgradeable, IDarwinCommunity {
         minVotingPeriod = 24 hours;
         maxVotingPeriod = 1 weeks;
         gracePeriod = 72 hours;
+        proposalMinVotesCountForAction = 1;
 
-        minNotRequiredToAccess = 10 * 1000 * 10**9; // 10k
-
-        tokenReceivedCoolDownPeriod = 15 days;
+        minDarwinTransferToAccess = 1 * 10**9; // 1 darwin
+        minDarwinRequiredToAccess = 10000 * 10**9; //10k
 
         for (uint256 i = 0; i < restrictedProposalSignatures.length; i++) {
             restrictedProposalActionSignature[restrictedProposalSignatures[i]] = true;
@@ -200,8 +197,96 @@ contract DarwinCommunity is OwnableUpgradeable, IDarwinCommunity {
         emit NewFundCandidate(id, valueAddress, proposal);
     }
 
-    function distributeCommunityFund() public {
-        // TODO: distribute tokens and log
+    function getCommunityTokens(
+        uint256[] memory candidates,
+        uint256[] memory votes,
+        uint256 totalVoteCount,
+        uint256 tokensToDistribute
+    )
+        private
+        view
+        returns (
+            uint256[] memory,
+            address[] memory,
+            uint256[] memory
+        )
+    {
+        address[] memory allTokenRecepients = new address[](candidates.length);
+        uint256[] memory allTokenDistribution = new uint256[](candidates.length);
+        uint256 validRecepientsCount = 0;
+
+        bool[] memory isValid = new bool[](candidates.length);
+
+        uint256 _totalVoteCount = 0;
+
+        for (uint256 i = 0; i < candidates.length; ) {
+            allTokenRecepients[i] = communityFundCandidates[candidates[i]].valueAddress;
+            allTokenDistribution[i] = (tokensToDistribute * votes[i]) / totalVoteCount;
+
+            if (
+                allTokenRecepients[i] != address(0) &&
+                allTokenRecepients[i] != address(this) &&
+                allTokenDistribution[i] > 0
+            ) {
+                validRecepientsCount += 1;
+                isValid[i] = true;
+            } else {
+                isValid[i] = false;
+            }
+
+            _totalVoteCount += votes[i];
+
+            unchecked {
+                i++;
+            }
+        }
+
+        address[] memory _recepients = new address[](validRecepientsCount);
+        uint256[] memory _tokens = new uint256[](validRecepientsCount);
+
+        uint256 index = 0;
+
+        for (uint256 i = 0; i < candidates.length; ) {
+            if (isValid[i]) {
+                _recepients[i] = allTokenRecepients[i];
+                _tokens[i] = allTokenDistribution[i];
+
+                unchecked {
+                    index++;
+                }
+            }
+
+            unchecked {
+                i++;
+            }
+        }
+
+        return (allTokenDistribution, _recepients, _tokens);
+    }
+
+    function distributeCommunityFund(
+        uint256 fundWeek,
+        uint256[] calldata candidates,
+        uint256[] calldata votes,
+        uint256 totalVoteCount,
+        uint256 tokensToDistribute
+    ) public onlyOwner {
+        require(candidates.length == votes.length, "DC::distributeCommunityFund: candidates and votes length mismatch");
+        require(candidates.length > 0, "DC::distributeCommunityFund: empty candidates");
+
+        uint256 communityTokens = darwin.balanceOf(address(this));
+
+        require(communityTokens >= tokensToDistribute, "DC::distributeCommunityFund: not enough tokens");
+
+        (
+            uint256[] memory allTokenDistribution,
+            address[] memory recipientsToTransfer,
+            uint256[] memory tokenAmountToTransfer
+        ) = getCommunityTokens(candidates, votes, totalVoteCount, tokensToDistribute);
+
+        darwin.bulkTransfer(recipientsToTransfer, tokenAmountToTransfer);
+
+        emit CommunityFundDistributed(fundWeek, candidates, allTokenDistribution);
     }
 
     function propose(
@@ -213,20 +298,23 @@ contract DarwinCommunity is OwnableUpgradeable, IDarwinCommunity {
         string memory description,
         string memory other,
         uint256 endTime
-    ) public canAccess returns (uint256) {
+    ) public preAcces(msg.sender, minDarwinTransferToAccess) returns (uint256) {
         require(
             targets.length == values.length &&
                 targets.length == signatures.length &&
                 targets.length == calldatas.length,
             "DC::propose: proposal function information arity mismatch"
         );
+
         require(targets.length <= proposalMaxOperations, "DC::propose: too many actions");
 
-        uint256 earliestEndTime = block.timestamp + minVotingDelay + minVotingPeriod;
-        uint256 furthestEndDate = block.timestamp + minVotingDelay + maxVotingPeriod;
+        {
+            uint256 earliestEndTime = block.timestamp + minVotingDelay + minVotingPeriod;
+            uint256 furthestEndDate = block.timestamp + minVotingDelay + maxVotingPeriod;
 
-        require(endTime >= earliestEndTime, "DC::propose: too early end time");
-        require(endTime <= furthestEndDate, "DC::propose: too late end time");
+            require(endTime >= earliestEndTime, "DC::propose: too early end time");
+            require(endTime <= furthestEndDate, "DC::propose: too late end time");
+        }
 
         uint256 startTime = block.timestamp + minVotingDelay;
 
@@ -245,6 +333,7 @@ contract DarwinCommunity is OwnableUpgradeable, IDarwinCommunity {
             proposer: msg.sender,
             targets: targets,
             values: values,
+            darwinAmount: minDarwinTransferToAccess,
             signatures: signatures,
             calldatas: calldatas,
             startTime: startTime,
@@ -307,8 +396,12 @@ contract DarwinCommunity is OwnableUpgradeable, IDarwinCommunity {
      * @param proposalId The id of the proposal to vote on
      * @param inSupport The support value for the vote. 0=against, 1=for, 2=abstain
      */
-    function castVote(uint256 proposalId, bool inSupport) external canAccess {
-        castVoteInternal(_msgSender(), proposalId, inSupport);
+    function castVote(
+        uint256 proposalId,
+        bool inSupport,
+        uint256 darwinAmount
+    ) external preAcces(msg.sender, darwinAmount) {
+        castVoteInternal(_msgSender(), proposalId, darwinAmount, inSupport);
         emit VoteCast(_msgSender(), proposalId, inSupport);
     }
 
@@ -321,8 +414,9 @@ contract DarwinCommunity is OwnableUpgradeable, IDarwinCommunity {
     function castVoteInternal(
         address voter,
         uint256 proposalId,
+        uint256 darwinAmount,
         bool inSupport
-    ) private canAccess {
+    ) private {
         require(state(proposalId) == ProposalState.Active, "DC::castVoteInternal: voting is closed");
 
         Receipt storage receipt = voteReceipts[proposalId][voter];
@@ -334,6 +428,7 @@ contract DarwinCommunity is OwnableUpgradeable, IDarwinCommunity {
 
         receipt.hasVoted = true;
         receipt.inSupport = inSupport;
+        receipt.darwinAmount = darwinAmount;
 
         if (inSupport) {
             proposal.forVotes += 1;
@@ -347,12 +442,17 @@ contract DarwinCommunity is OwnableUpgradeable, IDarwinCommunity {
      * @param proposalId The id of the proposal to execute
      */
     function execute(uint256 proposalId) external payable onlyOwner {
+        Proposal storage proposal = proposals[proposalId];
+
         require(
             state(proposalId) == ProposalState.Queued,
             "DC::execute: proposal can only be executed if it is queued"
         );
 
-        Proposal storage proposal = proposals[proposalId];
+        require(
+            proposal.forVotes + proposal.againstVotes >= proposalMinVotesCountForAction,
+            "DC::execute: not enough votes received"
+        );
 
         proposal.executed = true;
 
@@ -433,6 +533,14 @@ contract DarwinCommunity is OwnableUpgradeable, IDarwinCommunity {
         gracePeriod = value;
     }
 
+    function setMinDarwinRequiredToAccess(uint256 count) public onlyDarwinCommunity {
+        minDarwinRequiredToAccess = count;
+    }
+
+    function setProposalMinVotesCountForAction(uint256 count) public onlyDarwinCommunity {
+        proposalMinVotesCountForAction = count;
+    }
+
     function getActiveFundCandidates() public view returns (CommunityFundCandidate[] memory) {
         CommunityFundCandidate[] memory candidates = new CommunityFundCandidate[](
             activeCommunityFundCandidateIds.length
@@ -463,31 +571,26 @@ contract DarwinCommunity is OwnableUpgradeable, IDarwinCommunity {
     /**
      * @notice Checks if the balance of a seller has dipped below the minimum required to vote, and removes votes cast if so
      * @param sender Address of a seller of darwin tokens
-    */
-    function checkIfVotesAreElegible(address sender, uint amount) external override {
-
+     */
+    function checkIfVotesAreElegible(address sender, uint256 amount) external override {
         require(msg.sender == address(darwin), "Caller isn't darwin token");
 
-        if(amount >= MIN_DARWIN_REQUIRED_TO_ACCESS) {
+        if (amount >= minDarwinRequiredToAccess) {
             return;
         }
 
-        uint[] memory votes = usersVotes[sender];
+        uint256[] memory votes = usersVotes[sender];
 
         if (votes.length == 0) {
             return;
         }
-        
-        for(uint i = 0; i < votes.length; ) {
 
-            uint proposalId = votes[i];
+        for (uint256 i = 0; i < votes.length; ) {
+            uint256 proposalId = votes[i];
 
-            if(state(proposalId) == ProposalState.Active) {
-
-                if(voteReceipts[proposalId][sender].inSupport) {
-
+            if (state(proposalId) == ProposalState.Active) {
+                if (voteReceipts[proposalId][sender].inSupport) {
                     proposals[proposalId].forVotes -= 1;
-
                 } else {
                     proposals[proposalId].againstVotes -= 1;
                 }
@@ -498,10 +601,8 @@ contract DarwinCommunity is OwnableUpgradeable, IDarwinCommunity {
             unchecked {
                 ++i;
             }
-            
-        } 
+        }
 
         delete usersVotes[sender];
-
     }
 }

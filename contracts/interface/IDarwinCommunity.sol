@@ -3,9 +3,6 @@ pragma solidity ^0.8.0;
 // SPDX-License-Identifier: Unlicensed
 
 interface IDarwinCommunity {
-    error NoActiveFundCandidate();
-    error InvalidWeek(uint256 expected, uint256 provided);
-
     event ActiveFundCandidateRemoved(uint256 indexed id);
     event ActiveFundCandidateAdded(uint256 indexed id);
 
@@ -42,6 +39,8 @@ interface IDarwinCommunity {
         string signature,
         bytes data
     );
+
+    event CommunityFundDistributed(uint256 fundWeek, uint256[] candidates, uint256[] tokens);
 
     function setDarwinAddress(address account) external;
 

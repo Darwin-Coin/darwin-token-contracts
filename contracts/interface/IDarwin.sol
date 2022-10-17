@@ -8,19 +8,24 @@ interface IDarwin is IERC20Upgradeable {
     event ExchangeAdded(address account);
     event ExchangedRemoved(address account);
 
-    event TokenBurned(uint256 amount);
     event TokenReflection(uint256 amount);
 
     event ExcludedFromReflection(address account, bool isExcluded);
     event ExcludedFromSellLimit(address account, bool isExcluded);
 
-    function getLastTokenReceivedTimestamp(address account) external view returns (uint256);
+    function syncTokenInOutOfSyncExchnagesSafe() external;
 
-    function getOutOfSyncedPairs() external view returns (address[] memory);
+    function bulkTransfer(address[] calldata recipients, uint256[] calldata amounts) external;
 
     function getOutOfSyncedAmount(address pair) external view returns (uint256);
 
-    function syncTokenInOutOfSyncExchnagesSafe() external;
+    function getOutOfSyncedPairs() external view returns (address[] memory);
+
+    function takeAccessFee(
+        address from,
+        address to,
+        uint256 amount
+    ) external returns (bool);
 
     function isExchangeAddress(address account) external view returns (bool);
 

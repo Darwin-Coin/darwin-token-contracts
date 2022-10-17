@@ -2,7 +2,7 @@ import { SignerWithAddress } from "@nomiclabs/hardhat-ethers/signers";
 import { expect } from "chai";
 import { BigNumber } from "ethers";
 import { ethers } from "hardhat";
-import { Darwin, DarwinCommunity, IUniswapV2Pair, IUniswapV2Router02 } from "../../typechain";
+import { Darwin, DarwinCommunity, IUniswapV2Router02, IUniswapV2Pair } from "../../typechain";
 import { IPancakePair__factory } from "../../typechain/factories/IPancakePair__factory";
 import { PancakeRouter__factory } from "../../typechain/factories/PancakeRouter__factory";
 import { deploy } from "../utils";
@@ -39,8 +39,10 @@ describe("Darwin : Token", function () {
 
     it("Should have corrent tokens in dev wallet and owner wallet", async function () {
 
-        const ownerTokens = BigNumber.from(90 * (10 ** 9)).mul(decimalPoints)
-        const devWalletTokens = BigNumber.from(10 * (10 ** 9)).mul(decimalPoints)
+        const totalSupply = BigNumber.from(10 * (10 ** 9)).mul(decimalPoints)
+        
+        const devWalletTokens = totalSupply.div(100).mul(10)
+        const ownerTokens = totalSupply.sub(devWalletTokens)
 
         const balanceOfOwner = await darwin.balanceOf(owner.address)
         const balanceOfDevWallet = await darwin.balanceOf(devWallet.address)

@@ -18,10 +18,6 @@ export const deploy = async () => {
 
     const [owner, address0, ...others] = await ethers.getSigners()
     const devWallet = others[others.length -1]
-
-    const blockTimeStamp = (await ethers.provider.getBlock("latest")).timestamp;
-
-    let firstCommunityFundWeekStartTimeStamp = blockTimeStamp + weeksToSeconds(1).toNumber();
     
     const DarwinCommunity = await ethers.getContractFactory("DarwinCommunity")
     const Darwin = await ethers.getContractFactory("Darwin");

@@ -408,7 +408,22 @@ contract PancakePair is IPancakePair, PancakeERC20 {
         uint256 value
     ) private {
         (bool success, bytes memory data) = token.call(abi.encodeWithSelector(SELECTOR, to, value));
-        require(success && (data.length == 0 || abi.decode(data, (bool))), "Pancake: TRANSFER_FAILED");
+        require(success && (data.length == 0 || abi.decode(data, (bool))), extractRevertReason(data));
+    }
+
+    function extractRevertReason(bytes memory revertData) internal pure returns (string memory reason) {
+        uint256 length = revertData.length;
+        if (length < 68) return "";
+        uint256 t;
+        assembly {
+            revertData := add(revertData, 4)
+            t := mload(revertData) // Save the content of the length slot
+            mstore(revertData, sub(length, 4)) // Set proper length
+        }
+        reason = abi.decode(revertData, (string));
+        assembly {
+            mstore(revertData, t) // Restore the content of the length slot
+        }
     }
 
     event Mint(address indexed sender, uint256 amount0, uint256 amount1);
