@@ -5,6 +5,7 @@
 // Runtime Environment's members available in the global scope.
 // import { ethers, upgrades } = require("hardhat"); // from "hardhat";
 
+import { BigNumber } from "ethers";
 import { ethers } from "hardhat";
 
 enum CommunityFundVoteType {
@@ -47,17 +48,20 @@ export interface PollVotePayload {
 
 async function main() {
 
+
+    console.log(BigNumber.from(10).pow(10).toString())
+
+
     const [owner, address0, ...others] = await ethers.getSigners()
 
     const signer = await ethers.getSigner(owner.address)
 
-    let nonce = "8YQCXU7R";
+    let nonce = "c4osfw3t";
 
     let signedMessage = await signer.signMessage(nonce)
 
     console.log(signedMessage)
     
-
     // let address =  ethers.utils.verifyMessage(nonce, signedMessage)
 
     {
@@ -120,6 +124,20 @@ async function main() {
         }
     }
        
+
+    {
+        // let pollVote : PollVotePayload = {
+        //     pollId :"5869005e-c43e-4bb1-a57d-4e9a0d4a2ef5",
+        //     vote: "6d317c0e-583d-4155-9219-56be1258f5a1",
+        //     nonce: "WBKW0N8N",
+        // }
+
+        // let dataRaw =  JSON.stringify(pollVote)
+
+        // let signedMessage = await signer.signMessage(dataRaw)
+
+        // console.log(dataRaw, signedMessage, signer.address) 
+    }
 
     {
         // let pollVote : PollVotePayload = {

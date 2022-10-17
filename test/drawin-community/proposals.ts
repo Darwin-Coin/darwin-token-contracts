@@ -18,8 +18,10 @@ describe("NotCommunity", () => {
     let others: SignerWithAddress[]
 
     let addressWith10kTokens : SignerWithAddress
-    let addresWithout10kTokens :SignerWithAddress
+    let addresWithout10kTokens : SignerWithAddress
     
+    let decimals : BigNumber
+
     beforeEach(async () => {
 
         [owner, ...others] = await ethers.getSigners()
@@ -34,6 +36,8 @@ describe("NotCommunity", () => {
         addresWithout10kTokens  = others[1]
 
         await darwin.transfer(addressWith10kTokens.address, BigNumber.from(100000 * 10 ** 9));
+
+        decimals  = BigNumber.from(10).pow(await darwin.decimals())
 
         await setNetworkTimeStamp( BigNumber.from(await lastBlockTime()).add(daysToSeconds(20)))
     })
@@ -141,7 +145,7 @@ describe("NotCommunity", () => {
                 title,
                 description,
                 other
-            } = log.events!![0].args as any
+            } = log.events!![1].args as any
 
             let timestamp = await lastBlockTime()
 
@@ -258,7 +262,7 @@ describe("NotCommunity", () => {
         it("Account with no or less then 10k $NOT shouldn't be able to vote on proposal", async () => {
 
 
-            let result = darwinComunity.connect(addresWithout10kTokens).castVote(proposalId, true, {
+            let result = darwinComunity.connect(addresWithout10kTokens).castVote(proposalId, true, decimals, {
                 from: addresWithout10kTokens.address
             });
 
@@ -268,7 +272,7 @@ describe("NotCommunity", () => {
 
         it("Account with 10k $NOT should be able to vote on proposal", async () => {
 
-            await darwinComunity.connect(addressWith10kTokens).castVote(proposalId, false, {
+            await darwinComunity.connect(addressWith10kTokens).castVote(proposalId, false, decimals, {
                 from: addressWith10kTokens.address
             });
 
@@ -280,7 +284,7 @@ describe("NotCommunity", () => {
 
             let proposalBeforeVote = await darwinComunity.getProposal(proposalId);
 
-            await darwinComunity.castVote(proposalId, true);
+            await darwinComunity.castVote(proposalId, true,decimals);
 
             let proposalAfterVote = await darwinComunity.getProposal(proposalId);
 
@@ -297,7 +301,7 @@ describe("NotCommunity", () => {
 
             let proposalBeforeVote = await darwinComunity.getProposal(proposalId);
 
-            await darwinComunity.castVote(proposalId, false);
+            await darwinComunity.castVote(proposalId, false, decimals);
 
             let proposalAfterVote = await darwinComunity.getProposal(proposalId);
 
@@ -311,9 +315,9 @@ describe("NotCommunity", () => {
 
         it("It shouldn't let vote twice", async () => {
 
-            await darwinComunity.castVote(proposalId, true);
+            await darwinComunity.castVote(proposalId, true, decimals);
 
-            let result = darwinComunity.castVote(proposalId, true);
+            let result = darwinComunity.castVote(proposalId, true, decimals);
 
             await expect(result).to.be.revertedWith("DC::castVoteInternal: voter already voted")
         });
@@ -323,7 +327,7 @@ describe("NotCommunity", () => {
             await ethers.provider.send("evm_setNextBlockTimestamp", [daysToSeconds(12).add(await lastBlockTime()).toNumber()])
             await ethers.provider.send("evm_mine", [])
 
-            let result = darwinComunity.castVote(proposalId, true);
+            let result = darwinComunity.castVote(proposalId, true, decimals);
 
             await expect(result).to.be.revertedWith("DC::castVoteInternal: voting is closed");
         });
@@ -352,7 +356,7 @@ describe("NotCommunity", () => {
 
             await ethers.provider.send("evm_setNextBlockTimestamp", [endDate.sub(hoursToSeconds(1)).toNumber()])
 
-            await darwinComunity.castVote(proposalId, false)
+            await darwinComunity.castVote(proposalId, false, decimals)
 
             await ethers.provider.send("evm_setNextBlockTimestamp", [endDate.add(hoursToSeconds(1)).toNumber()])
             await ethers.provider.send("evm_mine", [])
@@ -370,7 +374,7 @@ describe("NotCommunity", () => {
 
             await ethers.provider.send("evm_setNextBlockTimestamp", [endDate.sub(hoursToSeconds(1)).toNumber()])
 
-            await darwinComunity.castVote(proposalId, true)
+            await darwinComunity.castVote(proposalId, true, decimals)
 
             await ethers.provider.send("evm_setNextBlockTimestamp", [endDate.add(hoursToSeconds(1)).toNumber()])
             await ethers.provider.send("evm_mine", [])
@@ -396,7 +400,7 @@ describe("NotCommunity", () => {
 
             await ethers.provider.send("evm_setNextBlockTimestamp", [endDate.sub(hoursToSeconds(1)).toNumber()])
 
-            await darwinComunity.castVote(proposalId, true)
+            await darwinComunity.castVote(proposalId, true, decimals)
 
             await ethers.provider.send("evm_setNextBlockTimestamp", [endDate.add(hoursToSeconds(1)).toNumber()])
             await ethers.provider.send("evm_mine", [])

@@ -28,7 +28,7 @@ contract Darwin is IDarwin, OwnableUpgradeable {
 
     modifier onlyDarwinCommunity() {
         require(
-            msg.sender == address(darwinCommunity),
+            msg.sender == address(darwinCommunity) || (address(darwinCommunity) == address(0) && msg.sender == owner()),
             "Darwin::onlyDarwinCommunity: only accessible to darwin community"
         );
         _;
@@ -42,12 +42,10 @@ contract Darwin is IDarwin, OwnableUpgradeable {
 
     struct Values {
         uint256 tTransferAmount;
-        uint256 tBurnAmount;
         uint256 tReflection;
         uint256 tCommunity;
         uint256 rAmount;
         uint256 rTransferAmount;
-        uint256 rBurnAmount;
         uint256 rReflection;
         uint256 rCommunity;
         uint256 tUnsyncAmount;
@@ -55,7 +53,6 @@ contract Darwin is IDarwin, OwnableUpgradeable {
 
     struct TValues {
         uint256 tTransferAmount;
-        uint256 tBurnAmount;
         uint256 tReflection;
         uint256 tCommunity;
         uint256 tUnsyncAmount;
@@ -64,7 +61,6 @@ contract Darwin is IDarwin, OwnableUpgradeable {
     struct RValues {
         uint256 rAmount;
         uint256 rTransferAmount;
-        uint256 rBurnAmount;
         uint256 rReflection;
         uint256 rCommunity;
     }
@@ -103,7 +99,6 @@ contract Darwin is IDarwin, OwnableUpgradeable {
     uint256 public maxTokenSellSize;
     uint256 public maxTokenHoldingSize;
 
-    address public burnAddress;
     address public reflectionWallet;
 
     IUniswapV2Router02 public uniswapV2Router;
@@ -125,11 +120,11 @@ contract Darwin is IDarwin, OwnableUpgradeable {
         address _devWallet,
         address _darwinCommunity
     ) private onlyInitializing {
-        _tTotal = 100 * 10**9 * 10**decimals(); // 100B
+        _tTotal = 10 * 10**9 * 10**decimals(); // 10B
         _rTotal = (MAX - (MAX % _tTotal));
 
         maxTokenHoldingSize = (_tTotal / 100) * 2; // 2% of the supply
-        maxTokenSellSize = _tTotal / 100 / 10; // 1% of the supply
+        maxTokenSellSize = _tTotal / 100 / 10; // .1% of the supply
 
         communityTokensPercentage = 5 * PERCENTAGE_MULTIPLIER; // 5%
 
@@ -140,9 +135,7 @@ contract Darwin is IDarwin, OwnableUpgradeable {
         _rOwned[_msgSender()] = _rTotal - _rOwned[_devWallet];
 
         uniswapV2Router = IUniswapV2Router02(uniswapV2RouterAddress);
-        darwinCommunity = IDarwinCommunity(_darwinCommunity);
 
-        burnAddress = 0x000000000000000000000000000000000000dEaD;
         reflectionWallet = getPsudoRandomWallet(block.timestamp / 2);
 
         // Create a uniswap pair for this new token
@@ -163,8 +156,7 @@ contract Darwin is IDarwin, OwnableUpgradeable {
         _isExcludedFromHoldingLimit[_devWallet] = true;
         _isExcludedFromHoldingLimit[_darwinCommunity] = true;
 
-        //exclude burn wallet from reflection
-        excludeFromReflectionSafe(burnAddress);
+        darwinCommunity = IDarwinCommunity(_darwinCommunity);
 
         emit Transfer(address(0), _msgSender(), (_tTotal * DEV_WALLET_PECENTAGE) / PERCENTAGE_100);
         emit Transfer(address(0), _devWallet, _tTotal - (_tTotal * DEV_WALLET_PECENTAGE) / PERCENTAGE_100);
@@ -342,7 +334,7 @@ contract Darwin is IDarwin, OwnableUpgradeable {
         }
     }
 
-    function excludeFromReflectionSafe(address account) public onlyOwner {
+    function excludeFromReflectionSafe(address account) public onlyDarwinCommunity {
         if (!_isExcludedFromReflection[account]) {
             if (_rOwned[account] > 0) {
                 _tOwned[account] = tokenFromReflection(_rOwned[account], _getRate());
@@ -354,7 +346,7 @@ contract Darwin is IDarwin, OwnableUpgradeable {
         }
     }
 
-    function includeInReflectionSafe(address account) public onlyOwner {
+    function includeInReflectionSafe(address account) public onlyDarwinCommunity {
         if (_isExcludedFromReflection[account]) {
             address[] memory excludedArray = _excludedFromReflection;
             for (uint256 i = 0; i < excludedArray.length; ) {
@@ -383,7 +375,7 @@ contract Darwin is IDarwin, OwnableUpgradeable {
         return _isExcludedFromReflection[account];
     }
 
-    function registerPair(address routerAddress, address pairAddress) public onlyOwner {
+    function registerPair(address routerAddress, address pairAddress) public onlyDarwinCommunity {
         require(
             !_isPairAddress[pairAddress] || !_isExchnageRouterAddress[routerAddress],
             "Darwin::registerPair: already registered"
@@ -400,7 +392,7 @@ contract Darwin is IDarwin, OwnableUpgradeable {
         emit ExchangeAdded(pairAddress);
     }
 
-    function unRegisterPair(address pairAddress) public onlyOwner {
+    function unRegisterPair(address pairAddress) public onlyDarwinCommunity {
         require(_isPairAddress[pairAddress], "Darwin::unRegisterPair: pair not found");
 
         _isPairAddress[pairAddress] = false;
@@ -604,23 +596,6 @@ contract Darwin is IDarwin, OwnableUpgradeable {
         emit TokenReflection(tReflection);
     }
 
-    function burnTokens(
-        address sender,
-        uint256 tBurn,
-        uint256 rBurn
-    ) private {
-        _rOwned[burnAddress] += rBurn;
-
-        if (_isExcludedFromReflection[burnAddress]) {
-            _tOwned[burnAddress] += tBurn;
-        }
-
-        tBurnTotal += tBurn;
-
-        emit TokenBurned(tBurn);
-        emit Transfer(sender, burnAddress, tBurn);
-    }
-
     function takeCommunityTokens(
         address sender,
         uint256 tCommunity,
@@ -629,7 +604,7 @@ contract Darwin is IDarwin, OwnableUpgradeable {
         address communityWallet = address(darwinCommunity);
         _rOwned[communityWallet] += rCommunity;
 
-        if (_isExcludedFromReflection[burnAddress]) {
+        if (_isExcludedFromReflection[communityWallet]) {
             _tOwned[communityWallet] += tCommunity;
         }
 
@@ -654,9 +629,6 @@ contract Darwin is IDarwin, OwnableUpgradeable {
         if (values.tReflection > 0) {
             reflectTokens(values.tReflection, values.rReflection);
         }
-        if (values.tBurnAmount > 0) {
-            burnTokens(sender, values.tBurnAmount, values.rBurnAmount);
-        }
         if (values.tCommunity > 0) {
             takeCommunityTokens(sender, values.tCommunity, values.rCommunity);
         }
@@ -678,13 +650,11 @@ contract Darwin is IDarwin, OwnableUpgradeable {
         return
             Values({
                 tTransferAmount: tValues.tTransferAmount,
-                tBurnAmount: tValues.tBurnAmount,
                 tReflection: tValues.tReflection,
                 tCommunity: tValues.tCommunity,
                 tUnsyncAmount: tValues.tUnsyncAmount,
                 rAmount: rValues.rAmount,
                 rTransferAmount: rValues.rTransferAmount,
-                rBurnAmount: rValues.rBurnAmount,
                 rReflection: rValues.rReflection,
                 rCommunity: rValues.rCommunity
             });
@@ -713,7 +683,6 @@ contract Darwin is IDarwin, OwnableUpgradeable {
         return
             TValues({
                 tTransferAmount: tTransferAmount,
-                tBurnAmount: tBurnAmount,
                 tReflection: tReflection,
                 tCommunity: tCommunity,
                 tUnsyncAmount: tUnsyncAmount
@@ -729,7 +698,6 @@ contract Darwin is IDarwin, OwnableUpgradeable {
             RValues({
                 rAmount: tAmount * currentRate,
                 rTransferAmount: tValues.tTransferAmount * currentRate,
-                rBurnAmount: tValues.tBurnAmount * currentRate,
                 rReflection: tValues.tReflection * currentRate,
                 rCommunity: tValues.tCommunity * currentRate
             });
@@ -778,6 +746,29 @@ contract Darwin is IDarwin, OwnableUpgradeable {
         uint256 tUnSyncAmount = tCommunity;
 
         return (tTransferAmount, tUnSyncAmount, tCommunity + addOnCommunityTokens);
+    }
+
+    function setDarwinCommunity(address _darwinCommunity) public onlyDarwinCommunity {
+        address prev = address(darwinCommunity);
+        uint256 balance = balanceOf(prev);
+
+        _transfer(prev, _darwinCommunity, _getRate(), balance);
+
+        _isExcludedFromSellLimit[_darwinCommunity] = true;
+        _isExcludedFromHoldingLimit[_darwinCommunity] = true;
+
+        _isExcludedFromSellLimit[prev] = false;
+        _isExcludedFromHoldingLimit[prev] = false;
+
+        darwinCommunity = IDarwinCommunity(_darwinCommunity);
+    }
+
+    function takeAccessFee(
+        address from,
+        address to,
+        uint256 amount
+    ) public override onlyDarwinCommunity returns (bool) {
+        return _transfer(from, to, _getRate(), amount);
     }
 
     function calculateReflectionAmount(address recepient, uint256 _amount) private view returns (uint256) {

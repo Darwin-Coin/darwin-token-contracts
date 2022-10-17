@@ -35,11 +35,11 @@ async function main() {
             address: owner.address
         },
         {
-            proposal: "Charity",
+            proposal: "Operations",
             address: owner.address
         },
         {
-            proposal: "Product development",
+            proposal: "Charity",
             address: owner.address
         },
         {
@@ -55,19 +55,15 @@ async function main() {
             address: owner.address
         },
         {
-            proposal: "Send back to Reward Wallet",
+            proposal: "Burn",
             address: owner.address
         },
         {
-            proposal: "Burn the funds",
+            proposal: "Reflections",
             address: owner.address
         },
         {
-            proposal: "Add to liquidity",
-            address: owner.address
-        },
-        {
-            proposal: "Save to use next week",
+            proposal: "Save to Next Week",
             address: owner.address
         }
     ]

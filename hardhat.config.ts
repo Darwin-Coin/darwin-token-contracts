@@ -118,7 +118,7 @@ const config: HardhatUserConfig = {
             }
         },
         hardhat: {
-            loggingEnabled: false,
+            loggingEnabled: true,
             // gasMultiplier:1,
             forking:{
                 enabled:false,
