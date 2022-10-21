@@ -12,6 +12,7 @@ interface IDarwinCommunity {
     event ProposalCreated(
         uint256 indexed id,
         address indexed proposer,
+        uint256 darwinAmount,
         uint256 startTime,
         uint256 endTime,
         string title,
@@ -23,7 +24,7 @@ interface IDarwinCommunity {
     /// @param voter The address which casted a vote
     /// @param proposalId The proposal id which was voted on
     /// @param inSupport Is the vote is favour
-    event VoteCast(address indexed voter, uint256 indexed proposalId, bool inSupport);
+    event VoteCast(address indexed voter, uint256 indexed proposalId, uint256 darwinAmount, bool inSupport);
 
     /// @notice An event emitted when a proposal has been canceled
     event ProposalCanceled(uint256 indexed id);

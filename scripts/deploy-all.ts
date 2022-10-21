@@ -15,7 +15,6 @@ import { getUniswapRouterAddress } from "./helpers";
 
 
 async function main() {
-    const up = upgrades as HardhatUpgrades
     
     const [owner, address0, address1, ...others] = await hardhat.ethers.getSigners()
     const devWallet = owner;
@@ -91,9 +90,9 @@ async function main() {
 
     const uniswapV2RouterAddress = await getUniswapRouterAddress(hardhat.network.name)
 
-    const darwinToken = await up.deployProxy(
+    const darwinToken = await upgrades.deployProxy(
         Darwin,
-        [uniswapV2RouterAddress, darwinCommunity.address, devWallet.address],
+        [uniswapV2RouterAddress, devWallet.address, darwinCommunity.address],
         {
             initializer: "initialize"
         }
@@ -101,7 +100,7 @@ async function main() {
 
     await darwinToken.deployed();
 
-    console.log("NotCrypto deployed at:", darwinToken.address);
+    console.log("Darwin deployed at:", darwinToken.address);
 
     await darwinCommunity.setDarwinAddress(darwinToken.address);
 

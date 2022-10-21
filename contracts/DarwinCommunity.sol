@@ -301,7 +301,7 @@ contract DarwinCommunity is OwnableUpgradeable, IDarwinCommunity {
             targets.length == values.length &&
                 targets.length == signatures.length &&
                 targets.length == calldatas.length,
-            "DC::propose: proposal function information arity mismatch"
+            "DC::propose: proposal function information mismatch"
         );
 
         require(targets.length <= proposalMaxOperations, "DC::propose: too many actions");
@@ -347,7 +347,16 @@ contract DarwinCommunity is OwnableUpgradeable, IDarwinCommunity {
         _lastProposalId = proposalId;
         proposals[newProposal.id] = newProposal;
 
-        emit ProposalCreated(newProposal.id, msg.sender, startTime, endTime, title, description, other);
+        emit ProposalCreated(
+            newProposal.id,
+            msg.sender,
+            minDarwinTransferToAccess,
+            startTime,
+            endTime,
+            title,
+            description,
+            other
+        );
         return newProposal.id;
     }
 
@@ -402,7 +411,7 @@ contract DarwinCommunity is OwnableUpgradeable, IDarwinCommunity {
         uint256 darwinAmount
     ) external preAcces(msg.sender, darwinAmount) {
         castVoteInternal(_msgSender(), proposalId, darwinAmount, inSupport);
-        emit VoteCast(_msgSender(), proposalId, inSupport);
+        emit VoteCast(_msgSender(), proposalId, darwinAmount, inSupport);
     }
 
     /**

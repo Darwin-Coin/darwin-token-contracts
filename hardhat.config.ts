@@ -106,7 +106,7 @@ const config: HardhatUserConfig = {
             chainId: 97,
             accounts:{
                 mnemonic: String(process.env.TEST_MNEMONICS),
-                count:1
+                count:10
             }
         },
         bscMainNet: {
@@ -118,7 +118,7 @@ const config: HardhatUserConfig = {
             }
         },
         hardhat: {
-            loggingEnabled: false,
+            loggingEnabled: true,
             // gasMultiplier:1,
             forking:{
                 enabled:false,

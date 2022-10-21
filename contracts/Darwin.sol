@@ -103,7 +103,7 @@ contract Darwin is IDarwin, OwnableUpgradeable {
 
     IUniswapV2Router02 public uniswapV2Router;
     IUniswapV2Pair public uniswapV2Pair;
-    IDarwinCommunity darwinCommunity;
+    IDarwinCommunity public darwinCommunity;
 
     function initialize(
         address uniswapV2RouterAddress,

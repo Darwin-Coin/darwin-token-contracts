@@ -1,20 +1,10 @@
 {
   "manifestVersion": "3.2",
   "admin": {
-    "address": "0x426F6F9e2339f614c4f13B551d74AA2401032dAC",
-    "txHash": "0xba49c4d99645474296e264c2c0af8834233a852a75a71f1ceeecff41cfc1a7a0"
+    "address": "0x03a16C47Fa284E13E3Ea628dCB5C7CD7d6F085d6",
+    "txHash": "0x69ee01fc5f4777bb9900d80cc36fae2b779894becdfeaf0ccdc7be4edd5937cc"
   },
   "proxies": [
-    {
-      "address": "0xc77c6d7a75409469824C0F5999499468658C807C",
-      "txHash": "0x620743bb4e10ff1a56fd1726f7a42148ad899fa9d35b765e87913d09f17004ac",
-      "kind": "transparent"
-    },
-    {
-      "address": "0x9EE244AF31D513c5cf57b20fEBdC42D10db19962",
-      "txHash": "0x9479ca6e32f761af3a8689ca11702b28c9ad6fc8a6ed5d87fb88509f5058b456",
-      "kind": "transparent"
-    },
     {
       "address": "0x6835ce91Da4d85a33715ab7f9750191338a410d9",
       "txHash": "0x00faadd6f315edece9c9ecb9dc4e643004dbb17217cf4890aa26830aca98ddfe",
@@ -1491,11 +1481,6 @@
       "kind": "transparent"
     },
     {
-      "address": "0x63849CC67165CD00fb3E4D01200Ac56eD3234b39",
-      "txHash": "0x0a0e13d8f2e50ba5b32460afa3478d3636a38f45c46141041184081eb9258933",
-      "kind": "transparent"
-    },
-    {
       "address": "0xaCFD4F95E9ffBA646838040440B0b90ea76fc7AB",
       "txHash": "0xf71044954d8af8b806847fd99e5b22a472b6881bea5f89016f5cc3e4345a19e2",
       "kind": "transparent"
@@ -1713,6 +1698,26 @@
     {
       "address": "0x8c8e92AdFB243eA52609F81375C9A82009dB9068",
       "txHash": "0x65ec133abf7ccef9a827cc66bf47e9e714296d888e3186799ec8b81542cafed3",
+      "kind": "transparent"
+    },
+    {
+      "address": "0xE59628178994E4B533Ec361907d08c2f9a107E2E",
+      "txHash": "0xf02aa09c1a0123f660d73f7644f2cb4093e78115efe90929c8d1ebbb196221db",
+      "kind": "transparent"
+    },
+    {
+      "address": "0x63849CC67165CD00fb3E4D01200Ac56eD3234b39",
+      "txHash": "0xc608886c712d66dbe59d308fd9ad9fe9eb0ae6e45a65f9dad58d9ca948092d52",
+      "kind": "transparent"
+    },
+    {
+      "address": "0xc77c6d7a75409469824C0F5999499468658C807C",
+      "txHash": "0x32e38a407b3d990fe7c4d1edd3c9883d15a06f3c4307bb4975052b10b68d2e02",
+      "kind": "transparent"
+    },
+    {
+      "address": "0x9EE244AF31D513c5cf57b20fEBdC42D10db19962",
+      "txHash": "0x941ca3d37171eddc493659831067482ca741d08a762c52f144b8ed20044864dc",
       "kind": "transparent"
     }
   ],
@@ -4346,9 +4351,408 @@
         }
       }
     },
-    "b160505ceff6930a2c86111ffdebfeb98105d352c96691f4f145a61edb0bdc18": {
+    "3349c325f49ed1f88b2ff1154e4b6005d5e17a424c0c44da27c7069bc367ff32": {
+      "address": "0x7845341Ba766Ac8c8Bf1aCB6c4bEaBCb988Cb20D",
+      "txHash": "0x253dfca11a485e9a8dc25a7a4fa49d0a67ac00296eca7e20c08a506bac6ed44b",
+      "layout": {
+        "storage": [
+          {
+            "label": "_initialized",
+            "offset": 0,
+            "slot": "0",
+            "type": "t_uint8",
+            "contract": "Initializable",
+            "src": "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol:62",
+            "retypedFrom": "bool"
+          },
+          {
+            "label": "_initializing",
+            "offset": 1,
+            "slot": "0",
+            "type": "t_bool",
+            "contract": "Initializable",
+            "src": "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol:67"
+          },
+          {
+            "label": "__gap",
+            "offset": 0,
+            "slot": "1",
+            "type": "t_array(t_uint256)50_storage",
+            "contract": "ContextUpgradeable",
+            "src": "@openzeppelin/contracts-upgradeable/utils/ContextUpgradeable.sol:36"
+          },
+          {
+            "label": "_owner",
+            "offset": 0,
+            "slot": "51",
+            "type": "t_address",
+            "contract": "OwnableUpgradeable",
+            "src": "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol:22"
+          },
+          {
+            "label": "__gap",
+            "offset": 0,
+            "slot": "52",
+            "type": "t_array(t_uint256)49_storage",
+            "contract": "OwnableUpgradeable",
+            "src": "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol:87"
+          },
+          {
+            "label": "communityFundCandidates",
+            "offset": 0,
+            "slot": "101",
+            "type": "t_mapping(t_uint256,t_struct(CommunityFundCandidate)4729_storage)",
+            "contract": "DarwinCommunity",
+            "src": "contracts/DarwinCommunity.sol:79"
+          },
+          {
+            "label": "activeCommunityFundCandidateIds",
+            "offset": 0,
+            "slot": "102",
+            "type": "t_array(t_uint256)dyn_storage",
+            "contract": "DarwinCommunity",
+            "src": "contracts/DarwinCommunity.sol:80"
+          },
+          {
+            "label": "voteReceipts",
+            "offset": 0,
+            "slot": "103",
+            "type": "t_mapping(t_uint256,t_mapping(t_address,t_struct(Receipt)4687_storage))",
+            "contract": "DarwinCommunity",
+            "src": "contracts/DarwinCommunity.sol:83"
+          },
+          {
+            "label": "proposals",
+            "offset": 0,
+            "slot": "104",
+            "type": "t_mapping(t_uint256,t_struct(Proposal)4722_storage)",
+            "contract": "DarwinCommunity",
+            "src": "contracts/DarwinCommunity.sol:86"
+          },
+          {
+            "label": "restrictedProposalActionSignature",
+            "offset": 0,
+            "slot": "105",
+            "type": "t_mapping(t_uint256,t_bool)",
+            "contract": "DarwinCommunity",
+            "src": "contracts/DarwinCommunity.sol:89"
+          },
+          {
+            "label": "usersVotes",
+            "offset": 0,
+            "slot": "106",
+            "type": "t_mapping(t_address,t_array(t_uint256)dyn_storage)",
+            "contract": "DarwinCommunity",
+            "src": "contracts/DarwinCommunity.sol:91"
+          },
+          {
+            "label": "_lastCommunityFundCandidateId",
+            "offset": 0,
+            "slot": "107",
+            "type": "t_uint256",
+            "contract": "DarwinCommunity",
+            "src": "contracts/DarwinCommunity.sol:93"
+          },
+          {
+            "label": "_lastProposalId",
+            "offset": 0,
+            "slot": "108",
+            "type": "t_uint256",
+            "contract": "DarwinCommunity",
+            "src": "contracts/DarwinCommunity.sol:94"
+          },
+          {
+            "label": "minDarwinTransferToAccess",
+            "offset": 0,
+            "slot": "109",
+            "type": "t_uint256",
+            "contract": "DarwinCommunity",
+            "src": "contracts/DarwinCommunity.sol:96"
+          },
+          {
+            "label": "minDarwinForAction",
+            "offset": 0,
+            "slot": "110",
+            "type": "t_uint256",
+            "contract": "DarwinCommunity",
+            "src": "contracts/DarwinCommunity.sol:98"
+          },
+          {
+            "label": "proposalMaxOperations",
+            "offset": 0,
+            "slot": "111",
+            "type": "t_uint256",
+            "contract": "DarwinCommunity",
+            "src": "contracts/DarwinCommunity.sol:99"
+          },
+          {
+            "label": "minVotingDelay",
+            "offset": 0,
+            "slot": "112",
+            "type": "t_uint256",
+            "contract": "DarwinCommunity",
+            "src": "contracts/DarwinCommunity.sol:100"
+          },
+          {
+            "label": "minVotingPeriod",
+            "offset": 0,
+            "slot": "113",
+            "type": "t_uint256",
+            "contract": "DarwinCommunity",
+            "src": "contracts/DarwinCommunity.sol:101"
+          },
+          {
+            "label": "maxVotingPeriod",
+            "offset": 0,
+            "slot": "114",
+            "type": "t_uint256",
+            "contract": "DarwinCommunity",
+            "src": "contracts/DarwinCommunity.sol:102"
+          },
+          {
+            "label": "gracePeriod",
+            "offset": 0,
+            "slot": "115",
+            "type": "t_uint256",
+            "contract": "DarwinCommunity",
+            "src": "contracts/DarwinCommunity.sol:103"
+          },
+          {
+            "label": "darwin",
+            "offset": 0,
+            "slot": "116",
+            "type": "t_contract(IDarwin)6435",
+            "contract": "DarwinCommunity",
+            "src": "contracts/DarwinCommunity.sol:105"
+          }
+        ],
+        "types": {
+          "t_address": {
+            "label": "address",
+            "numberOfBytes": "20"
+          },
+          "t_array(t_address)dyn_storage": {
+            "label": "address[]",
+            "numberOfBytes": "32"
+          },
+          "t_array(t_bytes_storage)dyn_storage": {
+            "label": "bytes[]",
+            "numberOfBytes": "32"
+          },
+          "t_array(t_string_storage)dyn_storage": {
+            "label": "string[]",
+            "numberOfBytes": "32"
+          },
+          "t_array(t_uint256)49_storage": {
+            "label": "uint256[49]",
+            "numberOfBytes": "1568"
+          },
+          "t_array(t_uint256)50_storage": {
+            "label": "uint256[50]",
+            "numberOfBytes": "1600"
+          },
+          "t_array(t_uint256)dyn_storage": {
+            "label": "uint256[]",
+            "numberOfBytes": "32"
+          },
+          "t_bool": {
+            "label": "bool",
+            "numberOfBytes": "1"
+          },
+          "t_bytes_storage": {
+            "label": "bytes",
+            "numberOfBytes": "32"
+          },
+          "t_contract(IDarwin)6435": {
+            "label": "contract IDarwin",
+            "numberOfBytes": "20"
+          },
+          "t_mapping(t_address,t_array(t_uint256)dyn_storage)": {
+            "label": "mapping(address => uint256[])",
+            "numberOfBytes": "32"
+          },
+          "t_mapping(t_address,t_struct(Receipt)4687_storage)": {
+            "label": "mapping(address => struct DarwinCommunity.Receipt)",
+            "numberOfBytes": "32"
+          },
+          "t_mapping(t_uint256,t_bool)": {
+            "label": "mapping(uint256 => bool)",
+            "numberOfBytes": "32"
+          },
+          "t_mapping(t_uint256,t_mapping(t_address,t_struct(Receipt)4687_storage))": {
+            "label": "mapping(uint256 => mapping(address => struct DarwinCommunity.Receipt))",
+            "numberOfBytes": "32"
+          },
+          "t_mapping(t_uint256,t_struct(CommunityFundCandidate)4729_storage)": {
+            "label": "mapping(uint256 => struct DarwinCommunity.CommunityFundCandidate)",
+            "numberOfBytes": "32"
+          },
+          "t_mapping(t_uint256,t_struct(Proposal)4722_storage)": {
+            "label": "mapping(uint256 => struct DarwinCommunity.Proposal)",
+            "numberOfBytes": "32"
+          },
+          "t_string_storage": {
+            "label": "string",
+            "numberOfBytes": "32"
+          },
+          "t_struct(CommunityFundCandidate)4729_storage": {
+            "label": "struct DarwinCommunity.CommunityFundCandidate",
+            "members": [
+              {
+                "label": "id",
+                "type": "t_uint256",
+                "offset": 0,
+                "slot": "0"
+              },
+              {
+                "label": "valueAddress",
+                "type": "t_address",
+                "offset": 0,
+                "slot": "1"
+              },
+              {
+                "label": "isActive",
+                "type": "t_bool",
+                "offset": 20,
+                "slot": "1"
+              }
+            ],
+            "numberOfBytes": "64"
+          },
+          "t_struct(Proposal)4722_storage": {
+            "label": "struct DarwinCommunity.Proposal",
+            "members": [
+              {
+                "label": "id",
+                "type": "t_uint256",
+                "offset": 0,
+                "slot": "0"
+              },
+              {
+                "label": "proposer",
+                "type": "t_address",
+                "offset": 0,
+                "slot": "1"
+              },
+              {
+                "label": "targets",
+                "type": "t_array(t_address)dyn_storage",
+                "offset": 0,
+                "slot": "2"
+              },
+              {
+                "label": "values",
+                "type": "t_array(t_uint256)dyn_storage",
+                "offset": 0,
+                "slot": "3"
+              },
+              {
+                "label": "signatures",
+                "type": "t_array(t_string_storage)dyn_storage",
+                "offset": 0,
+                "slot": "4"
+              },
+              {
+                "label": "calldatas",
+                "type": "t_array(t_bytes_storage)dyn_storage",
+                "offset": 0,
+                "slot": "5"
+              },
+              {
+                "label": "darwinAmount",
+                "type": "t_uint256",
+                "offset": 0,
+                "slot": "6"
+              },
+              {
+                "label": "startTime",
+                "type": "t_uint256",
+                "offset": 0,
+                "slot": "7"
+              },
+              {
+                "label": "endTime",
+                "type": "t_uint256",
+                "offset": 0,
+                "slot": "8"
+              },
+              {
+                "label": "forVotes",
+                "type": "t_uint256",
+                "offset": 0,
+                "slot": "9"
+              },
+              {
+                "label": "againstVotes",
+                "type": "t_uint256",
+                "offset": 0,
+                "slot": "10"
+              },
+              {
+                "label": "forVoteDarwins",
+                "type": "t_uint256",
+                "offset": 0,
+                "slot": "11"
+              },
+              {
+                "label": "aganistVoteDarwins",
+                "type": "t_uint256",
+                "offset": 0,
+                "slot": "12"
+              },
+              {
+                "label": "canceled",
+                "type": "t_bool",
+                "offset": 0,
+                "slot": "13"
+              },
+              {
+                "label": "executed",
+                "type": "t_bool",
+                "offset": 1,
+                "slot": "13"
+              }
+            ],
+            "numberOfBytes": "448"
+          },
+          "t_struct(Receipt)4687_storage": {
+            "label": "struct DarwinCommunity.Receipt",
+            "members": [
+              {
+                "label": "hasVoted",
+                "type": "t_bool",
+                "offset": 0,
+                "slot": "0"
+              },
+              {
+                "label": "inSupport",
+                "type": "t_bool",
+                "offset": 1,
+                "slot": "0"
+              },
+              {
+                "label": "darwinAmount",
+                "type": "t_uint256",
+                "offset": 0,
+                "slot": "1"
+              }
+            ],
+            "numberOfBytes": "64"
+          },
+          "t_uint256": {
+            "label": "uint256",
+            "numberOfBytes": "32"
+          },
+          "t_uint8": {
+            "label": "uint8",
+            "numberOfBytes": "1"
+          }
+        }
+      }
+    },
+    "3951e64185b438e1aaa203278403db14c404550114c469e827eac5a9360ab661": {
       "address": "0xc3D726a3bA3e72eB3928c11D31cAF3E754726adC",
-      "txHash": "0x6ee0508394d6d0cd6c64028c5b8c4e7db7e6835ebeb3a8a3909e4531e8a2335b",
+      "txHash": "0x86027947ca2c5906263059e5f95a45bd2678dcfe48196549715a0a9616ec3acc",
       "layout": {
         "storage": [
           {
