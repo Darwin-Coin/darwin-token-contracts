@@ -478,18 +478,6 @@ contract Darwin is IDarwin, OwnableUpgradeable {
 
         _tokenTransfer(from, to, amount, currentRate, isSell);
 
-        if (from != address(darwinCommunity)) {
-            uint256 rate = currentRate;
-
-            if (to == reflectionWallet) {
-                //Community wallet was sent to, changing up reflection, so have to recalculate rate
-                rate = _getRate();
-            }
-
-            ///@notice make call to darwinCommunity contract to see if votes are currently still valid
-            darwinCommunity.checkIfVotesAreElegible(from, _balanceOf(from, rate));
-        }
-
         return true;
     }
 

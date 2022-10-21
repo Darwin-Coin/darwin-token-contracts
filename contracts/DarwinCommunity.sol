@@ -46,6 +46,8 @@ contract DarwinCommunity is OwnableUpgradeable, IDarwinCommunity {
         uint256 endTime;
         uint256 forVotes;
         uint256 againstVotes;
+        uint256 forVoteDarwins;
+        uint256 aganistVoteDarwins;
         bool canceled;
         bool executed;
     }
@@ -57,7 +59,6 @@ contract DarwinCommunity is OwnableUpgradeable, IDarwinCommunity {
     }
 
     modifier preAcces(address from, uint256 darwinAmount) {
-        require(darwin.balanceOf(_msgSender()) >= minDarwinRequiredToAccess, "DC::canAccess: not enouch $DARWIN");
         require(minDarwinTransferToAccess <= darwinAmount, "DC::takeAccessFee: not enouch $DARWIN sent");
         require(darwin.takeAccessFee(from, address(this), darwinAmount), "DC::takeAccessFee: not enouch $DARWIN sent");
 
@@ -74,8 +75,6 @@ contract DarwinCommunity is OwnableUpgradeable, IDarwinCommunity {
 
         _;
     }
-
-    uint256 public minDarwinRequiredToAccess; //10k
 
     mapping(uint256 => CommunityFundCandidate) private communityFundCandidates;
     uint256[] private activeCommunityFundCandidateIds;
@@ -96,7 +95,7 @@ contract DarwinCommunity is OwnableUpgradeable, IDarwinCommunity {
 
     uint256 public minDarwinTransferToAccess;
 
-    uint256 public proposalMinVotesCountForAction;
+    uint256 public minDarwinForAction; //10k
     uint256 public proposalMaxOperations;
     uint256 public minVotingDelay;
     uint256 public minVotingPeriod;
@@ -130,10 +129,9 @@ contract DarwinCommunity is OwnableUpgradeable, IDarwinCommunity {
         minVotingPeriod = 24 hours;
         maxVotingPeriod = 1 weeks;
         gracePeriod = 72 hours;
-        proposalMinVotesCountForAction = 1;
 
         minDarwinTransferToAccess = 1 * 10**9; // 1 darwin
-        minDarwinRequiredToAccess = 10000 * 10**9; //10k
+        minDarwinForAction = 10000 * 10**9; //10k
 
         for (uint256 i = 0; i < restrictedProposalSignatures.length; i++) {
             restrictedProposalActionSignature[restrictedProposalSignatures[i]] = true;
@@ -340,6 +338,8 @@ contract DarwinCommunity is OwnableUpgradeable, IDarwinCommunity {
             endTime: endTime,
             forVotes: 0,
             againstVotes: 0,
+            forVoteDarwins: 0,
+            aganistVoteDarwins: 0,
             canceled: false,
             executed: false
         });
@@ -364,7 +364,7 @@ contract DarwinCommunity is OwnableUpgradeable, IDarwinCommunity {
             return ProposalState.Pending;
         } else if (block.timestamp <= proposal.endTime) {
             return ProposalState.Active;
-        } else if (proposal.forVotes < proposal.againstVotes) {
+        } else if (proposal.forVoteDarwins < proposal.aganistVoteDarwins) {
             return ProposalState.Defeated;
         } else if (proposal.executed) {
             return ProposalState.Executed;
@@ -432,7 +432,9 @@ contract DarwinCommunity is OwnableUpgradeable, IDarwinCommunity {
 
         if (inSupport) {
             proposal.forVotes += 1;
+            proposal.forVoteDarwins += darwinAmount;
         } else {
+            proposal.aganistVoteDarwins += darwinAmount;
             proposal.againstVotes += 1;
         }
     }
@@ -450,8 +452,8 @@ contract DarwinCommunity is OwnableUpgradeable, IDarwinCommunity {
         );
 
         require(
-            proposal.forVotes + proposal.againstVotes >= proposalMinVotesCountForAction,
-            "DC::execute: not enough votes received"
+            proposal.forVoteDarwins + proposal.aganistVoteDarwins >= minDarwinForAction,
+            "DC::execute: not enough darwin"
         );
 
         proposal.executed = true;
@@ -533,12 +535,8 @@ contract DarwinCommunity is OwnableUpgradeable, IDarwinCommunity {
         gracePeriod = value;
     }
 
-    function setMinDarwinRequiredToAccess(uint256 count) public onlyDarwinCommunity {
-        minDarwinRequiredToAccess = count;
-    }
-
-    function setProposalMinVotesCountForAction(uint256 count) public onlyDarwinCommunity {
-        proposalMinVotesCountForAction = count;
+    function setMinDarwinForAction(uint256 amount) public onlyDarwinCommunity {
+        minDarwinForAction = amount;
     }
 
     function getActiveFundCandidates() public view returns (CommunityFundCandidate[] memory) {
@@ -566,43 +564,5 @@ contract DarwinCommunity is OwnableUpgradeable, IDarwinCommunity {
 
     function isProposalSignatureRestricted(string calldata signature) public view returns (bool) {
         return restrictedProposalActionSignature[uint256(keccak256(bytes(signature)))];
-    }
-
-    /**
-     * @notice Checks if the balance of a seller has dipped below the minimum required to vote, and removes votes cast if so
-     * @param sender Address of a seller of darwin tokens
-     */
-    function checkIfVotesAreElegible(address sender, uint256 amount) external override {
-        require(msg.sender == address(darwin), "Caller isn't darwin token");
-
-        if (amount >= minDarwinRequiredToAccess) {
-            return;
-        }
-
-        uint256[] memory votes = usersVotes[sender];
-
-        if (votes.length == 0) {
-            return;
-        }
-
-        for (uint256 i = 0; i < votes.length; ) {
-            uint256 proposalId = votes[i];
-
-            if (state(proposalId) == ProposalState.Active) {
-                if (voteReceipts[proposalId][sender].inSupport) {
-                    proposals[proposalId].forVotes -= 1;
-                } else {
-                    proposals[proposalId].againstVotes -= 1;
-                }
-            }
-
-            delete voteReceipts[proposalId][sender];
-
-            unchecked {
-                ++i;
-            }
-        }
-
-        delete usersVotes[sender];
     }
 }

@@ -81,14 +81,6 @@ describe("NotCommunity", () => {
 
     describe("Create Proposals", () => {
 
-        it("Account with no or less then 10k $NOT shouldn't be able to create proposal", async () => {
-
-            let result =  createNewProposal(await getProposalParams(), addresWithout10kTokens)
-
-            await expect(result).to.be.revertedWith("DC::canAccess: not enouch $DARWIN");
-        });
-
-
         it("proposals with too early end date should fail", async () => {
 
             let params = await getProposalParams();
@@ -259,17 +251,6 @@ describe("NotCommunity", () => {
             await ethers.provider.send("evm_setNextBlockTimestamp", [endDate.sub(hoursToSeconds(1)).toNumber()])
         })
 
-        it("Account with no or less then 10k $NOT shouldn't be able to vote on proposal", async () => {
-
-
-            let result = darwinComunity.connect(addresWithout10kTokens).castVote(proposalId, true, decimals, {
-                from: addresWithout10kTokens.address
-            });
-
-            await expect(result).to.be.revertedWith("DC::canAccess: not enouch $DARWIN");
-
-        });
-
         it("Account with 10k $NOT should be able to vote on proposal", async () => {
 
             await darwinComunity.connect(addressWith10kTokens).castVote(proposalId, false, decimals, {
@@ -374,7 +355,7 @@ describe("NotCommunity", () => {
 
             await ethers.provider.send("evm_setNextBlockTimestamp", [endDate.sub(hoursToSeconds(1)).toNumber()])
 
-            await darwinComunity.castVote(proposalId, true, decimals)
+            await darwinComunity.castVote(proposalId, true, decimals.mul(10000))
 
             await ethers.provider.send("evm_setNextBlockTimestamp", [endDate.add(hoursToSeconds(1)).toNumber()])
             await ethers.provider.send("evm_mine", [])
@@ -400,7 +381,7 @@ describe("NotCommunity", () => {
 
             await ethers.provider.send("evm_setNextBlockTimestamp", [endDate.sub(hoursToSeconds(1)).toNumber()])
 
-            await darwinComunity.castVote(proposalId, true, decimals)
+            await darwinComunity.castVote(proposalId, true, decimals.mul(10000))
 
             await ethers.provider.send("evm_setNextBlockTimestamp", [endDate.add(hoursToSeconds(1)).toNumber()])
             await ethers.provider.send("evm_mine", [])

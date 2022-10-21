@@ -43,6 +43,4 @@ interface IDarwinCommunity {
     event CommunityFundDistributed(uint256 fundWeek, uint256[] candidates, uint256[] tokens);
 
     function setDarwinAddress(address account) external;
-
-    function checkIfVotesAreElegible(address sender, uint256 amount) external;
 }

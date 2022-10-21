@@ -118,7 +118,7 @@ const config: HardhatUserConfig = {
             }
         },
         hardhat: {
-            loggingEnabled: true,
+            loggingEnabled: false,
             // gasMultiplier:1,
             forking:{
                 enabled:false,
@@ -131,7 +131,6 @@ const config: HardhatUserConfig = {
             }
         }
     },
-
     gasReporter: {
         enabled: Boolean(process.env.REPORT_GAS),
         currency: "USD",
