@@ -155,7 +155,7 @@ contract Darwin is IDarwin, OwnableUpgradeable {
     }
 
     function approve(address spender, uint256 amount) external override returns (bool) {
-        syncTokenInOutOfSyncExchnagesSafe();
+        syncTokenInOutOfSyncExchangesSafe();
         _approve(_msgSender(), spender, amount);
         return true;
     }
@@ -164,18 +164,21 @@ contract Darwin is IDarwin, OwnableUpgradeable {
         return _allowances[owner][spender];
     }
 
+    // TODO: change to external / remove
     function increaseAllowance(address spender, uint256 addedValue) public virtual returns (bool) {
-        syncTokenInOutOfSyncExchnagesSafe();
+        syncTokenInOutOfSyncExchangesSafe();
         _approve(_msgSender(), spender, _allowances[_msgSender()][spender] + addedValue);
         return true;
     }
 
+    // TODO: change to external / remove
     function decreaseAllowance(address spender, uint256 subtractedValue) public virtual returns (bool) {
-        syncTokenInOutOfSyncExchnagesSafe();
+        syncTokenInOutOfSyncExchangesSafe();
         _approve(_msgSender(), spender, _allowances[_msgSender()][spender] - subtractedValue);
         return true;
     }
 
+    // TODO: change to external / remove
     function takeAccessFee(
         address from,
         address to,
@@ -184,7 +187,7 @@ contract Darwin is IDarwin, OwnableUpgradeable {
         return _transfer(from, to, _getRate(), amount);
     }
 
-    function syncTokenInOutOfSyncExchnagesSafe() public override {
+    function syncTokenInOutOfSyncExchangesSafe() public override {
         address[] memory outOfSync = _outOfSyncPairs;
 
         for (uint256 i = 0; i < outOfSync.length; ) {
@@ -213,6 +216,7 @@ contract Darwin is IDarwin, OwnableUpgradeable {
         }
     }
 
+    // TODO: change to external
     function setDarwinCommunity(address _darwinCommunity) public onlyDarwinCommunity {
         address prev = address(darwinCommunity);
         uint256 balance = balanceOf(prev);
@@ -277,6 +281,7 @@ contract Darwin is IDarwin, OwnableUpgradeable {
         emit ExchangeAdded(pairAddress);
     }
 
+    // TODO: change to external
     function unRegisterPair(address pairAddress) public onlyDarwinCommunity {
         if (!_isPairAddress[pairAddress]) {
             revert PairNotRegistered();
@@ -300,22 +305,27 @@ contract Darwin is IDarwin, OwnableUpgradeable {
         return _balanceOf(account, _getRate());
     }
 
+    // TODO: change to external / remove
     function isExcludedFromReward(address account) public view override returns (bool) {
         return _isExcludedFromReflection[account];
     }
 
+    // TODO: change to external / remove
     function isExcludedFromTxLimit(address account) public view override returns (bool) {
         return _isExcludedFromSellLimit[account];
     }
 
+    // TODO: change to external / remove
     function isExcludedFromHoldingLimit(address account) public view override returns (bool) {
         return _isExcludedFromHoldingLimit[account];
     }
 
+    // TODO: change to external / remove
     function getOutOfSyncedPairs() public view override returns (address[] memory) {
         return _outOfSyncPairs;
     }
 
+    // TODO: change to external / remove
     function getOutOfSyncedAmount(address pair) public view override returns (uint256) {
         return _pairUnsyncAmount[pair];
     }
@@ -324,10 +334,12 @@ contract Darwin is IDarwin, OwnableUpgradeable {
         return _isExcludedFromSellLimit[account];
     }
 
+    // TODO: change to external / remove
     function isExcludedFromReflection(address account) public view returns (bool) {
         return _isExcludedFromReflection[account];
     }
 
+    // TODO: change to external / remove
     function isExchangeAddress(address account) public view override returns (bool) {
         return _isPairAddress[account];
     }
@@ -391,7 +403,7 @@ contract Darwin is IDarwin, OwnableUpgradeable {
         address _devWallet,
         address _darwinCommunity
     ) private onlyInitializing {
-        _tTotal = 10 * 10**9 * 10**decimals(); // 10B
+        _tTotal = 10 * 10**9 * 10**decimals(); // 10B // TODO: check this
         _rTotal = (_MAX - (_MAX % _tTotal));
 
         maxTokenHoldingSize = (_tTotal / 100) * 2; // 2% of the supply
@@ -488,7 +500,7 @@ contract Darwin is IDarwin, OwnableUpgradeable {
         }
 
         if (!isSell) {
-            syncTokenInOutOfSyncExchnagesSafe();
+            syncTokenInOutOfSyncExchangesSafe();
         }
 
         _tokenTransfer(from, to, amount, currentRate, isSell);
