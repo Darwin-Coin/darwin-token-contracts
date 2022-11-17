@@ -5,15 +5,25 @@ pragma solidity ^0.8.0;
 import "@openzeppelin/contracts-upgradeable/interfaces/IERC20Upgradeable.sol";
 
 interface IDarwin is IERC20Upgradeable {
+    /// TransferFrom amount is greater than allowance
     error InsufficientAllowance();
+    /// Only the DarwinCommunity can call this function
     error OnlyDarwinCommunity();
+    /// rAmount is greater than the total reflections
     error RAmountGreaterThanReflections();
+    /// Input cannot be the zero address
     error ZeroAddress();
+    /// Amount cannot be 0
     error ZeroAmount();
+    /// Arrays must be the same length
     error InvalidArrayLengths();
+    /// Pair is already registered
     error PairAlreadyRegistered();
+    /// Pair is not registered
     error PairNotRegistered();
+    /// Holding limit exceeded
     error HoldingLimitExceeded();
+    /// Sell limit exceeded
     error SellLimitExceeded();
 
     event ExchangeAdded(address account);
@@ -24,7 +34,7 @@ interface IDarwin is IERC20Upgradeable {
     event ExcludedFromReflection(address account, bool isExcluded);
     event ExcludedFromSellLimit(address account, bool isExcluded);
 
-    function syncTokenInOutOfSyncExchnagesSafe() external;
+    function syncTokenInOutOfSyncExchangesSafe() external;
 
     function bulkTransfer(address[] calldata recipients, uint256[] calldata amounts) external;
 
