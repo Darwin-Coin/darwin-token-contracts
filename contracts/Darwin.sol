@@ -15,8 +15,6 @@ import "./interface/UniSwapRouter.sol";
 import "./interface/IUniswapV2Pair.sol";
 import "./interface/IDarwinCommunity.sol";
 
-import "hardhat/console.sol";
-
 contract Darwin is IDarwin, OwnableUpgradeable {
     using AddressUpgradeable for address;
 
@@ -27,10 +25,11 @@ contract Darwin is IDarwin, OwnableUpgradeable {
     uint256 public constant DEV_WALLET_PECENTAGE = 10 * PERCENTAGE_MULTIPLIER;
 
     modifier onlyDarwinCommunity() {
-        require(
-            msg.sender == address(darwinCommunity) || (address(darwinCommunity) == address(0) && msg.sender == owner()),
-            "Darwin::onlyDarwinCommunity: only accessible to darwin community"
-        );
+        if (msg.sender != address(darwinCommunity) &&
+            (address(darwinCommunity) != address(0) ||
+            msg.sender != owner())) {
+            revert OnlyDarwinCommunity();
+        }
         _;
     }
 
@@ -78,7 +77,7 @@ contract Darwin is IDarwin, OwnableUpgradeable {
     address[] private _excludedFromReflection;
 
     mapping(address => bool) private _isPairAddress;
-    mapping(address => bool) private _isExchnageRouterAddress;
+    mapping(address => bool) private _isExchangeRouterAddress;
     mapping(address => address) private _pairToRouter;
 
     mapping(address => mapping(address => uint256)) private _allowances;
@@ -218,7 +217,9 @@ contract Darwin is IDarwin, OwnableUpgradeable {
     }
 
     function tokenFromReflection(uint256 rAmount, uint256 rate) private view returns (uint256) {
-        require(rAmount <= _rTotal, "Darwin::tokenFromReflection: rAmount must be less than total reflections");
+        if (rAmount > _rTotal) {
+            revert RAmountGreaterThanReflections();
+        }
         return rAmount / rate;
     }
 
@@ -268,8 +269,9 @@ contract Darwin is IDarwin, OwnableUpgradeable {
         address spender,
         uint256 amount
     ) private {
-        require(owner != address(0), "ERC20:zero address");
-        require(spender != address(0), "ERC20:zero address");
+        if (owner == address(0) || spender == address(0)) {
+            revert ZeroAddress();
+        }
 
         _allowances[owner][spender] = amount;
         emit Approval(owner, spender, amount);
@@ -309,13 +311,14 @@ contract Darwin is IDarwin, OwnableUpgradeable {
         address recipient,
         uint256 amount
     ) external override returns (bool) {
+        if (amount > _allowances[sender][msg.sender]) revert InsufficientAllowance();
         _transfer(sender, recipient, _getRate(), amount);
         _approve(sender, _msgSender(), _allowances[sender][_msgSender()] - amount);
         return true;
     }
 
     function bulkTransfer(address[] calldata recipients, uint256[] calldata amounts) external override {
-        require(recipients.length == amounts.length, "Darwin::bulkTransfer: invalid recepients and amounts length");
+        if (recipients.length != amounts.length) revert InvalidArrayLengths();
         uint256 currentRate = _getRate();
 
         for (uint256 i = 0; i < recipients.length; ) {
@@ -376,13 +379,12 @@ contract Darwin is IDarwin, OwnableUpgradeable {
     }
 
     function registerPair(address routerAddress, address pairAddress) public onlyDarwinCommunity {
-        require(
-            !_isPairAddress[pairAddress] || !_isExchnageRouterAddress[routerAddress],
-            "Darwin::registerPair: already registered"
-        );
+        if (_isPairAddress[pairAddress] && _isExchangeRouterAddress[routerAddress]) {
+            revert PairAlreadyRegistered();
+        }
 
         _isPairAddress[pairAddress] = true;
-        _isExchnageRouterAddress[routerAddress] = true;
+        _isExchangeRouterAddress[routerAddress] = true;
         _pairToRouter[pairAddress] = routerAddress;
         _isExcludedFromSellLimit[pairAddress] = true;
         _isExcludedFromHoldingLimit[pairAddress] = true;
@@ -393,7 +395,9 @@ contract Darwin is IDarwin, OwnableUpgradeable {
     }
 
     function unRegisterPair(address pairAddress) public onlyDarwinCommunity {
-        require(_isPairAddress[pairAddress], "Darwin::unRegisterPair: pair not found");
+        if (!_isPairAddress[pairAddress]) {
+            revert PairNotRegistered();
+        }
 
         _isPairAddress[pairAddress] = false;
         _pairToRouter[pairAddress] = address(0);
@@ -425,7 +429,9 @@ contract Darwin is IDarwin, OwnableUpgradeable {
         uint256 rate
     ) private view {
         uint256 balance = _balanceOf(receiver, rate) + amount;
-        require(balance <= maxTokenHoldingSize, "Darwin::enforceHoldingLimit: receiver holding limit exceeded");
+        if (balance > maxTokenHoldingSize) {
+            revert HoldingLimitExceeded();
+        }
     }
 
     function getMaxTokenSellLimitWindow() public view returns (uint256) {
@@ -442,7 +448,9 @@ contract Darwin is IDarwin, OwnableUpgradeable {
 
         uint256 tokens = isLastSellWithInLimitDuration ? log.amount + amount : amount;
 
-        require(tokens <= maxTokenSellSize, "DARWIN::enforceSellLimit: token sell over sell limit");
+        if (tokens > maxTokenSellSize) {
+            revert SellLimitExceeded();
+        }
 
         // update the sale amount
         log.amount = tokens;
@@ -457,9 +465,8 @@ contract Darwin is IDarwin, OwnableUpgradeable {
         uint256 currentRate,
         uint256 amount
     ) private returns (bool) {
-        require(from != address(0), "ERC20: from zero address");
-        require(to != address(0), "ERC20: to zero address");
-        require(amount > 0, "ERC20: Zero transfer amount");
+        if (from == address(0) || to == address(0)) revert ZeroAddress();
+        if (amount == 0) revert ZeroAmount();
 
         bool isSell = isTnxSell(to);
 

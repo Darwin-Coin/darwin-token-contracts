@@ -5,6 +5,17 @@ pragma solidity ^0.8.0;
 import "@openzeppelin/contracts-upgradeable/interfaces/IERC20Upgradeable.sol";
 
 interface IDarwin is IERC20Upgradeable {
+    error InsufficientAllowance();
+    error OnlyDarwinCommunity();
+    error RAmountGreaterThanReflections();
+    error ZeroAddress();
+    error ZeroAmount();
+    error InvalidArrayLengths();
+    error PairAlreadyRegistered();
+    error PairNotRegistered();
+    error HoldingLimitExceeded();
+    error SellLimitExceeded();
+
     event ExchangeAdded(address account);
     event ExchangedRemoved(address account);
 
