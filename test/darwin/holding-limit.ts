@@ -57,7 +57,7 @@ describe("Darwin : Holding Limits", function () {
     
         const tnx  = darwin.transfer(address0.address, tokensToTransfer);
 
-        await expect(tnx).to.be.revertedWith("Darwin::enforceHoldingLimit: receiver holding limit exceeded");
+        await expect(tnx).to.be.revertedWith("HoldingLimitExceeded");
 
     });
 
