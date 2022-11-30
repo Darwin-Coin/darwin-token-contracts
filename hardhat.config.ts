@@ -70,6 +70,15 @@ const config: HardhatUserConfig = {
                         runs: 200
                     },
                 }
+            },
+            {
+                version: "0.8.9",
+                settings: {
+                    optimizer: {
+                        enabled: true,
+                        runs: 200
+                    },
+                }
             }
 
         ],
@@ -118,7 +127,7 @@ const config: HardhatUserConfig = {
             }
         },
         hardhat: {
-            loggingEnabled: true,
+            loggingEnabled: false,
             // gasMultiplier:1,
             forking:{
                 enabled:false,
