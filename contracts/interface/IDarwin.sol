@@ -25,6 +25,8 @@ interface IDarwin is IERC20Upgradeable {
     error HoldingLimitExceeded();
     /// Sell limit exceeded
     error SellLimitExceeded();
+    /// Paused
+    error Paused();
 
     event ExchangeAdded(address account);
     event ExchangedRemoved(address account);

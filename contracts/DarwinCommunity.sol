@@ -5,18 +5,11 @@ pragma solidity ^0.8.0;
 import "./interface/IDarwin.sol";
 import "./interface/IDarwinCommunity.sol";
 
-import "@openzeppelin/contracts-upgradeable/utils/math/SafeMathUpgradeable.sol";
-import "@openzeppelin/contracts-upgradeable/utils/AddressUpgradeable.sol";
-
-import "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
-import "@openzeppelin/contracts-upgradeable/utils/ContextUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
-import "@openzeppelin/contracts/proxy/transparent/ProxyAdmin.sol";
-import "hardhat/console.sol";
+import "@openzeppelin/contracts-upgradeable/proxy/utils/UUPSUpgradeable.sol";
 
-contract DarwinCommunity is OwnableUpgradeable, IDarwinCommunity {
-    using SafeMathUpgradeable for uint256;
-
+contract DarwinCommunity is OwnableUpgradeable, IDarwinCommunity, UUPSUpgradeable {
+    
     enum ProposalState {
         Pending,
         Active,
@@ -56,11 +49,9 @@ contract DarwinCommunity is OwnableUpgradeable, IDarwinCommunity {
         bool isActive;
     }
 
-    modifier preAcces(address from, uint256 darwinAmount) {
-        require(darwin.balanceOf(_msgSender()) >= minDarwinRequiredToAccess, "DC::canAccess: not enouch $DARWIN");
+    modifier preAccess(address from, uint256 darwinAmount) {
         require(minDarwinTransferToAccess <= darwinAmount, "DC::takeAccessFee: not enouch $DARWIN sent");
         require(darwin.takeAccessFee(from, address(this), darwinAmount), "DC::takeAccessFee: not enouch $DARWIN sent");
-
         _;
     }
 
@@ -74,8 +65,6 @@ contract DarwinCommunity is OwnableUpgradeable, IDarwinCommunity {
 
         _;
     }
-
-    uint256 public minDarwinRequiredToAccess; //10k
 
     mapping(uint256 => CommunityFundCandidate) private communityFundCandidates;
     uint256[] private activeCommunityFundCandidateIds;
@@ -133,7 +122,6 @@ contract DarwinCommunity is OwnableUpgradeable, IDarwinCommunity {
         proposalMinVotesCountForAction = 1;
 
         minDarwinTransferToAccess = 1 * 10**9; // 1 darwin
-        minDarwinRequiredToAccess = 10000 * 10**9; //10k
 
         for (uint256 i = 0; i < restrictedProposalSignatures.length; i++) {
             restrictedProposalActionSignature[restrictedProposalSignatures[i]] = true;
@@ -298,7 +286,7 @@ contract DarwinCommunity is OwnableUpgradeable, IDarwinCommunity {
         string memory description,
         string memory other,
         uint256 endTime
-    ) public preAcces(msg.sender, minDarwinTransferToAccess) returns (uint256) {
+    ) public preAccess(msg.sender, minDarwinTransferToAccess) returns (uint256) {
         require(
             targets.length == values.length &&
                 targets.length == signatures.length &&
@@ -400,7 +388,7 @@ contract DarwinCommunity is OwnableUpgradeable, IDarwinCommunity {
         uint256 proposalId,
         bool inSupport,
         uint256 darwinAmount
-    ) external preAcces(msg.sender, darwinAmount) {
+    ) external preAccess(msg.sender, darwinAmount) {
         castVoteInternal(_msgSender(), proposalId, darwinAmount, inSupport);
         emit VoteCast(_msgSender(), proposalId, inSupport);
     }
@@ -533,10 +521,6 @@ contract DarwinCommunity is OwnableUpgradeable, IDarwinCommunity {
         gracePeriod = value;
     }
 
-    function setMinDarwinRequiredToAccess(uint256 count) public onlyDarwinCommunity {
-        minDarwinRequiredToAccess = count;
-    }
-
     function setProposalMinVotesCountForAction(uint256 count) public onlyDarwinCommunity {
         proposalMinVotesCountForAction = count;
     }
@@ -568,41 +552,6 @@ contract DarwinCommunity is OwnableUpgradeable, IDarwinCommunity {
         return restrictedProposalActionSignature[uint256(keccak256(bytes(signature)))];
     }
 
-    /**
-     * @notice Checks if the balance of a seller has dipped below the minimum required to vote, and removes votes cast if so
-     * @param sender Address of a seller of darwin tokens
-     */
-    function checkIfVotesAreElegible(address sender, uint256 amount) external override {
-        require(msg.sender == address(darwin), "Caller isn't darwin token");
+    function _authorizeUpgrade(address newImplementation) internal override onlyOwner {}
 
-        if (amount >= minDarwinRequiredToAccess) {
-            return;
-        }
-
-        uint256[] memory votes = usersVotes[sender];
-
-        if (votes.length == 0) {
-            return;
-        }
-
-        for (uint256 i = 0; i < votes.length; ) {
-            uint256 proposalId = votes[i];
-
-            if (state(proposalId) == ProposalState.Active) {
-                if (voteReceipts[proposalId][sender].inSupport) {
-                    proposals[proposalId].forVotes -= 1;
-                } else {
-                    proposals[proposalId].againstVotes -= 1;
-                }
-            }
-
-            delete voteReceipts[proposalId][sender];
-
-            unchecked {
-                ++i;
-            }
-        }
-
-        delete usersVotes[sender];
-    }
 }

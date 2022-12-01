@@ -44,5 +44,4 @@ interface IDarwinCommunity {
 
     function setDarwinAddress(address account) external;
 
-    function checkIfVotesAreElegible(address sender, uint256 amount) external;
 }
