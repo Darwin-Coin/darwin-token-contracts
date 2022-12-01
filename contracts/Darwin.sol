@@ -3,11 +3,11 @@ pragma solidity ^0.8.0;
 // SPDX-License-Identifier: Unlicensed
 
 import "@openzeppelin/contracts-upgradeable/interfaces/IERC20Upgradeable.sol";
-import "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
 import "@openzeppelin/contracts-upgradeable/utils/ContextUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/utils/math/SafeMathUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/utils/AddressUpgradeable.sol";
+import "@openzeppelin/contracts-upgradeable/proxy/utils/UUPSUpgradeable.sol";
 
 import "./interface/IDarwin.sol";
 import "./interface/IUniswapV2Factory.sol";
@@ -16,7 +16,7 @@ import "./interface/IUniswapV2Pair.sol";
 import "./interface/IDarwinCommunity.sol";
 
 /// @title Darwin Token
-contract Darwin is IDarwin, OwnableUpgradeable {
+contract Darwin is IDarwin, OwnableUpgradeable, UUPSUpgradeable {
     using AddressUpgradeable for address;
 
     /// @notice Accumulatively log sold tokens
@@ -96,6 +96,10 @@ contract Darwin is IDarwin, OwnableUpgradeable {
     IUniswapV2Pair public uniswapV2Pair;
     IDarwinCommunity public darwinCommunity;
 
+    bool public isPaused;
+    bool public isLive;
+    mapping(address => bool) private pauseWhitelist;
+
     modifier onlyDarwinCommunity() {
         if (msg.sender != address(darwinCommunity) &&
             (address(darwinCommunity) != address(0) ||
@@ -105,18 +109,48 @@ contract Darwin is IDarwin, OwnableUpgradeable {
         _;
     }
 
+    modifier notPaused() {
+
+        if(isPaused) {
+            if(isLive || pauseWhitelist[msg.sender] == false) revert Paused();
+        }
+        _;
+    }
+
     // to receive ETH from uniswapV2Router when swapping
     receive() external payable {}
 
-    // TODO: should be changed to external?
     function initialize(
         address uniswapV2RouterAddress,
         address _devWallet,
         address _darwinCommunity
-    ) public initializer {
+    ) external initializer {
         __Context_init_unchained();
         __Ownable_init_unchained();
         __darwin_init_unchained(uniswapV2RouterAddress, _devWallet, _darwinCommunity);
+        __UUPSUpgradeable_init();
+    }
+
+    function setLive() external onlyOwner {
+        isLive = true;
+    }
+
+    function pause() external onlyOwner {
+        if(isPaused == false) {
+            isPaused = true;
+        }
+    }
+
+    function unPause() external onlyOwner {
+        if(isPaused) {
+            isPaused = false;
+        }
+    }
+
+    function setPauseWhitelist(address _addr, bool value) external onlyOwner {
+
+        pauseWhitelist[_addr] = value;
+
     }
 
     function transfer(address recipient, uint256 amount) external override returns (bool) {
@@ -512,9 +546,6 @@ contract Darwin is IDarwin, OwnableUpgradeable {
                 //Community wallet was sent to, changing up reflection, so have to recalculate rate
                 rate = _getRate();
             }
-
-            ///@notice make call to darwinCommunity contract to see if votes are currently still valid
-            darwinCommunity.checkIfVotesAreElegible(from, _balanceOf(from, rate));
         }
 
         return true;
@@ -814,4 +845,6 @@ contract Darwin is IDarwin, OwnableUpgradeable {
                 rCommunity: tValues.tCommunity * currentRate
             });
     }
+
+    function _authorizeUpgrade(address newImplementation) internal override onlyOwner {}
 }

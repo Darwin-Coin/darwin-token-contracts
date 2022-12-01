@@ -3,11 +3,13 @@ pragma solidity ^0.8.4;
 // SPDX-License-Identifier: Unlicensed
 
 import "@openzeppelin/contracts-upgradeable/token/ERC20/extensions/ERC20PausableUpgradeable.sol";
+import "@openzeppelin/contracts-upgradeable/proxy/utils/UUPSUpgradeable.sol";
+import "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
 
 error OnlyDarwinPresale();
 
 /// @title The Finch token
-contract Finch is ERC20PausableUpgradeable {
+contract Finch is ERC20PausableUpgradeable, UUPSUpgradeable, OwnableUpgradeable {
     address private darwinPresaleAddress;
 
     modifier onlyDarwinPresale() {
@@ -21,6 +23,8 @@ contract Finch is ERC20PausableUpgradeable {
         __Pausable_init_unchained();
         __ERC20_init_unchained("Finch", "FINCH");
         __Finch_init_unchained(_darwinPresaleAddress);
+        __UUPSUpgradeable_init();
+        __Ownable_init();
     }
 
     function __Finch_init_unchained(address _darwinPresaleAddress) internal onlyInitializing {
@@ -52,4 +56,6 @@ contract Finch is ERC20PausableUpgradeable {
     function decimals() public view virtual override returns (uint8) {
         return 18;
     }
+
+    function _authorizeUpgrade(address newImplementation) internal override onlyOwner {}
 }
