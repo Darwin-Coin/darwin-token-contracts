@@ -1,4 +1,4 @@
-pragma solidity ^0.8.0;
+pragma solidity 0.8.14;
 
 // SPDX-License-Identifier: Unlicensed
 
@@ -8,11 +8,11 @@ import "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/utils/math/SafeMathUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/utils/AddressUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/proxy/utils/UUPSUpgradeable.sol";
+import "@uniswap/v2-core/contracts/interfaces/IUniswapV2Factory.sol";
+import "@uniswap/v2-periphery/contracts/interfaces/IUniswapV2Router02.sol";
+import "@uniswap/v2-core/contracts/interfaces/IUniswapV2Pair.sol";
 
 import "./interface/IDarwin.sol";
-import "./interface/IUniswapV2Factory.sol";
-import "./interface/UniSwapRouter.sol";
-import "./interface/IUniswapV2Pair.sol";
 import "./interface/IDarwinCommunity.sol";
 
 /// @title Darwin Token

@@ -1,9 +1,19 @@
 import { expect } from 'chai';
-import { ethers } from 'hardhat';
 import { BigNumber } from "ethers"
+import hre, { ethers } from "hardhat";
 import { setNetworkTimeStamp } from "../../scripts/utils";
-import { DarwinEcosystem, DarwinPresale, IUniswapV2Pair, IUniswapV2Router02, TestErc20Token, Finch } from "../../typechain/";
-import { deployContracts } from "./utils";
+import { DarwinEcosystem,
+        DarwinCommunity,
+        DarwinPresale,
+        IUniswapV2Pair
+        ,IUniswapV2Router02,
+        Darwin,
+        Finch,
+        IUniswapV2Router02__factory,
+        IUniswapV2Factory,
+        IUniswapV2Factory__factory
+    } from "../../typechain/";
+import { deployContracts, deployContractsDarwin } from "./utils";
 import { SignerWithAddress } from '@nomiclabs/hardhat-ethers/signers';
 import { daysToSeconds, getUniswapRouterAddress, lastBlockTime } from "../../scripts/utils"
 
@@ -14,20 +24,25 @@ enum Status {
     FAILURE
 }
 
-describe("Darwin : Presale", function () {
+describe.only("Darwin : Presale", function () {
 
     let darwinPresale: DarwinPresale
     let darwinEcosystem: DarwinEcosystem
-    let token: TestErc20Token
-    let finch: TestErc20Token
+    let token: Darwin
+    let finch: Finch
+    let darwinCommunity:DarwinCommunity
 
-    let uniswapv2Router: IUniswapV2Router02
-    let uniswapPair: IUniswapV2Pair
+    let uniswapRouterAddress:string
+
+    let router: IUniswapV2Router02
 
     let owner: SignerWithAddress
     let address0: SignerWithAddress
 
     let others: SignerWithAddress[]
+
+    let weth:string
+
 
     before(async () => {
         [owner,address0,  ...others] = await ethers.getSigners()
@@ -36,12 +51,25 @@ describe("Darwin : Presale", function () {
     describe("Deployments", () => {
 
         beforeEach(async () => {
-            const deployedContract = await deployContracts();
+
+            uniswapRouterAddress = await getUniswapRouterAddress(hre.network.name);
+            router = IUniswapV2Router02__factory.connect(
+              uniswapRouterAddress,
+              owner
+            );
+            const factory = IUniswapV2Factory__factory.connect(
+              await router.factory(),
+              owner
+            );
+            weth = await router.WETH();
+
+            const deployedContract = await deployContractsDarwin(uniswapRouterAddress, owner.address);
             darwinPresale = deployedContract.darwinPresale;
             darwinEcosystem = deployedContract.darwinEcosystem
             token = deployedContract.darwin;
             finch = deployedContract.finch;
             //await  createAirDrop(darwinPresale,darwinEcosystem,token)
+           
         })
     
         it("should deploy", async () => {
