@@ -1,14 +1,15 @@
 // SPDX-License-Identifier: MIT
-pragma solidity ^0.8.9;
+pragma solidity 0.8.14;
 
 import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/security/ReentrancyGuard.sol";
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import "@openzeppelin/contracts/token/ERC20/extensions/IERC20Metadata.sol";
 
-import {IUniswapV2Router02} from "./interface/UniSwapRouter.sol";
-import {IUniswapV2Pair} from "./interface/IUniswapV2Pair.sol";
-import {IUniswapV2Factory} from "./interface/IUniswapV2Factory.sol";
+import "@uniswap/v2-core/contracts/interfaces/IUniswapV2Factory.sol";
+import "@uniswap/v2-periphery/contracts/interfaces/IUniswapV2Router02.sol";
+import "@uniswap/v2-core/contracts/interfaces/IUniswapV2Pair.sol";
+
 import {IDarwinPresale} from "./interface/IDarwinPresale.sol";
 import {IPausable} from "./interface/IPausable.sol";
 
@@ -243,25 +244,22 @@ contract DarwinPresale is IDarwinPresale, ReentrancyGuard, Ownable {
         }
 
         uint256 balance = address(this).balance;
-        uint256 marketing = (status.raisedAmount *
-            (MARKETING_PERCENTAGE + MARKETING_ADDITIONAL_PERCENTAGE)) / 100;
-        marketing -= marketingWithdrawn;
-        marketingWithdrawn += marketing;
+        
         uint256 team = (status.raisedAmount * TEAM_PERCENTAGE) / 100;
-        uint256 lp = balance - marketing - team; // 45%
+        uint256 lp = balance - team; // 45%
 
         uint256 finchLp = lp / 10; // 10% of lp
+
         if (finchLp > 1 ether) {
             finchLp = 1 ether;
         }
         lp -= finchLp;
 
-        IPausable(address(darwin)).unpause(); // unpause darwin transfer
-        IPausable(address(finch)).unpause(); // unpause finch transfer
+        //uint darwinToDeposit = HARDCAP * 
 
         _addLiquidity(address(darwin), LP_AMOUNT, lp);
         _addLiquidity(address(finch), FINCH_LP_AMOUNT, finchLp);
-        _transferBNB(marketingWallet, marketing);
+        
         _transferBNB(teamWallet, team);
 
         uint256 totalDepositedTokens = LP_AMOUNT +

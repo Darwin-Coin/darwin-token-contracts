@@ -1,4 +1,4 @@
-pragma solidity ^0.8.0;
+pragma solidity 0.8.14;
 
 // SPDX-License-Identifier: Unlicensed
 
@@ -532,7 +532,6 @@ contract DarwinCommunity is OwnableUpgradeable, IDarwinCommunity, UUPSUpgradeabl
         for (uint256 i = 0; i < activeCommunityFundCandidateIds.length; i++) {
             candidates[i] = communityFundCandidates[activeCommunityFundCandidateIds[i]];
         }
-
         return candidates;
     }
 

@@ -1,15 +1,16 @@
-pragma solidity ^0.8.0;
+pragma solidity 0.8.14;
 
 // SPDX-License-Identifier: Unlicensed
 
 import "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
 import "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/utils/AddressUpgradeable.sol";
+import "@openzeppelin/contracts-upgradeable/proxy/utils/UUPSUpgradeable.sol";
 
 import "./interface/IDarwinEcosystem.sol";
 
 /// @title Darwin Ecosystem
-contract DarwinEcosystem is OwnableUpgradeable, IDarwinEcosystem {
+contract DarwinEcosystem is OwnableUpgradeable, IDarwinEcosystem, UUPSUpgradeable {
     using AddressUpgradeable for address;
 
     /// @notice The contract name
@@ -51,4 +52,6 @@ contract DarwinEcosystem is OwnableUpgradeable, IDarwinEcosystem {
     function __darwin_ecosystem_init_unchained(address _darwinPresaleAddress) private onlyInitializing {
         darwinPresaleAddress = _darwinPresaleAddress;
     }
+
+    function _authorizeUpgrade(address newImplementation) internal override onlyOwner {}
 }

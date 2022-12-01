@@ -11,6 +11,9 @@ import {
   IUniswapV2Factory__factory,
   IUniswapV2Router02__factory,
   TestErc20Token,
+  Darwin,
+  Finch,
+  DarwinCommunity
 } from "../../typechain";
 
 export const deployContracts = async () => {
@@ -33,6 +36,34 @@ export const deployContracts = async () => {
     darwinEcosystem,
     darwin,
     finch,
+  };
+};
+
+export const deployContractsDarwin = async (routerAddress:string, devWallet:string) => {
+  const Darwin = await ethers.getContractFactory("Darwin");
+  const Finch = await ethers.getContractFactory("Finch");
+  const DarwinEcosystem = await ethers.getContractFactory("DarwinEcosystem");
+  const DarwinPresale = await ethers.getContractFactory("DarwinPresale");
+  const DarwinCommunity = await ethers.getContractFactory("DarwinCommunity");
+
+  const darwinPresale = await DarwinPresale.deploy() as DarwinPresale;
+
+  const darwinEcosystem = (await upgrades.deployProxy(DarwinEcosystem, [
+    darwinPresale.address,
+  ], {kind: "uups"})) as DarwinEcosystem;
+
+  const darwinCommunity = await upgrades.deployProxy(DarwinCommunity, [[], [], []], {kind: "uups"}) as DarwinCommunity
+
+  const darwin = await upgrades.deployProxy(Darwin, [routerAddress, devWallet, darwinCommunity.address], {kind: "uups"}) as Darwin
+  
+  const finch = await upgrades.deployProxy(Finch, [darwinPresale.address], {kind: "uups"}) as Finch
+
+  return {
+    darwinPresale,
+    darwinEcosystem,
+    darwin,
+    finch,
+    darwinCommunity
   };
 };
 
