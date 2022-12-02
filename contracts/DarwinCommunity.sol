@@ -51,7 +51,7 @@ contract DarwinCommunity is OwnableUpgradeable, IDarwinCommunity, UUPSUpgradeabl
 
     modifier preAccess(address from, uint256 darwinAmount) {
         require(minDarwinTransferToAccess <= darwinAmount, "DC::takeAccessFee: not enouch $DARWIN sent");
-        require(darwin.takeAccessFee(from, address(this), darwinAmount), "DC::takeAccessFee: not enouch $DARWIN sent");
+        require(darwin.transferFrom(from, address(this), darwinAmount), "DC::takeAccessFee: not enouch $DARWIN sent");
         _;
     }
 

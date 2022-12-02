@@ -212,15 +212,6 @@ contract Darwin is IDarwin, OwnableUpgradeable, UUPSUpgradeable {
         return true;
     }
 
-    // TODO: change to external / remove
-    function takeAccessFee(
-        address from,
-        address to,
-        uint256 amount
-    ) public override onlyDarwinCommunity returns (bool) {
-        return _transfer(from, to, _getRate(), amount);
-    }
-
     function syncTokenInOutOfSyncExchangesSafe() public override {
         address[] memory outOfSync = _outOfSyncPairs;
 
