@@ -149,25 +149,14 @@ contract DarwinPresale is IDarwinPresale, ReentrancyGuard, Ownable {
     /// @dev Emits a UserDeposit event
     /// @dev Emits a RewardsDispersed event
     function userDeposit() external payable nonReentrant isInitialized {
+
         if (presaleStatus() != Status.ACTIVE) {
             revert PresaleNotActive();
-        }
-        if (msg.value < RAISE_MIN || msg.value > RAISE_MAX) {
-            revert InvalidDepositAmount();
         }
 
         uint256 base = userDeposits[msg.sender];
 
-        // remaining base tokens to reach hardcap
-        uint256 remaining = HARDCAP - status.raisedAmount;
-
-        // base tokens left for user
-        uint256 allowance = RAISE_MAX - base;
-
-        // cap allowance to remaining tokens
-        allowance = allowance > remaining ? remaining : allowance;
-
-        if (msg.value > allowance) {
+        if (msg.value < RAISE_MIN || base + msg.value > RAISE_MAX) {
             revert InvalidDepositAmount();
         }
 
@@ -246,32 +235,36 @@ contract DarwinPresale is IDarwinPresale, ReentrancyGuard, Ownable {
         uint256 balance = address(this).balance;
         
         uint256 team = (status.raisedAmount * TEAM_PERCENTAGE) / 100;
-        uint256 lp = balance - team; // 45%
+        uint256 marketing = (status.raisedAmount * MARKETING_ADDITIONAL_PERCENTAGE) / 100;
+
+        uint256 lp = balance - team - marketing; // 45%
 
         uint256 finchLp = lp / 10; // 10% of lp
 
         if (finchLp > 1 ether) {
             finchLp = 1 ether;
         }
+        
         lp -= finchLp;
 
-        //uint darwinToDeposit = HARDCAP * 
+        // calculate the ratio of funds raised to the hardcap and multiply by the darwin lp amount to get the number of darwin needed to deposit
+        uint darwinToDeposit = (HARDCAP * LP_AMOUNT) / status.raisedAmount;
 
-        _addLiquidity(address(darwin), LP_AMOUNT, lp);
+        _addLiquidity(address(darwin), darwinToDeposit, lp);
         _addLiquidity(address(finch), FINCH_LP_AMOUNT, finchLp);
         
         _transferBNB(teamWallet, team);
+        _transferBNB(marketingWallet, marketing);
 
-        uint256 totalDepositedTokens = LP_AMOUNT +
-            calculateDarwinAmount(HARDCAP);
-
-        uint256 remainingTokens = totalDepositedTokens - status.soldAmount;
-
-        if (!darwin.transfer(owner(), remainingTokens)) {
+        if (!darwin.transfer(owner(), darwin.balanceOf(address(this)))) {
             revert TransferFailed();
         }
 
-        emit LpProvided(lp, remainingTokens);
+        if (!finch.transfer(owner(), darwin.balanceOf(address(this)))) {
+            revert TransferFailed();
+        }
+
+        emit LpProvided(lp, darwinToDeposit);
     }
 
     /// @notice Returns the current stage of the presale
@@ -360,7 +353,7 @@ contract DarwinPresale is IDarwinPresale, ReentrancyGuard, Ownable {
 
     function _transferBNB(address to, uint256 amount) internal {
         // solhint-disable-next-line avoid-low-level-calls
-        (bool success, ) = payable(to).call{value: amount}("");
+        (bool success, ) = to.call{value: amount}("");
         if (!success) {
             revert TransferFailed();
         }
@@ -392,7 +385,7 @@ contract DarwinPresale is IDarwinPresale, ReentrancyGuard, Ownable {
         uint256 bnbAmount
     ) private {
         // approve token transfer to cover all possible scenarios
-        if (!darwin.approve(address(router), tokenAmount)) {
+        if (!IERC20(tokenAddress).approve(address(router), tokenAmount)) {
             revert ApproveFailed();
         }
 
