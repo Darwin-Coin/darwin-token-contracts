@@ -166,9 +166,10 @@ contract DarwinPresale is IDarwinPresale, ReentrancyGuard, Ownable {
         }
 
         userDeposits[msg.sender] += msg.value;
-        status.raisedAmount += msg.value;
-
+       
         uint256 darwinAmount = calculateDarwinAmount(msg.value);
+
+        status.raisedAmount += msg.value;
         darwinTransferred[msg.sender] += darwinAmount;
         status.soldAmount += darwinAmount;
 
@@ -244,11 +245,19 @@ contract DarwinPresale is IDarwinPresale, ReentrancyGuard, Ownable {
         if (finchLp > 1 ether) {
             finchLp = 1 ether;
         }
-        
+
         lp -= finchLp;
 
-        // calculate the ratio of funds raised to the hardcap and multiply by the darwin lp amount to get the number of darwin needed to deposit
-        uint darwinToDeposit = (HARDCAP * LP_AMOUNT) / status.raisedAmount;
+        // set the price of darwin in the lp to be the price of the next satge of funding
+        uint nextStage = _getCurrentStage() + 1;
+        uint darwinDepositRate;
+        if(nextStage == 9) {
+            darwinDepositRate = 15_873;
+        } else {
+            (darwinDepositRate, ,) = _getStageDetails(nextStage);
+        }
+
+        uint darwinToDeposit = lp * darwinDepositRate;
 
         _addLiquidity(address(darwin), darwinToDeposit, lp);
         _addLiquidity(address(finch), FINCH_LP_AMOUNT, finchLp);
@@ -326,18 +335,23 @@ contract DarwinPresale is IDarwinPresale, ReentrancyGuard, Ownable {
             uint256 rate;
             uint256 stageAmount;
             uint256 stageCap;
+            uint amountRaised = status.raisedAmount;
             while (bnbAmount > 0) {
                 (rate, stageAmount, stageCap) = _getStageDetails(stage);
-                if (bnbAmount <= stageAmount) {
+                uint amountLeftInStage = stageCap - amountRaised;
+                if (bnbAmount <= amountLeftInStage) {
                     darwinAmount += (bnbAmount * rate);
                     bnbAmount = 0;
                     break;
-                } else {
-                    darwinAmount += (stageAmount * rate);
-                    bnbAmount -= stageAmount;
                 }
+
+                amountRaised += amountLeftInStage;
+                darwinAmount += (amountLeftInStage * rate);
+                bnbAmount -= amountLeftInStage;
+                
                 ++stage;
             }
+            
             return darwinAmount;
         }
     }
@@ -405,21 +419,22 @@ contract DarwinPresale is IDarwinPresale, ReentrancyGuard, Ownable {
     }
 
     function _getCurrentStage() private view returns (uint256) {
-        if (status.raisedAmount > 117_164 ether) {
+        uint raisedAmount = status.raisedAmount;
+        if (raisedAmount > 117_164 ether) {
             return 8;
-        } else if (status.raisedAmount > 96_690 ether) {
+        } else if (raisedAmount > 96_690 ether) {
             return 7;
-        } else if (status.raisedAmount > 78_135 ether) {
+        } else if (raisedAmount > 78_135 ether) {
             return 6;
-        } else if (status.raisedAmount > 61_170 ether) {
+        } else if (raisedAmount > 61_170 ether) {
             return 5;
-        } else if (status.raisedAmount > 45_545 ether) {
+        } else if (raisedAmount > 45_545 ether) {
             return 4;
-        } else if (status.raisedAmount > 31_063 ether) {
+        } else if (raisedAmount > 31_063 ether) {
             return 3;
-        } else if (status.raisedAmount > 17_569 ether) {
+        } else if (raisedAmount > 17_569 ether) {
             return 2;
-        } else if (status.raisedAmount > 5_000 ether) {
+        } else if (raisedAmount > 5_000 ether) {
             return 1;
         } else {
             return 0;
