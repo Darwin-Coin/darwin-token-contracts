@@ -65,8 +65,6 @@ contract DarwinPresale is IDarwinPresale, ReentrancyGuard, Ownable {
 
     /// @notice Mapping of total BNB deposited by user
     mapping(address => uint256) public userDeposits;
-    mapping(address => uint256) public darwinTransferred;
-    mapping(address => uint256) public finchTransferred;
 
     PresaleStatus public status;
 
@@ -170,11 +168,9 @@ contract DarwinPresale is IDarwinPresale, ReentrancyGuard, Ownable {
         uint256 darwinAmount = calculateDarwinAmount(msg.value);
 
         status.raisedAmount += msg.value;
-        darwinTransferred[msg.sender] += darwinAmount;
         status.soldAmount += darwinAmount;
 
         uint256 finchAmount = calculateFinchAmount(msg.value);
-        finchTransferred[msg.sender] += finchAmount;
 
         uint256 marketingAmount = (msg.value * MARKETING_PERCENTAGE) / 100;
         _transferBNB(marketingWallet, marketingAmount);
@@ -286,7 +282,7 @@ contract DarwinPresale is IDarwinPresale, ReentrancyGuard, Ownable {
         address account
     ) external view returns (uint256, uint256) {
         uint256 deposited = userDeposits[account];
-        uint256 owned = darwinTransferred[account];
+        uint256 owned = darwin.balanceOf(account);
         return (deposited, owned);
     }
 
@@ -351,7 +347,7 @@ contract DarwinPresale is IDarwinPresale, ReentrancyGuard, Ownable {
                 
                 ++stage;
             }
-            
+
             return darwinAmount;
         }
     }
