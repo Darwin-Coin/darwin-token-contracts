@@ -44,12 +44,6 @@ interface IDarwin is IERC20Upgradeable {
 
     function getOutOfSyncedPairs() external view returns (address[] memory);
 
-    function takeAccessFee(
-        address from,
-        address to,
-        uint256 amount
-    ) external returns (bool);
-
     function isExchangeAddress(address account) external view returns (bool);
 
     function isExcludedFromReward(address account) external view returns (bool);
