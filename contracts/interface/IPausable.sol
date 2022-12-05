@@ -1,6 +1,6 @@
 pragma solidity 0.8.14;
 
-// SPDX-License-Identifier: Unlicensed
+// SPDX-License-Identifier: MIT
 
 /// @title Interface for a contract that can be paused and unpaused
 interface IPausable {

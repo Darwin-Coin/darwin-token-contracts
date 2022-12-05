@@ -1,6 +1,6 @@
 pragma solidity 0.8.14;
 
-// SPDX-License-Identifier: Unlicensed
+// SPDX-License-Identifier: MIT
 
 import "@openzeppelin/contracts-upgradeable/token/ERC20/extensions/ERC20PausableUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/proxy/utils/UUPSUpgradeable.sol";

@@ -1,6 +1,6 @@
 pragma solidity 0.8.14;
 
-// SPDX-License-Identifier: Unlicensed
+// SPDX-License-Identifier: MIT
 
 import "@openzeppelin/contracts-upgradeable/interfaces/IERC20Upgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/utils/ContextUpgradeable.sol";

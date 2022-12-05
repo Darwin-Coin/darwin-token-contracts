@@ -1,6 +1,6 @@
 pragma solidity 0.8.14;
 
-// SPDX-License-Identifier: Unlicensed
+// SPDX-License-Identifier: MIT
 
 import "./interface/IDarwin.sol";
 import "./interface/IDarwinCommunity.sol";
