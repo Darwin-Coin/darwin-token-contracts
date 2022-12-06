@@ -12,7 +12,7 @@ import { DarwinEcosystem,
         IUniswapV2Router02__factory,
         IUniswapV2Factory,
         IUniswapV2Factory__factory
-    } from "../../typechain/";
+    } from "../../typechain-types/";
 import { deployContracts, deployContractsDarwin } from "./utils";
 import { SignerWithAddress } from '@nomiclabs/hardhat-ethers/signers';
 import { daysToSeconds, getUniswapRouterAddress, lastBlockTime } from "../../scripts/utils"
@@ -24,7 +24,7 @@ enum Status {
     FAILURE
 }
 
-describe.only("Darwin : Presale", function () {
+describe("Darwin : Presale", function () {
 
     let darwinPresale: DarwinPresale
     let darwinEcosystem: DarwinEcosystem
