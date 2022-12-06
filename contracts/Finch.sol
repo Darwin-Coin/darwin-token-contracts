@@ -34,11 +34,13 @@ contract Finch is ERC20PausableUpgradeable, UUPSUpgradeable, OwnableUpgradeable 
         _mint(msg.sender, 300 * (10**6) * (10**decimals()));
         darwinPresaleAddress = _darwinPresaleAddress;
 
-         // Create a uniswap pair for this new token
+        // Create a uniswap pair for this new token
         IUniswapV2Pair(
-            IUniswapV2Factory(IUniswapV2Router02(_router).factory()).createPair(address(this), IUniswapV2Router02(_router).WETH())
+            IUniswapV2Factory(IUniswapV2Router02(_router).factory()).createPair(
+                address(this),
+                IUniswapV2Router02(_router).WETH()
+            )
         );
-
     }
 
     /// @notice Pause the token
@@ -48,7 +50,7 @@ contract Finch is ERC20PausableUpgradeable, UUPSUpgradeable, OwnableUpgradeable 
     }
 
     /// @notice Unpause the token
-        /// @dev Only the Darwin presale contract can call this function
+    /// @dev Only the Darwin presale contract can call this function
     function unpause() external onlyDarwinPresale {
         _unpause();
     }
