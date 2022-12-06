@@ -14,7 +14,7 @@ import {
   Darwin,
   Finch,
   DarwinCommunity
-} from "../../typechain";
+} from "../../typechain-types";
 
 export const deployContracts = async () => {
   const Darwin = await ethers.getContractFactory("TestErc20Token");
@@ -22,11 +22,13 @@ export const deployContracts = async () => {
   const DarwinEcosystem = await ethers.getContractFactory("DarwinEcosystem");
   const DarwinPresale = await ethers.getContractFactory("DarwinPresale");
 
+  console.log("after getContractFactory");
+
   const darwinPresale = await DarwinPresale.deploy() as DarwinPresale;
 
   const darwinEcosystem = (await upgrades.deployProxy(DarwinEcosystem, [
     darwinPresale.address,
-  ])) as DarwinEcosystem;
+    ], {kind: "uups"})) as DarwinEcosystem;
 
   const darwin = await Darwin.deploy() as TestErc20Token;
   const finch = await Finch.deploy() as TestErc20Token;
@@ -46,17 +48,19 @@ export const deployContractsDarwin = async (routerAddress:string, devWallet:stri
   const DarwinPresale = await ethers.getContractFactory("DarwinPresale");
   const DarwinCommunity = await ethers.getContractFactory("DarwinCommunity");
 
-  const darwinPresale = await DarwinPresale.deploy() as DarwinPresale;
+  let darwinEcosystem, darwin, finch, darwinCommunity, darwinPresale;
 
-  const darwinEcosystem = (await upgrades.deployProxy(DarwinEcosystem, [
+  darwinPresale = await DarwinPresale.deploy() as DarwinPresale;
+
+  darwinEcosystem = (await upgrades.deployProxy(DarwinEcosystem, [
     darwinPresale.address,
   ], {kind: "uups"})) as DarwinEcosystem;
 
-  const darwinCommunity = await upgrades.deployProxy(DarwinCommunity, [[], [], []], {kind: "uups"}) as DarwinCommunity
+  darwinCommunity = await upgrades.deployProxy(DarwinCommunity, [[], [], []], {kind: "uups"}) as DarwinCommunity
 
-  const darwin = await upgrades.deployProxy(Darwin, [routerAddress, devWallet, darwinCommunity.address], {kind: "uups"}) as Darwin
+  darwin = await upgrades.deployProxy(Darwin, [routerAddress, devWallet, darwinCommunity.address], {kind: "uups"}) as Darwin
   
-  const finch = await upgrades.deployProxy(Finch, [darwinPresale.address], {kind: "uups"}) as Finch
+  finch = await upgrades.deployProxy(Finch, [darwinPresale.address, routerAddress], {kind: "uups"}) as Finch
 
   return {
     darwinPresale,

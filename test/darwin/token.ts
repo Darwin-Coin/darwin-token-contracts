@@ -2,9 +2,9 @@ import { SignerWithAddress } from "@nomiclabs/hardhat-ethers/signers";
 import { expect } from "chai";
 import { BigNumber } from "ethers";
 import { ethers } from "hardhat";
-import { Darwin, DarwinCommunity, IUniswapV2Router02, IUniswapV2Pair } from "../../typechain";
-import { IPancakePair__factory } from "../../typechain/factories/IPancakePair__factory";
-import { PancakeRouter__factory } from "../../typechain/factories/PancakeRouter__factory";
+import { Darwin, DarwinCommunity, IUniswapV2Router02, IUniswapV2Pair } from "../../typechain-types";
+import { IPancakePair__factory } from "../../typechain-types";
+import { PancakeRouter__factory } from "../../typechain-types";
 import { deploy } from "../utils";
 
 
