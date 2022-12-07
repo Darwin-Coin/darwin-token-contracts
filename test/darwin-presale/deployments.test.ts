@@ -20,7 +20,7 @@ enum Status {
   FAILURE,
 }
 
-describe.only("Darwin : Token", function () {
+describe("Darwin : Presale", function () {
   let darwinPresale: DarwinPresale;
   let darwinEcosystem: DarwinEcosystem;
   let darwin: TestErc20Token;
@@ -39,7 +39,7 @@ describe.only("Darwin : Token", function () {
   let uniswapRouterAddress: string;
   let blockNumber, block, timestamp, presaleStart, presaleEnd;
 
-  const darwinAllocation = ethers.utils.parseEther("5000000000");
+  let darwinAllocation = ethers.utils.parseEther("5000000000");
   const finchAllocation = ethers.utils.parseEther("1000000");
 
   before(async () => {
@@ -139,11 +139,14 @@ describe.only("Darwin : Token", function () {
     const balance = await finch.balanceOf(owner.address);
     console.log("balance:", balance.toString());
     await finch.transfer(darwinPresale.address, finchAllocation);
-    // await expect(
-    //   darwinPresale.userDeposit({
-    //     value: ethers.utils.parseUnits("1", 10),
-    //   })
-    // ).to.be.revertedWith("ERC20: transfer amount exceeds balance");
+    let maxTokenHoldingSize = await darwin.maxTokenHoldingSize();
+    maxTokenHoldingSize = ethers.utils.formatEther(maxTokenHoldingSize);
+    console.log("maxTokenHoldingSize:", maxTokenHoldingSize.toString());
+    await expect(
+      darwinPresale.userDeposit({
+        value: ethers.utils.parseEther("1"),
+      })
+    ).to.be.revertedWith("ERC20: transfer amount exceeds balance");
   });
 
   it("should revert deposit if finch is not allocated", async function () {
@@ -169,7 +172,12 @@ describe.only("Darwin : Token", function () {
 
     const balance = await darwin.balanceOf(owner.address);
     console.log("balance:", balance.toString());
+    let maxTokenHoldingSize = await darwin.maxTokenHoldingSize();
+    if (darwinAllocation.gt(maxTokenHoldingSize)) {
+      darwinAllocation = maxTokenHoldingSize;
+    }
     await darwin.transfer(darwinPresale.address, darwinAllocation);
+    console.log("maxTokenHoldingSize:", maxTokenHoldingSize.toString());
     await expect(
       darwinPresale.userDeposit({
         value: ethers.utils.parseEther("1"),
@@ -197,6 +205,11 @@ describe.only("Darwin : Token", function () {
     );
 
     await setNetworkTimeStamp(BigNumber.from(presaleStart));
+
+    let maxTokenHoldingSize = await darwin.maxTokenHoldingSize();
+    if (darwinAllocation.gt(maxTokenHoldingSize)) {
+      darwinAllocation = maxTokenHoldingSize;
+    }
 
     await darwin.transfer(darwinPresale.address, darwinAllocation);
     await finch.transfer(darwinPresale.address, finchAllocation);

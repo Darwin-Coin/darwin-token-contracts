@@ -7,13 +7,10 @@ import { IPancakePair__factory } from "../../typechain-types";
 import { PancakeRouter__factory } from "../../typechain-types";
 import { deploy } from "../utils";
 
-
-const decimalPoints = BigNumber.from((10 ** 9))
-
 describe("Darwin : Token", function () {
 
     let darwin: Darwin
-    let darwinComunity: DarwinCommunity
+    let darwinCommunity: DarwinCommunity
     let uniswapv2Router: IUniswapV2Router02
     let uniswapPair: IUniswapV2Pair
 
@@ -31,15 +28,15 @@ describe("Darwin : Token", function () {
         let deployedContract = await deploy();
         darwin = deployedContract.darwin;
         devWallet = deployedContract.dev;
-        darwinComunity = deployedContract.darwinCommunity;
+        darwinCommunity = deployedContract.darwinCommunity;
         uniswapv2Router = PancakeRouter__factory.connect(await darwin.uniswapV2Router(), owner);
         uniswapPair = IPancakePair__factory.connect(await darwin.uniswapV2Pair(), owner);
     })
 
 
-    it("Should have corrent tokens in dev wallet and owner wallet", async function () {
+    it("Should have correct tokens in dev wallet and owner wallet", async function () {
 
-        const totalSupply = BigNumber.from(10 * (10 ** 9)).mul(decimalPoints)
+        const totalSupply = ethers.utils.parseEther("10000000000") // 10 B
         
         const devWalletTokens = totalSupply.div(100).mul(10)
         const ownerTokens = totalSupply.sub(devWalletTokens)

@@ -87,21 +87,21 @@ describe("Darwin : Presale", function () {
 
             await initDarwinPresale(darwinPresale, token.address, finch.address, owner);
 
-            await expect(initDarwinPresale(darwinPresale, token.address, finch.address, owner)).to.be.revertedWith("AlreadyInitialized");
+            await expect(initDarwinPresale(darwinPresale, token.address, finch.address, owner)).to.be.revertedWithCustomError(darwinPresale, "AlreadyInitialized");
 
         })
 
         it("cant initialize with zero address", async() => {
 
-            await expect(initDarwinPresale(darwinPresale, ethers.constants.AddressZero, finch.address, owner)).to.be.revertedWith("ZeroAddress");
-            await expect(initDarwinPresale(darwinPresale, token.address, ethers.constants.AddressZero, owner)).to.be.revertedWith("ZeroAddress");
+            await expect(initDarwinPresale(darwinPresale, ethers.constants.AddressZero, finch.address, owner)).to.be.revertedWithCustomError(darwinPresale, "ZeroAddress");
+            await expect(initDarwinPresale(darwinPresale, token.address, ethers.constants.AddressZero, owner)).to.be.revertedWithCustomError(darwinPresale, "ZeroAddress");
 
         })
 
         it("start time has to be initialized in the future", async() => {
 
             await expect(darwinPresale.connect(owner).init(token.address, finch.address, await lastBlockTime(), daysToSeconds(20).add(await lastBlockTime()))
-                ).to.be.revertedWith("InvalidStartDate");
+                ).to.be.revertedWithCustomError(darwinPresale, "InvalidStartDate");
 
         })
 
@@ -110,7 +110,7 @@ describe("Darwin : Presale", function () {
             let startTime:BigNumber = await daysToSeconds(1).add(await lastBlockTime())
 
             await expect(darwinPresale.connect(owner).init(token.address, finch.address, startTime, startTime.sub(1))
-                ).to.be.revertedWith("InvalidEndDate");
+                ).to.be.revertedWithCustomError(darwinPresale, "InvalidEndDate");
 
         })
 
