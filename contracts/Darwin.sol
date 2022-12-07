@@ -390,7 +390,7 @@ contract Darwin is IDarwin, OwnableUpgradeable, UUPSUpgradeable {
     }
 
     function decimals() public pure returns (uint256) {
-        return 9; // TODO: change to 18
+        return 18;
     }
 
     function _getAmountToBurnBasedOnDesync(
