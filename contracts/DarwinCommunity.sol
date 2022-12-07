@@ -9,7 +9,6 @@ import "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/proxy/utils/UUPSUpgradeable.sol";
 
 contract DarwinCommunity is OwnableUpgradeable, IDarwinCommunity, UUPSUpgradeable {
-    
     enum ProposalState {
         Pending,
         Active,
@@ -50,8 +49,8 @@ contract DarwinCommunity is OwnableUpgradeable, IDarwinCommunity, UUPSUpgradeabl
     }
 
     modifier preAccess(address from, uint256 darwinAmount) {
-        require(minDarwinTransferToAccess <= darwinAmount, "DC::takeAccessFee: not enouch $DARWIN sent");
-        require(darwin.transferFrom(from, address(this), darwinAmount), "DC::takeAccessFee: not enouch $DARWIN sent");
+        require(minDarwinTransferToAccess <= darwinAmount, "DC::takeAccessFee: not enough $DARWIN sent");
+        require(darwin.transferFrom(from, address(this), darwinAmount), "DC::takeAccessFee: not enough $DARWIN sent");
         _;
     }
 
@@ -552,5 +551,4 @@ contract DarwinCommunity is OwnableUpgradeable, IDarwinCommunity, UUPSUpgradeabl
     }
 
     function _authorizeUpgrade(address newImplementation) internal override onlyOwner {}
-
 }

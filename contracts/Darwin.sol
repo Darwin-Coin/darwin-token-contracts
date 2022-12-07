@@ -101,18 +101,17 @@ contract Darwin is IDarwin, OwnableUpgradeable, UUPSUpgradeable {
     mapping(address => bool) private pauseWhitelist;
 
     modifier onlyDarwinCommunity() {
-        if (msg.sender != address(darwinCommunity) &&
-            (address(darwinCommunity) != address(0) ||
-            msg.sender != owner())) {
+        if (
+            msg.sender != address(darwinCommunity) && (address(darwinCommunity) != address(0) || msg.sender != owner())
+        ) {
             revert OnlyDarwinCommunity();
         }
         _;
     }
 
     modifier notPaused() {
-
-        if(isPaused) {
-            if(isLive || pauseWhitelist[msg.sender] == false) revert Paused();
+        if (isPaused) {
+            if (isLive || pauseWhitelist[msg.sender] == false) revert Paused();
         }
         _;
     }
@@ -136,21 +135,19 @@ contract Darwin is IDarwin, OwnableUpgradeable, UUPSUpgradeable {
     }
 
     function pause() external onlyOwner {
-        if(isPaused == false) {
+        if (isPaused == false) {
             isPaused = true;
         }
     }
 
     function unPause() external onlyOwner {
-        if(isPaused) {
+        if (isPaused) {
             isPaused = false;
         }
     }
 
     function setPauseWhitelist(address _addr, bool value) external onlyOwner {
-
         pauseWhitelist[_addr] = value;
-
     }
 
     function transfer(address recipient, uint256 amount) external override returns (bool) {
@@ -393,7 +390,7 @@ contract Darwin is IDarwin, OwnableUpgradeable, UUPSUpgradeable {
     }
 
     function decimals() public pure returns (uint256) {
-        return 9; // TODO: change to 18
+        return 18;
     }
 
     function _getAmountToBurnBasedOnDesync(
@@ -817,7 +814,6 @@ contract Darwin is IDarwin, OwnableUpgradeable, UUPSUpgradeable {
     function _calculateReflectionAmount(address recepient, uint256 _amount) private view returns (uint256) {
         return recepient == reflectionWallet ? _amount : 0;
     }
-
 
     function _calculateNormalCommunityTokens(uint256 _amount) private view returns (uint256) {
         return (_amount * communityTokensPercentage) / _PERCENTAGE_100;

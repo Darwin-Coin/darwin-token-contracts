@@ -10,8 +10,8 @@ import {
   IUniswapV2Factory__factory,
   IUniswapV2Router02__factory,
   TestErc20Token,
-} from "../../typechain";
-import { deployContracts } from "./utils";
+} from "../../typechain-types";
+import { deployContractsDarwin } from "./utils";
 
 enum Status {
   QUEUED,
@@ -20,7 +20,7 @@ enum Status {
   FAILURE,
 }
 
-describe("Darwin : Token", function () {
+describe("Darwin : Presale", function () {
   let darwinPresale: DarwinPresale;
   let darwinEcosystem: DarwinEcosystem;
   let darwin: TestErc20Token;
@@ -37,11 +37,9 @@ describe("Darwin : Token", function () {
   let teamWallet: string;
 
   let uniswapRouterAddress: string;
+  let blockNumber, block, timestamp, presaleStart, presaleEnd;
 
-  const presaleStart: string = "1669193560";
-  const presaleEnd: string = "1669293560";
-
-  const darwinAllocation = ethers.utils.parseEther("5000000000");
+  let darwinAllocation = ethers.utils.parseEther("5000000000");
   const finchAllocation = ethers.utils.parseEther("1000000");
 
   before(async () => {
@@ -51,34 +49,23 @@ describe("Darwin : Token", function () {
   });
 
   beforeEach(async () => {
-    const deployedContract = await deployContracts();
+    uniswapRouterAddress = await getUniswapRouterAddress(hre.network.name);
+
+    const deployedContract = await deployContractsDarwin(uniswapRouterAddress, teamWallet.address);
+
     darwinPresale = deployedContract.darwinPresale;
     darwinEcosystem = deployedContract.darwinEcosystem;
     darwin = deployedContract.darwin;
     finch = deployedContract.finch;
-
-    uniswapRouterAddress = await getUniswapRouterAddress(hre.network.name);
-    const router = IUniswapV2Router02__factory.connect(
-      uniswapRouterAddress,
-      darwinPresale.signer
-    );
-    const factory = IUniswapV2Factory__factory.connect(
-      await router.factory(),
-      darwinPresale.signer
-    );
-
-    const weth = await router.WETH();
-
-    const createDarwinPair = await factory.createPair(darwin.address, weth);
-    await createDarwinPair.wait();
-
-    const createFinchPair = await factory.createPair(finch.address, weth);
-    await createFinchPair.wait();
-
-    // await createAirDrop(darwinPresale, darwinEcosystem, token);
   });
 
   it("Should initialize presale", async function () {
+  blockNumber = await ethers.provider.getBlockNumber();
+   block = await ethers.provider.getBlock(blockNumber);
+   timestamp = block.timestamp;
+   presaleStart = timestamp + 10;
+   presaleEnd = presaleStart + 60 * 60 * 24 * 7;
+
     await darwinPresale.init(
       darwin.address,
       finch.address,
@@ -97,10 +84,16 @@ describe("Darwin : Token", function () {
   it("should not allow deposits before initialization", async function () {
     await expect(
       darwinPresale.userDeposit({ value: ethers.utils.parseEther("1") })
-    ).to.be.revertedWith("NotInitialized");
+    ).to.be.revertedWithCustomError(darwinPresale, "NotInitialized");
   });
 
   it("should not allow deposits before presaleStart", async function () {
+    blockNumber = await ethers.provider.getBlockNumber();
+    block = await ethers.provider.getBlock(blockNumber);
+    timestamp = block.timestamp;
+    presaleStart = timestamp + 10;
+    presaleEnd = presaleStart + 60 * 60 * 24 * 7;
+
     await darwinPresale.init(
       darwin.address,
       finch.address,
@@ -121,6 +114,12 @@ describe("Darwin : Token", function () {
   });
 
   it("should revert deposit if darwin is not allocated", async function () {
+    blockNumber = await ethers.provider.getBlockNumber();
+  block = await ethers.provider.getBlock(blockNumber);
+  timestamp = block.timestamp;
+  presaleStart = timestamp + 10;
+  presaleEnd = presaleStart + 60 * 60 * 24 * 7;
+
     await darwinPresale.init(
       darwin.address,
       finch.address,
@@ -137,16 +136,12 @@ describe("Darwin : Token", function () {
 
     await setNetworkTimeStamp(BigNumber.from(presaleStart));
 
-    const blockNumber = await ethers.provider.getBlockNumber();
-    const block = await ethers.provider.getBlock(blockNumber);
-    const timestamp = block.timestamp;
-
-    console.log("timestamp:", timestamp);
-    console.log("presaleStart:", presaleStart);
-
     const balance = await finch.balanceOf(owner.address);
     console.log("balance:", balance.toString());
     await finch.transfer(darwinPresale.address, finchAllocation);
+    let maxTokenHoldingSize = await darwin.maxTokenHoldingSize();
+    maxTokenHoldingSize = ethers.utils.formatEther(maxTokenHoldingSize);
+    console.log("maxTokenHoldingSize:", maxTokenHoldingSize.toString());
     await expect(
       darwinPresale.userDeposit({
         value: ethers.utils.parseEther("1"),
@@ -155,10 +150,10 @@ describe("Darwin : Token", function () {
   });
 
   it("should revert deposit if finch is not allocated", async function () {
-    const blockNumber = await ethers.provider.getBlockNumber();
-    const block = await ethers.provider.getBlock(blockNumber);
-    const timestamp = block.timestamp;
-    const presaleStart = timestamp + 10;
+    blockNumber = await ethers.provider.getBlockNumber();
+    block = await ethers.provider.getBlock(blockNumber);
+    timestamp = block.timestamp;
+    presaleStart = timestamp + 10;
     await darwinPresale.init(
       darwin.address,
       finch.address,
@@ -177,7 +172,12 @@ describe("Darwin : Token", function () {
 
     const balance = await darwin.balanceOf(owner.address);
     console.log("balance:", balance.toString());
+    let maxTokenHoldingSize = await darwin.maxTokenHoldingSize();
+    if (darwinAllocation.gt(maxTokenHoldingSize)) {
+      darwinAllocation = maxTokenHoldingSize;
+    }
     await darwin.transfer(darwinPresale.address, darwinAllocation);
+    console.log("maxTokenHoldingSize:", maxTokenHoldingSize.toString());
     await expect(
       darwinPresale.userDeposit({
         value: ethers.utils.parseEther("1"),
@@ -186,10 +186,10 @@ describe("Darwin : Token", function () {
   });
 
   it("should correctly deposit bnb", async function () {
-    const blockNumber = await ethers.provider.getBlockNumber();
-    const block = await ethers.provider.getBlock(blockNumber);
-    const timestamp = block.timestamp;
-    const presaleStart = timestamp + 10;
+    blockNumber = await ethers.provider.getBlockNumber();
+    block = await ethers.provider.getBlock(blockNumber);
+    timestamp = block.timestamp;
+    presaleStart = timestamp + 10;
     await darwinPresale.init(
       darwin.address,
       finch.address,
@@ -205,6 +205,11 @@ describe("Darwin : Token", function () {
     );
 
     await setNetworkTimeStamp(BigNumber.from(presaleStart));
+
+    let maxTokenHoldingSize = await darwin.maxTokenHoldingSize();
+    if (darwinAllocation.gt(maxTokenHoldingSize)) {
+      darwinAllocation = maxTokenHoldingSize;
+    }
 
     await darwin.transfer(darwinPresale.address, darwinAllocation);
     await finch.transfer(darwinPresale.address, finchAllocation);

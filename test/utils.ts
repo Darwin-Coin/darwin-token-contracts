@@ -4,7 +4,7 @@ import { BigNumber, BigNumberish, BytesLike } from "ethers";
 
 import hardhat, { ethers, upgrades } from "hardhat";
 import { getUniswapRouterAddress } from "../scripts/helpers";
-import { Darwin, DarwinCommunity, MockDarwinCommunity, ProxyAdmin } from "../typechain";
+import { Darwin, DarwinCommunity, MockDarwinCommunity, ProxyAdmin } from "../typechain-types";
 
 export const now = () => Math.floor(Date.now() / 1000)
 export const lastBlockTime = async () => (await ethers.provider.getBlock("latest")).timestamp
