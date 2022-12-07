@@ -31,6 +31,11 @@ describe("Darwin : Presale", function () {
 
   let owner: SignerWithAddress;
   let address0: SignerWithAddress;
+  let address1: SignerWithAddress;
+  let address2: SignerWithAddress;
+  let address3: SignerWithAddress;
+  let address4: SignerWithAddress;
+  let address5: SignerWithAddress;
 
   let others: SignerWithAddress[];
   let marketingWallet: string;
@@ -43,7 +48,7 @@ describe("Darwin : Presale", function () {
   const finchAllocation = ethers.utils.parseEther("1000000");
 
   before(async () => {
-    [owner, address0, ...others] = await ethers.getSigners();
+    [owner, address0, address1, address2, address3, address4, address5, ...others] = await ethers.getSigners();
     marketingWallet = others[0];
     teamWallet = others[1];
   });
@@ -185,7 +190,47 @@ describe("Darwin : Presale", function () {
     ).to.be.revertedWith("ERC20: transfer amount exceeds balance");
   });
 
-  it("should correctly deposit bnb", async function () {
+  it("should revert if deposit size is less than .1 bnb", async function () {
+    blockNumber = await ethers.provider.getBlockNumber();
+    block = await ethers.provider.getBlock(blockNumber);
+    timestamp = block.timestamp;
+    presaleStart = timestamp + 10;
+    await darwinPresale.init(
+      darwin.address,
+      finch.address,
+      presaleStart,
+      presaleEnd
+    );
+
+    await darwinPresale.initPresale(
+      uniswapRouterAddress,
+      darwinEcosystem.address,
+      marketingWallet.address,
+      teamWallet.address
+    );
+
+    await setNetworkTimeStamp(BigNumber.from(presaleStart));
+
+    let maxTokenHoldingSize = await darwin.maxTokenHoldingSize();
+    if (darwinAllocation.gt(maxTokenHoldingSize)) {
+      darwinAllocation = maxTokenHoldingSize;
+    }
+
+    await darwin.transfer(darwinPresale.address, darwinAllocation);
+    await finch.transfer(darwinPresale.address, finchAllocation);
+
+    const darwinBalanceBefore = await darwin.balanceOf(owner.address);
+    const darwinPresaleBalance = await darwin.balanceOf(darwinPresale.address);
+
+    const finchBalanceBefore = await finch.balanceOf(owner.address);
+    const finchPresaleBalance = await finch.balanceOf(darwinPresale.address);
+
+    await expect(darwinPresale.userDeposit({
+      value: ethers.utils.parseEther(".01"),
+    })).to.be.revertedWithCustomError(darwinPresale, "InvalidDepositAmount");
+  });
+
+  it("should correctly deposit 1 bnb", async function () {
     blockNumber = await ethers.provider.getBlockNumber();
     block = await ethers.provider.getBlock(blockNumber);
     timestamp = block.timestamp;
@@ -229,6 +274,351 @@ describe("Darwin : Presale", function () {
 
     expect(darwinBalanceAfter).to.be.gt(darwinBalanceBefore);
     expect(finchBalanceAfter).to.be.gt(finchBalanceBefore);
+
+    // TODO add more specific comparisons
+  });
+
+  it("should correctly deposit 2.5 bnb", async function () {
+    blockNumber = await ethers.provider.getBlockNumber();
+    block = await ethers.provider.getBlock(blockNumber);
+    timestamp = block.timestamp;
+    presaleStart = timestamp + 10;
+    await darwinPresale.init(
+      darwin.address,
+      finch.address,
+      presaleStart,
+      presaleEnd
+    );
+
+    await darwinPresale.initPresale(
+      uniswapRouterAddress,
+      darwinEcosystem.address,
+      marketingWallet.address,
+      teamWallet.address
+    );
+
+    await setNetworkTimeStamp(BigNumber.from(presaleStart));
+
+    let maxTokenHoldingSize = await darwin.maxTokenHoldingSize();
+    if (darwinAllocation.gt(maxTokenHoldingSize)) {
+      darwinAllocation = maxTokenHoldingSize;
+    }
+
+    await darwin.transfer(darwinPresale.address, darwinAllocation);
+    await finch.transfer(darwinPresale.address, finchAllocation);
+
+    const darwinBalanceBefore = await darwin.balanceOf(owner.address);
+    const darwinPresaleBalance = await darwin.balanceOf(darwinPresale.address);
+
+    const finchBalanceBefore = await finch.balanceOf(owner.address);
+    const finchPresaleBalance = await finch.balanceOf(darwinPresale.address);
+
+    const deposit = await darwinPresale.userDeposit({
+      value: ethers.utils.parseEther("2.5"),
+    });
+
+    const darwinBalanceAfter = await darwin.balanceOf(owner.address);
+    const finchBalanceAfter = await finch.balanceOf(owner.address);
+
+    expect(darwinBalanceAfter).to.be.gt(darwinBalanceBefore);
+    expect(finchBalanceAfter).to.be.gt(finchBalanceBefore);
+
+    // TODO add more specific comparisons
+  });
+
+  it("should correctly deposit 5 bnb", async function () {
+    blockNumber = await ethers.provider.getBlockNumber();
+    block = await ethers.provider.getBlock(blockNumber);
+    timestamp = block.timestamp;
+    presaleStart = timestamp + 10;
+    await darwinPresale.init(
+      darwin.address,
+      finch.address,
+      presaleStart,
+      presaleEnd
+    );
+
+    await darwinPresale.initPresale(
+      uniswapRouterAddress,
+      darwinEcosystem.address,
+      marketingWallet.address,
+      teamWallet.address
+    );
+
+    await setNetworkTimeStamp(BigNumber.from(presaleStart));
+
+    let maxTokenHoldingSize = await darwin.maxTokenHoldingSize();
+    if (darwinAllocation.gt(maxTokenHoldingSize)) {
+      darwinAllocation = maxTokenHoldingSize;
+    }
+
+    await darwin.transfer(darwinPresale.address, darwinAllocation);
+    await finch.transfer(darwinPresale.address, finchAllocation);
+
+    const darwinBalanceBefore = await darwin.balanceOf(owner.address);
+    const darwinPresaleBalance = await darwin.balanceOf(darwinPresale.address);
+
+    const finchBalanceBefore = await finch.balanceOf(owner.address);
+    const finchPresaleBalance = await finch.balanceOf(darwinPresale.address);
+
+    const deposit = await darwinPresale.userDeposit({
+      value: ethers.utils.parseEther("5"),
+    });
+
+    const darwinBalanceAfter = await darwin.balanceOf(owner.address);
+    const finchBalanceAfter = await finch.balanceOf(owner.address);
+
+    expect(darwinBalanceAfter).to.be.gt(darwinBalanceBefore);
+    expect(finchBalanceAfter).to.be.gt(finchBalanceBefore);
+
+    // TODO add more specific comparisons
+  });
+
+  it("should correctly deposit 10 bnb", async function () {
+    blockNumber = await ethers.provider.getBlockNumber();
+    block = await ethers.provider.getBlock(blockNumber);
+    timestamp = block.timestamp;
+    presaleStart = timestamp + 10;
+    await darwinPresale.init(
+      darwin.address,
+      finch.address,
+      presaleStart,
+      presaleEnd
+    );
+
+    await darwinPresale.initPresale(
+      uniswapRouterAddress,
+      darwinEcosystem.address,
+      marketingWallet.address,
+      teamWallet.address
+    );
+
+    await setNetworkTimeStamp(BigNumber.from(presaleStart));
+
+    let maxTokenHoldingSize = await darwin.maxTokenHoldingSize();
+    if (darwinAllocation.gt(maxTokenHoldingSize)) {
+      darwinAllocation = maxTokenHoldingSize;
+    }
+
+    await darwin.transfer(darwinPresale.address, darwinAllocation);
+    await finch.transfer(darwinPresale.address, finchAllocation);
+
+    const darwinBalanceBefore = await darwin.balanceOf(owner.address);
+    const darwinPresaleBalance = await darwin.balanceOf(darwinPresale.address);
+
+    const finchBalanceBefore = await finch.balanceOf(owner.address);
+    const finchPresaleBalance = await finch.balanceOf(darwinPresale.address);
+
+    const deposit = await darwinPresale.userDeposit({
+      value: ethers.utils.parseEther("10"),
+    });
+
+    const darwinBalanceAfter = await darwin.balanceOf(owner.address);
+    const finchBalanceAfter = await finch.balanceOf(owner.address);
+
+    expect(darwinBalanceAfter).to.be.gt(darwinBalanceBefore);
+    expect(finchBalanceAfter).to.be.gt(finchBalanceBefore);
+
+    // TODO add more specific comparisons
+  });
+
+  it("should correctly deposit 50 bnb", async function () {
+    blockNumber = await ethers.provider.getBlockNumber();
+    block = await ethers.provider.getBlock(blockNumber);
+    timestamp = block.timestamp;
+    presaleStart = timestamp + 10;
+    await darwinPresale.init(
+      darwin.address,
+      finch.address,
+      presaleStart,
+      presaleEnd
+    );
+
+    await darwinPresale.initPresale(
+      uniswapRouterAddress,
+      darwinEcosystem.address,
+      marketingWallet.address,
+      teamWallet.address
+    );
+
+    await setNetworkTimeStamp(BigNumber.from(presaleStart));
+
+    let maxTokenHoldingSize = await darwin.maxTokenHoldingSize();
+    if (darwinAllocation.gt(maxTokenHoldingSize)) {
+      darwinAllocation = maxTokenHoldingSize;
+    }
+
+    await darwin.transfer(darwinPresale.address, darwinAllocation);
+    await finch.transfer(darwinPresale.address, finchAllocation);
+
+    const darwinBalanceBefore = await darwin.balanceOf(owner.address);
+    const darwinPresaleBalance = await darwin.balanceOf(darwinPresale.address);
+
+    const finchBalanceBefore = await finch.balanceOf(owner.address);
+    const finchPresaleBalance = await finch.balanceOf(darwinPresale.address);
+
+    const deposit = await darwinPresale.userDeposit({
+      value: ethers.utils.parseEther("50"),
+    });
+
+    const darwinBalanceAfter = await darwin.balanceOf(owner.address);
+    const finchBalanceAfter = await finch.balanceOf(owner.address);
+
+    expect(darwinBalanceAfter).to.be.gt(darwinBalanceBefore);
+    expect(finchBalanceAfter).to.be.gt(finchBalanceBefore);
+
+    // TODO add more specific comparisons
+  });
+
+  it("should correctly deposit 4000 bnb", async function () {
+    blockNumber = await ethers.provider.getBlockNumber();
+    block = await ethers.provider.getBlock(blockNumber);
+    timestamp = block.timestamp;
+    presaleStart = timestamp + 10;
+    await darwinPresale.init(
+      darwin.address,
+      finch.address,
+      presaleStart,
+      presaleEnd
+    );
+
+    await darwinPresale.initPresale(
+      uniswapRouterAddress,
+      darwinEcosystem.address,
+      marketingWallet.address,
+      teamWallet.address
+    );
+
+    await setNetworkTimeStamp(BigNumber.from(presaleStart));
+
+    let maxTokenHoldingSize = await darwin.maxTokenHoldingSize();
+    if (darwinAllocation.gt(maxTokenHoldingSize)) {
+      darwinAllocation = maxTokenHoldingSize;
+    }
+
+    await darwin.transfer(darwinPresale.address, darwinAllocation);
+    await finch.transfer(darwinPresale.address, finchAllocation);
+
+    const darwinBalanceBefore = await darwin.balanceOf(owner.address);
+    const darwinPresaleBalance = await darwin.balanceOf(darwinPresale.address);
+
+    const finchBalanceBefore = await finch.balanceOf(owner.address);
+    const finchPresaleBalance = await finch.balanceOf(darwinPresale.address);
+
+    const deposit = await darwinPresale.connect(address0).userDeposit({
+      value: ethers.utils.parseEther("4000"),
+    });
+
+    const darwinBalanceAfter = await darwin.balanceOf(owner.address);
+    const finchBalanceAfter = await finch.balanceOf(owner.address);
+
+    expect(darwinBalanceAfter).to.be.gt(darwinBalanceBefore);
+    expect(finchBalanceAfter).to.be.gt(finchBalanceBefore);
+
+    // TODO add more specific comparisons
+  });
+
+  it("should revert if deposit is >4000 bnb", async function () {
+    blockNumber = await ethers.provider.getBlockNumber();
+    block = await ethers.provider.getBlock(blockNumber);
+    timestamp = block.timestamp;
+    presaleStart = timestamp + 10;
+    await darwinPresale.init(
+      darwin.address,
+      finch.address,
+      presaleStart,
+      presaleEnd
+    );
+
+    await darwinPresale.initPresale(
+      uniswapRouterAddress,
+      darwinEcosystem.address,
+      marketingWallet.address,
+      teamWallet.address
+    );
+
+    await setNetworkTimeStamp(BigNumber.from(presaleStart));
+
+    let maxTokenHoldingSize = await darwin.maxTokenHoldingSize();
+    if (darwinAllocation.gt(maxTokenHoldingSize)) {
+      darwinAllocation = maxTokenHoldingSize;
+    }
+
+    await darwin.transfer(darwinPresale.address, darwinAllocation);
+    await finch.transfer(darwinPresale.address, finchAllocation);
+
+    const darwinBalanceBefore = await darwin.balanceOf(owner.address);
+    const darwinPresaleBalance = await darwin.balanceOf(darwinPresale.address);
+
+    const finchBalanceBefore = await finch.balanceOf(owner.address);
+    const finchPresaleBalance = await finch.balanceOf(darwinPresale.address);
+
+    await expect(darwinPresale.userDeposit({
+      value: ethers.utils.parseEther("4001"),
+    })).to.be.revertedWithCustomError(darwinPresale, "InvalidDepositAmount");
+  });
+
+  it("should reach the hardcap", async function () {
+    blockNumber = await ethers.provider.getBlockNumber();
+    block = await ethers.provider.getBlock(blockNumber);
+    timestamp = block.timestamp;
+    presaleStart = timestamp + 10;
+    await darwinPresale.init(
+      darwin.address,
+      finch.address,
+      presaleStart,
+      presaleEnd
+    );
+
+    await darwinPresale.initPresale(
+      uniswapRouterAddress,
+      darwinEcosystem.address,
+      marketingWallet.address,
+      teamWallet.address
+    );
+
+    await setNetworkTimeStamp(BigNumber.from(presaleStart));
+
+    let maxTokenHoldingSize = await darwin.maxTokenHoldingSize();
+    if (darwinAllocation.gt(maxTokenHoldingSize)) {
+      darwinAllocation = maxTokenHoldingSize;
+    }
+
+    await darwin.transfer(darwinPresale.address, darwinAllocation);
+    await finch.transfer(darwinPresale.address, finchAllocation);
+
+    await darwinPresale.connect(address1).userDeposit({
+      value: ethers.utils.parseEther("4000"),
+    });
+
+    await darwinPresale.connect(address2).userDeposit({
+      value: ethers.utils.parseEther("4000"),
+    });
+
+    await darwinPresale.connect(address3).userDeposit({
+      value: ethers.utils.parseEther("4000"),
+    });
+
+    await darwinPresale.connect(address4).userDeposit({
+      value: ethers.utils.parseEther("4000"),
+    });
+
+    await darwinPresale.connect(address5).userDeposit({
+      value: ethers.utils.parseEther("4000"),
+    });
+
+    let remainingAmount = 140_000 - 20_000;
+    let i = 0
+    while (remainingAmount >= 4000) {
+      await darwinPresale.connect(others[i]).userDeposit({
+        value: ethers.utils.parseEther("4000"),
+      });
+      remainingAmount -= 4000;
+      i++;
+    }
+    await darwinPresale.connect(others[i]).userDeposit({
+      value: ethers.utils.parseEther(remainingAmount.toString()),
+    });
 
     // TODO add more specific comparisons
   });
