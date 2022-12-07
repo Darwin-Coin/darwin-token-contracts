@@ -10,8 +10,8 @@ import "@uniswap/v2-core/contracts/interfaces/IUniswapV2Factory.sol";
 import "@uniswap/v2-periphery/contracts/interfaces/IUniswapV2Router02.sol";
 import "@uniswap/v2-core/contracts/interfaces/IUniswapV2Pair.sol";
 
-import {IDarwinPresale} from "./interface/IDarwinPresale.sol";
-import {IPausable} from "./interface/IPausable.sol";
+import { IDarwinPresale } from "./interface/IDarwinPresale.sol";
+import { IPausable } from "./interface/IPausable.sol";
 
 // TODO check if entire interface files need to be imported
 import "./interface/IDarwinEcosystem.sol";
@@ -127,15 +127,9 @@ contract DarwinPresale is IDarwinPresale, ReentrancyGuard, Ownable {
         _setMarketingWallet(_marketingWallet);
         _setTeamWallet(_teamWallet);
 
-        address darwinPairAddress = IUniswapV2Factory(router.factory()).getPair(
-            address(darwin),
-            router.WETH()
-        );
+        address darwinPairAddress = IUniswapV2Factory(router.factory()).getPair(address(darwin), router.WETH());
 
-        address finchPairAddress = IUniswapV2Factory(router.factory()).getPair(
-            address(finch),
-            router.WETH()
-        );
+        address finchPairAddress = IUniswapV2Factory(router.factory()).getPair(address(finch), router.WETH());
 
         // ensure pairs exist
         if (darwinPairAddress == address(0) || finchPairAddress == address(0)) {
@@ -147,7 +141,6 @@ contract DarwinPresale is IDarwinPresale, ReentrancyGuard, Ownable {
     /// @dev Emits a UserDeposit event
     /// @dev Emits a RewardsDispersed event
     function userDeposit() external payable nonReentrant isInitialized {
-
         if (presaleStatus() != Status.ACTIVE) {
             revert PresaleNotActive();
         }
@@ -164,7 +157,7 @@ contract DarwinPresale is IDarwinPresale, ReentrancyGuard, Ownable {
         }
 
         userDeposits[msg.sender] += msg.value;
-       
+
         uint256 darwinAmount = calculateDarwinAmount(msg.value);
 
         status.raisedAmount += msg.value;
@@ -182,7 +175,7 @@ contract DarwinPresale is IDarwinPresale, ReentrancyGuard, Ownable {
             revert TransferFailed();
         }
 
-        darwinEcosystem.setAddressPresaleTier(msg.sender, _getTier(base));
+        darwinEcosystem.setAddressPresaleTier(msg.sender, _getTier(userDeposits[msg.sender]));
 
         emit UserDeposit(msg.sender, msg.value, darwinAmount, finchAmount);
     }
@@ -208,10 +201,7 @@ contract DarwinPresale is IDarwinPresale, ReentrancyGuard, Ownable {
     /// @notice Set the marketing and team wallets
     /// @param _marketingWallet The new marketing wallet address
     /// @param _teamWallet The new team wallet address
-    function setWallets(
-        address _marketingWallet,
-        address _teamWallet
-    ) external onlyOwner {
+    function setWallets(address _marketingWallet, address _teamWallet) external onlyOwner {
         if (_marketingWallet == address(0) || _teamWallet == address(0)) {
             revert ZeroAddress();
         }
@@ -230,7 +220,7 @@ contract DarwinPresale is IDarwinPresale, ReentrancyGuard, Ownable {
         }
 
         uint256 balance = address(this).balance;
-        
+
         uint256 team = (status.raisedAmount * TEAM_PERCENTAGE) / 100;
         uint256 marketing = (status.raisedAmount * MARKETING_ADDITIONAL_PERCENTAGE) / 100;
 
@@ -245,19 +235,19 @@ contract DarwinPresale is IDarwinPresale, ReentrancyGuard, Ownable {
         lp -= finchLp;
 
         // set the price of darwin in the lp to be the price of the next satge of funding
-        uint nextStage = _getCurrentStage() + 1;
-        uint darwinDepositRate;
-        if(nextStage == 9) {
+        uint256 nextStage = _getCurrentStage() + 1;
+        uint256 darwinDepositRate;
+        if (nextStage == 9) {
             darwinDepositRate = 15_873;
         } else {
-            (darwinDepositRate, ,) = _getStageDetails(nextStage);
+            (darwinDepositRate, , ) = _getStageDetails(nextStage);
         }
 
-        uint darwinToDeposit = lp * darwinDepositRate;
+        uint256 darwinToDeposit = lp * darwinDepositRate;
 
         _addLiquidity(address(darwin), darwinToDeposit, lp);
         _addLiquidity(address(finch), FINCH_LP_AMOUNT, finchLp);
-        
+
         _transferBNB(teamWallet, team);
         _transferBNB(marketingWallet, marketing);
 
@@ -278,9 +268,7 @@ contract DarwinPresale is IDarwinPresale, ReentrancyGuard, Ownable {
         stage = _getCurrentStage();
     }
 
-    function tokensDepositedAndOwned(
-        address account
-    ) external view returns (uint256, uint256) {
+    function tokensDepositedAndOwned(address account) external view returns (uint256, uint256) {
         uint256 deposited = userDeposits[account];
         uint256 owned = darwin.balanceOf(account);
         return (deposited, owned);
@@ -288,11 +276,7 @@ contract DarwinPresale is IDarwinPresale, ReentrancyGuard, Ownable {
 
     /// @notice Returns the number of tokens left to raise on the current stage
     /// @return tokensLeft The number of tokens left to raise on the current stage
-    function baseTokensLeftToRaiseOnCurrentStage()
-        public
-        view
-        returns (uint256 tokensLeft)
-    {
+    function baseTokensLeftToRaiseOnCurrentStage() public view returns (uint256 tokensLeft) {
         (, , uint256 stageCap) = _getStageDetails(_getCurrentStage());
         tokensLeft = stageCap - status.raisedAmount;
     }
@@ -316,9 +300,7 @@ contract DarwinPresale is IDarwinPresale, ReentrancyGuard, Ownable {
     /// @notice Calculates the number of tokens that can be bought with `bnbAmount` BNB
     /// @param bnbAmount The number of BNB to be deposited
     /// @return The number of Darwin to be purchased with `bnbAmount` BNB
-    function calculateDarwinAmount(
-        uint256 bnbAmount
-    ) public view returns (uint256) {
+    function calculateDarwinAmount(uint256 bnbAmount) public view returns (uint256) {
         if (bnbAmount > HARDCAP - status.raisedAmount) {
             revert AmountExceedsHardcap();
         }
@@ -331,10 +313,10 @@ contract DarwinPresale is IDarwinPresale, ReentrancyGuard, Ownable {
             uint256 rate;
             uint256 stageAmount;
             uint256 stageCap;
-            uint amountRaised = status.raisedAmount;
+            uint256 amountRaised = status.raisedAmount;
             while (bnbAmount > 0) {
                 (rate, stageAmount, stageCap) = _getStageDetails(stage);
-                uint amountLeftInStage = stageCap - amountRaised;
+                uint256 amountLeftInStage = stageCap - amountRaised;
                 if (bnbAmount <= amountLeftInStage) {
                     darwinAmount += (bnbAmount * rate);
                     bnbAmount = 0;
@@ -344,7 +326,7 @@ contract DarwinPresale is IDarwinPresale, ReentrancyGuard, Ownable {
                 amountRaised += amountLeftInStage;
                 darwinAmount += (amountLeftInStage * rate);
                 bnbAmount -= amountLeftInStage;
-                
+
                 ++stage;
             }
 
@@ -355,15 +337,13 @@ contract DarwinPresale is IDarwinPresale, ReentrancyGuard, Ownable {
     /// @notice Calculates the number of Finch that can be bought with `bnbAmount` BNB
     /// @param bnbAmount The number of BNB to be deposited
     /// @return The number of Finch to be purchased with `bnbAmount` BNB
-    function calculateFinchAmount(
-        uint256 bnbAmount
-    ) public pure returns (uint256) {
+    function calculateFinchAmount(uint256 bnbAmount) public pure returns (uint256) {
         return (bnbAmount * FINCH_PER_BNB);
     }
 
     function _transferBNB(address to, uint256 amount) internal {
         // solhint-disable-next-line avoid-low-level-calls
-        (bool success, ) = to.call{value: amount}("");
+        (bool success, ) = to.call{ value: amount }("");
         if (!success) {
             revert TransferFailed();
         }
@@ -400,7 +380,7 @@ contract DarwinPresale is IDarwinPresale, ReentrancyGuard, Ownable {
         }
 
         // add the liquidity
-        router.addLiquidityETH{value: bnbAmount}(
+        router.addLiquidityETH{ value: bnbAmount }(
             tokenAddress, // token
             tokenAmount, // amountTokenDesired
             0, // amountTokenMin (slippage is unavoidable)
@@ -415,7 +395,7 @@ contract DarwinPresale is IDarwinPresale, ReentrancyGuard, Ownable {
     }
 
     function _getCurrentStage() private view returns (uint256) {
-        uint raisedAmount = status.raisedAmount;
+        uint256 raisedAmount = status.raisedAmount;
         if (raisedAmount > 117_164 ether) {
             return 8;
         } else if (raisedAmount > 96_690 ether) {
@@ -437,9 +417,15 @@ contract DarwinPresale is IDarwinPresale, ReentrancyGuard, Ownable {
         }
     }
 
-    function _getStageDetails(
-        uint256 stage
-    ) private pure returns (uint256, uint256, uint256) {
+    function _getStageDetails(uint256 stage)
+        private
+        pure
+        returns (
+            uint256,
+            uint256,
+            uint256
+        )
+    {
         assert(stage <= 8);
         if (stage == 0) {
             return (50_000, 5_000 ether, 5_000 ether);

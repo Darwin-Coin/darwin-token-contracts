@@ -1,6 +1,5 @@
-pragma solidity 0.8.14;
-
 // SPDX-License-Identifier: MIT
+pragma solidity 0.8.14;
 
 import "./interface/IDarwin.sol";
 import "./interface/IDarwinCommunity.sol";
