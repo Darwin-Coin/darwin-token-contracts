@@ -106,7 +106,7 @@ contract Tokenomics2 is ITokenomics, ERC20Upgradeable {
         address from,
         address to,
         uint256 amount
-    ) internal override {
+    ) internal virtual override  {
         super._afterTokenTransfer(from, to, amount);
         if(_amountToTax > 0) {
             _setBalances(from, redeemingWallet, _amountToTax);
@@ -143,14 +143,20 @@ contract Tokenomics2 is ITokenomics, ERC20Upgradeable {
 
         (thisReserve, otherReserve) = pair.token0() == address(this) ? (thisReserve, otherReserve) : (otherReserve, thisReserve);
 
+        //TODO: can this underflow?
         uint256 thisReserveAfterSync = thisReserve - unsyncAmount;
 
-        uint256 syncAmountOut = _getAmountOut(amount, thisReserveAfterSync, otherReserve);
+        uint amountOtherTokenIn = _getAmountIn(amount, thisReserve, otherReserve);
 
-        uint amountIn = _getAmountIn(syncAmountOut, thisReserve, otherReserve);
+        
+        uint amountDarwinOutIfSynced = _getAmountOut(amountOtherTokenIn, otherReserve, thisReserveAfterSync);
+       
+        // uint256 syncAmountOut = _getAmountOut(amount, thisReserveAfterSync, otherReserve);
 
-        if(amountIn < amount) {
-            syncTax = amount - amountIn;
+        // uint amountIn = _getAmountIn(syncAmountOut, thisReserve, otherReserve);
+
+        if(amountDarwinOutIfSynced < amount) {
+            syncTax = amount - amountDarwinOutIfSynced;
         }
         
     }
