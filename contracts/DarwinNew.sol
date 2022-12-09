@@ -8,6 +8,7 @@ import "@openzeppelin/contracts-upgradeable/access/AccessControlUpgradeable.sol"
 import "./interface/IDarwinNew.sol";
 import "./interface/IDarwinCommunity.sol";
 import "@uniswap/v2-core/contracts/interfaces/IUniswapV2Factory.sol";
+import "@uniswap/v2-periphery/contracts/interfaces/IUniswapV2Router02.sol";
 import "./Tokenomics2.sol";
 
 contract DarwinNew is IDarwinNew, Tokenomics2, OwnableUpgradeable, AccessControlUpgradeable, UUPSUpgradeable {
@@ -17,19 +18,20 @@ contract DarwinNew is IDarwinNew, Tokenomics2, OwnableUpgradeable, AccessControl
     bytes32 public constant UPGRADER_ROLE = keccak256("UPGRADER_ROLE");
 
     // constants
-    uint256 private constant _MULTIPLIER = 2**152;
+    uint256 private constant _MULTIPLIER = 2**160;
     uint256 private constant _PERCENTAGE_MULTIPLIER = 100;
     uint256 private constant _PERCENTAGE_100 = 100 * _PERCENTAGE_MULTIPLIER;
 
     uint256 public constant DEV_WALLET_PECENTAGE = 10;
-    uint256 public constant MAX_SUPPLY = 10**10;
+    uint256 public constant MAX_SUPPLY = 10e10 ether;
     uint256 public constant MAX_TOKEN_HOLDING_SIZE = (MAX_SUPPLY * 2) / 100; // 2% of the supply
     uint256 public constant MAX_TOKEN_SELL_SIZE = MAX_SUPPLY / 1000; // .1% of the supply;
     uint256 public constant MAX_TOKEN_SALE_LIMIT_DURATION = 5 hours;
 
     // limit exclusions
-    mapping(address => bool) private _isExcludedFromSellLimit;
-    mapping(address => bool) private _isExcludedFromHoldingLimit;
+    //TODO: consider changing to private, but test expect this to be accessable
+    mapping(address => bool) public isExcludedFromSellLimit;
+    mapping(address => bool) public isExcludedFromHoldingLimit;
 
     // Logs
     /// @notice track sold tokens over maxTokenSaleLimitDuration
@@ -44,8 +46,6 @@ contract DarwinNew is IDarwinNew, Tokenomics2, OwnableUpgradeable, AccessControl
 
     address public rewardsWallet;
     IDarwinCommunity darwinCommunity;
-    IUniswapV2Router02 public uniswapV2Router;
-    IUniswapV2Pair public uniswapV2Pair;
 
     //TODO: should consider moving outside or inheriting from pausable
     // pausing
@@ -91,6 +91,22 @@ contract DarwinNew is IDarwinNew, Tokenomics2, OwnableUpgradeable, AccessControl
         address _darwinCommunity
     ) private onlyInitializing { 
 
+        // exclude wallets from sell limit
+        isExcludedFromSellLimit[_msgSender()] = true;
+        isExcludedFromSellLimit[_devWallet] = true;
+        isExcludedFromSellLimit[_darwinCommunity] = true;
+
+        // exclude wallets from holding limit
+        isExcludedFromHoldingLimit[_msgSender()] = true;
+        isExcludedFromHoldingLimit[_devWallet] = true;
+        isExcludedFromHoldingLimit[_darwinCommunity] = true;
+
+        _setExcludedFromRewards(_msgSender());
+
+        _setExcludedFromRewards(_darwinCommunity);
+
+        _setExcludedFromRewards(_devWallet);
+
         uint devMint = (MAX_SUPPLY * DEV_WALLET_PECENTAGE / 100);
 
         _mint(_devWallet, devMint);
@@ -99,28 +115,18 @@ contract DarwinNew is IDarwinNew, Tokenomics2, OwnableUpgradeable, AccessControl
 
         _mint(msg.sender, deployerMint);
 
-        uniswapV2Router = IUniswapV2Router02(uniswapV2RouterAddress);
+        IUniswapV2Router02 uniswapV2Router = IUniswapV2Router02(uniswapV2RouterAddress);
 
         //TODO: should we really be setting the rewards wallet to be this?
         rewardsWallet = address(uint160(uint256(keccak256(abi.encodePacked(block.timestamp, block.number)))));
 
         // Create a uniswap pair for this new token
-        uniswapV2Pair = IUniswapV2Pair(
+        IUniswapV2Pair uniswapV2Pair = IUniswapV2Pair(
             IUniswapV2Factory(uniswapV2Router.factory()).createPair(address(this), uniswapV2Router.WETH())
         );
 
         // add exchange wallets
         _registerPair(uniswapV2RouterAddress, address(uniswapV2Pair));
-
-        // exclude wallets from sell limit
-        _isExcludedFromSellLimit[_msgSender()] = true;
-        _isExcludedFromSellLimit[_devWallet] = true;
-        _isExcludedFromSellLimit[_darwinCommunity] = true;
-
-        // exclude wallets from holding limit
-        _isExcludedFromHoldingLimit[_msgSender()] = true;
-        _isExcludedFromHoldingLimit[_devWallet] = true;
-        _isExcludedFromHoldingLimit[_darwinCommunity] = true;
 
         darwinCommunity = IDarwinCommunity(_darwinCommunity);
 
@@ -185,6 +191,12 @@ contract DarwinNew is IDarwinNew, Tokenomics2, OwnableUpgradeable, AccessControl
 
     function _setExcludedFromRewards(address account) internal {
         if(_isExcludedFromRewards[account]) revert AccountAlreadyExcluded();
+
+        uint _culmulativeRewardPerToken = culmulativeRewardPerToken;
+        uint last = _lastCulmulativeRewards[account];
+        if(last < _culmulativeRewardPerToken) {
+            _distributeRewardToUser(_culmulativeRewardPerToken, last, ERC20Upgradeable.balanceOf(account), account);
+        }
         _isExcludedFromRewards[account] = true;
         excludedFromRewards.push(account);
     }
@@ -205,15 +217,15 @@ contract DarwinNew is IDarwinNew, Tokenomics2, OwnableUpgradeable, AccessControl
 
     function _registerPair(address routerAddress, address pairAddress) internal override {
         super._registerPair(routerAddress, pairAddress);
-        _isExcludedFromSellLimit[pairAddress] = true;
-        _isExcludedFromHoldingLimit[pairAddress] = true;
+        isExcludedFromSellLimit[pairAddress] = true;
+        isExcludedFromHoldingLimit[pairAddress] = true;
         _setExcludedFromRewards(pairAddress);
     }
 
     function _unRegisterPair(address routerAddress, address pairAddress) internal override {
         super._unRegisterPair(routerAddress, pairAddress);
-        delete _isExcludedFromSellLimit[pairAddress];
-        delete _isExcludedFromHoldingLimit[pairAddress];
+        delete isExcludedFromSellLimit[pairAddress];
+        delete isExcludedFromHoldingLimit[pairAddress];
         _removeExcludedFromRewards(pairAddress);
     }
 
@@ -227,7 +239,7 @@ contract DarwinNew is IDarwinNew, Tokenomics2, OwnableUpgradeable, AccessControl
     }
 
     function _enforceHoldingLimit(address account) private view {
-        if(_isExcludedFromHoldingLimit[account]) return;
+        if(isExcludedFromHoldingLimit[account]) return;
         if (ERC20Upgradeable.balanceOf(account) > MAX_TOKEN_HOLDING_SIZE) {
             revert HoldingLimitExceeded();
         }
@@ -235,7 +247,7 @@ contract DarwinNew is IDarwinNew, Tokenomics2, OwnableUpgradeable, AccessControl
 
     /// @notice inforce token sale limit over sale limit duration
     function _enforceSellLimit(address account, uint256 amount) private {
-        if(_isExcludedFromSellLimit[account]) return;
+        if(isExcludedFromSellLimit[account] || account == address(0)) return;
         TokenSellLog storage log = _tokenSellLog[account];
         uint216 newAmount = uint216(amount);
         uint40 currentTime = uint40(block.timestamp);
@@ -286,6 +298,12 @@ contract DarwinNew is IDarwinNew, Tokenomics2, OwnableUpgradeable, AccessControl
     }
 
     ////////////////////// COMMUNITY FUNCTIONS /////////////////////////////////////
+
+    function excludeFromRewards(address account) external onlyDarwinCommunity {
+
+        _setExcludedFromRewards(account);
+
+    }
 
     function registerPair(address routerAddress, address pairAddress) public onlyDarwinCommunity {
         _registerPair(routerAddress, pairAddress);

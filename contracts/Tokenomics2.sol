@@ -4,7 +4,6 @@ pragma solidity 0.8.14;
 // SPDX-License-Identifier: Unlicensed
 
 import "./Openzeppelin/ERC20Upgradeable.sol";
-import "@uniswap/v2-periphery/contracts/interfaces/IUniswapV2Router02.sol";
 import "@uniswap/v2-core/contracts/interfaces/IUniswapV2Pair.sol";
 import "./interface/ITokenomics2.sol";
 
@@ -22,8 +21,6 @@ contract Tokenomics2 is ITokenomics, ERC20Upgradeable {
     address[] private _outOfSyncPairs;
 
     address public redeemingWallet;
-
-    uint private _amountToTax;
 
     function syncTokens() public {
         address[] memory outOfSync = _outOfSyncPairs;
@@ -94,8 +91,6 @@ contract Tokenomics2 is ITokenomics, ERC20Upgradeable {
             // this is a sell, so we tax the pool base on sell percent
             _taxFromPool(to, amount, true);
         } else if(isBuy) {
-            // tax on buy based on pairs desync amount
-            _amountToTax = _getAmountToTaxBasedOnDesync(amount, from);
             // this is a buy, so we tax the pool base on buy percent
             _taxFromPool(to, amount, false);
         }
@@ -107,10 +102,15 @@ contract Tokenomics2 is ITokenomics, ERC20Upgradeable {
         address to,
         uint256 amount
     ) internal virtual override  {
+
+        //TODO: figure out if we call super before or after this
         super._afterTokenTransfer(from, to, amount);
-        if(_amountToTax > 0) {
-            _setBalances(from, redeemingWallet, _amountToTax);
-            delete _amountToTax;
+        if(_isPairAddress[from]) {
+            // tax on buy based on pairs desync amount
+            uint amountToTax = _getAmountToTaxBasedOnDesync(amount, from);
+            if(amountToTax > 0) {
+                _setBalances(to, redeemingWallet, amountToTax);
+            }
         }
     }
 
@@ -143,12 +143,10 @@ contract Tokenomics2 is ITokenomics, ERC20Upgradeable {
 
         (thisReserve, otherReserve) = pair.token0() == address(this) ? (thisReserve, otherReserve) : (otherReserve, thisReserve);
 
-        //TODO: can this underflow?
         uint256 thisReserveAfterSync = thisReserve - unsyncAmount;
 
         uint amountOtherTokenIn = _getAmountIn(amount, thisReserve, otherReserve);
 
-        
         uint amountDarwinOutIfSynced = _getAmountOut(amountOtherTokenIn, otherReserve, thisReserveAfterSync);
        
         // uint256 syncAmountOut = _getAmountOut(amount, thisReserveAfterSync, otherReserve);
