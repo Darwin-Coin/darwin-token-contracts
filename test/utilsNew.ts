@@ -1,6 +1,7 @@
 import { getManifestAdmin } from "@openzeppelin/hardhat-upgrades/dist/admin";
 import { BigNumber, BigNumberish, BytesLike } from "ethers";
 import { SignerWithAddress } from "@nomiclabs/hardhat-ethers/signers";
+import { expect } from "chai";
 
 
 import hardhat, { ethers, upgrades } from "hardhat";
@@ -77,7 +78,20 @@ export const etherToWei = (ether: number) => {
 
     return ethers.utils.parseEther(ether.toString());
 
-} 
+}
+
+// Compare two BigNumbers that are close to one another.
+//
+// This is useful for when you want to compare the balance of an address after
+// it executes a transaction, and you don't want to worry about accounting for
+// balances changes due to paying for gas a.k.a. transaction fees.
+export const closeTo = async (
+    a: BigNumberish,
+    b: BigNumberish,
+    margin: BigNumberish
+  ) => {
+    expect(a).to.be.closeTo(b, margin);
+  };
 
 export interface NewProposalParams {
     targets: string[],

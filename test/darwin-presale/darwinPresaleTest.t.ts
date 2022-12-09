@@ -11,9 +11,12 @@ import { DarwinEcosystem,
         Finch,
         IUniswapV2Router02__factory,
         IUniswapV2Factory,
-        IUniswapV2Factory__factory
+        IUniswapV2Factory__factory,
+        TestErc20Token
     } from "../../typechain/";
-import { deployContracts, deployContractsDarwin } from "./utils";
+import { deployContracts, 
+    //deployContractsDarwin 
+} from "./utils";
 import { SignerWithAddress } from '@nomiclabs/hardhat-ethers/signers';
 import { daysToSeconds, getUniswapRouterAddress, lastBlockTime } from "../../scripts/utils"
 
@@ -28,8 +31,8 @@ describe.only("Darwin : Presale", function () {
 
     let darwinPresale: DarwinPresale
     let darwinEcosystem: DarwinEcosystem
-    let token: Darwin
-    let finch: Finch
+    let token: TestErc20Token
+    let finch: TestErc20Token
     let darwinCommunity:DarwinCommunity
 
     let uniswapRouterAddress:string
@@ -63,7 +66,11 @@ describe.only("Darwin : Presale", function () {
             );
             weth = await router.WETH();
 
-            const deployedContract = await deployContractsDarwin(uniswapRouterAddress, owner.address);
+            const startTime = (await lastBlockTime()) + 20;
+
+            const endTime = daysToSeconds(20).add(startTime).toNumber();
+
+            const deployedContract = await deployContracts(startTime, endTime);
             darwinPresale = deployedContract.darwinPresale;
             darwinEcosystem = deployedContract.darwinEcosystem
             token = deployedContract.darwin;
@@ -78,55 +85,55 @@ describe.only("Darwin : Presale", function () {
         
         })
 
-        it("should initialize the drop", async() => {
-            await initDarwinPresale(darwinPresale, token.address, finch.address, owner);
+        // it("should initialize the drop", async() => {
+        //     await initDarwinPresale(darwinPresale, token.address, finch.address, owner);
 
-        })
+        // })
 
-        it("cant be initialized twice", async() => {
+        // it("cant be initialized twice", async() => {
 
-            await initDarwinPresale(darwinPresale, token.address, finch.address, owner);
+        //     await initDarwinPresale(darwinPresale, token.address, finch.address, owner);
 
-            await expect(initDarwinPresale(darwinPresale, token.address, finch.address, owner)).to.be.revertedWith("AlreadyInitialized");
+        //     await expect(initDarwinPresale(darwinPresale, token.address, finch.address, owner)).to.be.revertedWith("AlreadyInitialized");
 
-        })
+        // })
 
-        it("cant initialize with zero address", async() => {
+        // it("cant initialize with zero address", async() => {
 
-            await expect(initDarwinPresale(darwinPresale, ethers.constants.AddressZero, finch.address, owner)).to.be.revertedWith("ZeroAddress");
-            await expect(initDarwinPresale(darwinPresale, token.address, ethers.constants.AddressZero, owner)).to.be.revertedWith("ZeroAddress");
+        //     await expect(initDarwinPresale(darwinPresale, ethers.constants.AddressZero, finch.address, owner)).to.be.revertedWith("ZeroAddress");
+        //     await expect(initDarwinPresale(darwinPresale, token.address, ethers.constants.AddressZero, owner)).to.be.revertedWith("ZeroAddress");
 
-        })
+        // })
 
-        it("start time has to be initialized in the future", async() => {
+        // it("start time has to be initialized in the future", async() => {
 
-            await expect(darwinPresale.connect(owner).init(token.address, finch.address, await lastBlockTime(), daysToSeconds(20).add(await lastBlockTime()))
-                ).to.be.revertedWith("InvalidStartDate");
+        //     await expect(darwinPresale.connect(owner).init(token.address, finch.address, await lastBlockTime(), daysToSeconds(20).add(await lastBlockTime()))
+        //         ).to.be.revertedWith("InvalidStartDate");
 
-        })
+        // })
 
-        it("end time has to be after start", async() => {
+        // it("end time has to be after start", async() => {
 
-            let startTime:BigNumber = await daysToSeconds(1).add(await lastBlockTime())
+        //     let startTime:BigNumber = await daysToSeconds(1).add(await lastBlockTime())
 
-            await expect(darwinPresale.connect(owner).init(token.address, finch.address, startTime, startTime.sub(1))
-                ).to.be.revertedWith("InvalidEndDate");
+        //     await expect(darwinPresale.connect(owner).init(token.address, finch.address, startTime, startTime.sub(1))
+        //         ).to.be.revertedWith("InvalidEndDate");
 
-        })
+        // })
 
     });
 
 
-    async function initDarwinPresale(darwinPresale:DarwinPresale, darwin:string, finch: string, signer:SignerWithAddress) {
+    // async function initDarwinPresale(darwinPresale:DarwinPresale, darwin:string, finch: string, signer:SignerWithAddress) {
 
-        await darwinPresale.connect(signer).init(
-            darwin,
-            finch,
-            await daysToSeconds(1).add(await lastBlockTime()),
-            daysToSeconds(20).add(await lastBlockTime())
-        )
+    //     await darwinPresale.connect(signer).init(
+    //         darwin,
+    //         finch,
+    //         await daysToSeconds(1).add(await lastBlockTime()),
+    //         daysToSeconds(20).add(await lastBlockTime())
+    //     )
     
-    }
+    // }
     
 
 });

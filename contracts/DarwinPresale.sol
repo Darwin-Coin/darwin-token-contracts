@@ -16,6 +16,8 @@ import {IPausable} from "./interface/IPausable.sol";
 // TODO check if entire interface files need to be imported
 import "./interface/IDarwinEcosystem.sol";
 
+import "hardhat/console.sol";
+
 /// @title Darwin Presale
 contract DarwinPresale is IDarwinPresale, ReentrancyGuard, Ownable {
     /// @notice Min BNB deposit per user
@@ -38,9 +40,9 @@ contract DarwinPresale is IDarwinPresale, ReentrancyGuard, Ownable {
     uint256 public constant FINCH_PER_BNB = 1_000;
 
     /// @notice The Darwin token
-    IERC20 public darwin;
+    IERC20 public immutable darwin;
     /// @notice The Finch token
-    IERC20 public finch;
+    IERC20 public immutable finch;
     /// @notice Timestamp of the presale start (2021-10-01 00:00:00 UTC)
     uint256 public presaleStart; // 2021-10-01 00:00:00 UTC
 
@@ -70,28 +72,9 @@ contract DarwinPresale is IDarwinPresale, ReentrancyGuard, Ownable {
 
     IDarwinEcosystem private darwinEcosystem;
     IUniswapV2Router02 private router;
-    bool private _isInitialized;
 
-    modifier isInitialized() {
-        if (!_isInitialized) {
-            revert NotInitialized();
-        }
-        _;
-    }
+    constructor(address _darwin, address _finch, uint256 _presaleStart, uint256 _presaleEnd) {
 
-    /// @dev Initializes the darwin address and presale start date
-    /// @param _darwin The darwin token address
-    /// @param _finch The finch token address
-    /// @param _presaleStart The presale start date
-    /// @param _presaleEnd The presale end date
-    function init(
-        address _darwin,
-        address _finch,
-        uint256 _presaleStart,
-        uint256 _presaleEnd
-    ) external onlyOwner {
-        if (_isInitialized) revert AlreadyInitialized();
-        _isInitialized = true;
         if (_darwin == address(0) || _finch == address(0)) revert ZeroAddress();
         // solhint-disable-next-line not-rely-on-time
         if (_presaleStart < block.timestamp) revert InvalidStartDate();
@@ -100,6 +83,7 @@ contract DarwinPresale is IDarwinPresale, ReentrancyGuard, Ownable {
         finch = IERC20(_finch);
         presaleStart = _presaleStart;
         presaleEnd = _presaleEnd;
+
     }
 
     /// @notice Initialize the presale parameters
@@ -141,12 +125,14 @@ contract DarwinPresale is IDarwinPresale, ReentrancyGuard, Ownable {
         if (darwinPairAddress == address(0) || finchPairAddress == address(0)) {
             revert PairNotFound();
         }
+
+        
     }
 
     /// @notice Deposits BNB into the presale
     /// @dev Emits a UserDeposit event
     /// @dev Emits a RewardsDispersed event
-    function userDeposit() external payable nonReentrant isInitialized {
+    function userDeposit() external payable nonReentrant {
 
         if (presaleStatus() != Status.ACTIVE) {
             revert PresaleNotActive();
@@ -182,7 +168,7 @@ contract DarwinPresale is IDarwinPresale, ReentrancyGuard, Ownable {
             revert TransferFailed();
         }
 
-        darwinEcosystem.setAddressPresaleTier(msg.sender, _getTier(base));
+        darwinEcosystem.setAddressPresaleTier(msg.sender, _getTier(base + msg.value));
 
         emit UserDeposit(msg.sender, msg.value, darwinAmount, finchAmount);
     }
@@ -256,20 +242,20 @@ contract DarwinPresale is IDarwinPresale, ReentrancyGuard, Ownable {
         uint darwinToDeposit = lp * darwinDepositRate;
 
         _addLiquidity(address(darwin), darwinToDeposit, lp);
-        _addLiquidity(address(finch), FINCH_LP_AMOUNT, finchLp);
+        // _addLiquidity(address(finch), FINCH_LP_AMOUNT, finchLp);
         
-        _transferBNB(teamWallet, team);
-        _transferBNB(marketingWallet, marketing);
+        // _transferBNB(teamWallet, team);
+        // _transferBNB(marketingWallet, marketing);
 
-        if (!darwin.transfer(owner(), darwin.balanceOf(address(this)))) {
-            revert TransferFailed();
-        }
+        // if (!darwin.transfer(owner(), darwin.balanceOf(address(this)))) {
+        //     revert TransferFailed();
+        // }
 
-        if (!finch.transfer(owner(), darwin.balanceOf(address(this)))) {
-            revert TransferFailed();
-        }
+        // if (!finch.transfer(owner(), darwin.balanceOf(address(this)))) {
+        //     revert TransferFailed();
+        // }
 
-        emit LpProvided(lp, darwinToDeposit);
+        // emit LpProvided(lp, darwinToDeposit);
     }
 
     /// @notice Returns the current stage of the presale
@@ -399,6 +385,11 @@ contract DarwinPresale is IDarwinPresale, ReentrancyGuard, Ownable {
             revert ApproveFailed();
         }
 
+        console.log("_add liquidity called");
+        console.log("router address ", address(router));
+        console.log("factory address", router.factory());
+        console.log("pair address", IUniswapV2Factory(router.factory()).getPair(address(darwin), router.WETH()));
+
         // add the liquidity
         router.addLiquidityETH{value: bnbAmount}(
             tokenAddress, // token
@@ -416,21 +407,21 @@ contract DarwinPresale is IDarwinPresale, ReentrancyGuard, Ownable {
 
     function _getCurrentStage() private view returns (uint256) {
         uint raisedAmount = status.raisedAmount;
-        if (raisedAmount > 117_164 ether) {
+        if (raisedAmount >= 117_164 ether) {
             return 8;
-        } else if (raisedAmount > 96_690 ether) {
+        } else if (raisedAmount >= 96_690 ether) {
             return 7;
-        } else if (raisedAmount > 78_135 ether) {
+        } else if (raisedAmount >= 78_135 ether) {
             return 6;
-        } else if (raisedAmount > 61_170 ether) {
+        } else if (raisedAmount >= 61_170 ether) {
             return 5;
-        } else if (raisedAmount > 45_545 ether) {
+        } else if (raisedAmount >= 45_545 ether) {
             return 4;
-        } else if (raisedAmount > 31_063 ether) {
+        } else if (raisedAmount >= 31_063 ether) {
             return 3;
-        } else if (raisedAmount > 17_569 ether) {
+        } else if (raisedAmount >= 17_569 ether) {
             return 2;
-        } else if (raisedAmount > 5_000 ether) {
+        } else if (raisedAmount >= 5_000 ether) {
             return 1;
         } else {
             return 0;
@@ -452,13 +443,13 @@ contract DarwinPresale is IDarwinPresale, ReentrancyGuard, Ownable {
         } else if (stage == 4) {
             return (38_000, 15_625 ether, 61_170 ether);
         } else if (stage == 5) {
-            return (35_000, 16_925 ether, 78_135 ether);
+            return (35_000, 16_965 ether, 78_135 ether);
         } else if (stage == 6) {
             return (32_000, 18_555 ether, 96_690 ether);
         } else if (stage == 7) {
             return (29_000, 20_474 ether, 117_164 ether);
         } else {
-            return (26_131, 22_745 ether, 140_000 ether);
+            return (26_131, 22_836 ether, 140_000 ether);
         }
     }
 

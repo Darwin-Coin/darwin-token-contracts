@@ -145,7 +145,8 @@ const config: HardhatUserConfig = {
             accounts: {
                 mnemonic: String(process.env.TEST_MNEMONICS),
                 count: 100,
-                initialIndex: 0
+                initialIndex: 0,
+                accountsBalance: "1000000000000000000000000000000000", // 100000ETH
             }
         }
     },

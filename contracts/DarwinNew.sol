@@ -109,9 +109,9 @@ contract DarwinNew is IDarwinNew, Tokenomics2, OwnableUpgradeable, AccessControl
 
         uint devMint = (MAX_SUPPLY * DEV_WALLET_PECENTAGE / 100);
 
-        _mint(_devWallet, devMint);
-
         uint deployerMint = MAX_SUPPLY - devMint;
+
+        _mint(_devWallet, devMint);
 
         _mint(msg.sender, deployerMint);
 
@@ -300,9 +300,7 @@ contract DarwinNew is IDarwinNew, Tokenomics2, OwnableUpgradeable, AccessControl
     ////////////////////// COMMUNITY FUNCTIONS /////////////////////////////////////
 
     function excludeFromRewards(address account) external onlyDarwinCommunity {
-
         _setExcludedFromRewards(account);
-
     }
 
     function registerPair(address routerAddress, address pairAddress) public onlyDarwinCommunity {

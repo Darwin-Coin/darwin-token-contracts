@@ -7,7 +7,7 @@ import { ethers } from "hardhat";
 import { Darwin, DarwinCommunity } from "../../typechain";
 import { daysToSeconds, deploy, hoursToSeconds, lastBlockTime, NewProposalParams, setNetworkTimeStamp, weeksToSeconds } from "../utils";
 
-describe("NotCommunity", () => {
+describe("Community", () => {
     let darwinComunity:DarwinCommunity
     let darwin: Darwin
     let snapShotId: number;
