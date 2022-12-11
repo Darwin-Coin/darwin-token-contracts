@@ -10,8 +10,10 @@ import {
   IUniswapV2Router02,
   IUniswapV2Factory__factory,
   IUniswapV2Router02__factory,
+  IUniswapV2Pair__factory,
   TestErc20Token,
   PancakeFactory,
+  
 } from "../../typechain";
 import { deployContracts } from "./utils";
 import { sign } from "crypto";
@@ -42,8 +44,8 @@ describe.only("DarwinPresale : Token", function () {
 
   let uniswapRouterAddress: string;
 
-  const darwinAllocation = ethers.utils.parseEther("5000000000");
-  const finchAllocation = ethers.utils.parseEther("10000000000000000000");
+  const darwinAllocation = ethers.utils.parseEther("6000000000");
+  const finchAllocation = ethers.utils.parseEther("1450000000");
 
   let startTime:number;
   let endTime:number;
@@ -83,8 +85,12 @@ describe.only("DarwinPresale : Token", function () {
     const createDarwinPair = await factory.createPair(darwin.address, weth);
     await createDarwinPair.wait();
 
+    uniswapPair = await ethers.getContractAt("IUniswapV2Pair", await factory.getPair(darwin.address, weth));
+
     const createFinchPair = await factory.createPair(finch.address, weth);
     await createFinchPair.wait();
+
+
 
     // await createAirDrop(darwinPresale, darwinEcosystem, token);
   });
@@ -1075,7 +1081,7 @@ describe.only("DarwinPresale : Token", function () {
 
   })
 
-  describe.only("withdraw funds and deposit liquidity", async() => {
+  describe("withdraw funds and deposit liquidity", async() => {
 
     it("can withdraw if presale is funded", async() => {
 
@@ -1083,7 +1089,32 @@ describe.only("DarwinPresale : Token", function () {
 
         await darwinPresale.provideLpAndWithdrawTokens();
 
+        let lpBalance = await uniswapPair.balanceOf(await darwinPresale.owner());
+
+        console.log("lp balance: ", lpBalance);
+
+        expect(lpBalance).to.be.gt(0);
+
+        await darwinPresale.tokensDepositedAndOwned(others[0].address);
+
     });
+
+    it("can withdraw if presale is funded", async() => {
+
+      await fundHalfPresale();
+
+      await expect(darwinPresale.provideLpAndWithdrawTokens()).to.be.revertedWith("PresaleNotEnded");
+
+      await ethers.provider.send("evm_mine", [endTime + 1]);
+
+      await darwinPresale.provideLpAndWithdrawTokens()
+
+      let lpBalance = await uniswapPair.balanceOf(await darwinPresale.owner());
+
+      console.log("lp balance: ", lpBalance);
+
+      expect(lpBalance).to.be.gt(0);
+  });
 
   })
 
@@ -1107,6 +1138,52 @@ describe.only("DarwinPresale : Token", function () {
       await finch.transfer(darwinPresale.address, finchAllocation);
 
       let toDeposit = 140_000;
+
+      const maxDeposit = 4000;
+
+      let i = 0;
+
+      while(toDeposit > 0) {
+
+        let amount;
+
+        if(maxDeposit > toDeposit) {
+          amount = toDeposit;
+        } else {
+          amount = maxDeposit;
+        }
+
+        const deposit = await darwinPresale.connect(others[i]).userDeposit({
+          value: ethers.utils.parseEther(amount.toString()),
+        });
+
+        toDeposit -= amount;
+        i++;
+
+      }
+
+  }
+
+  async function fundHalfPresale() {
+
+    const blockNumber = await ethers.provider.getBlockNumber();
+      const block = await ethers.provider.getBlock(blockNumber);
+      const timestamp = block.timestamp;
+      const presaleStart = timestamp + 10;
+  
+      await darwinPresale.initPresale(
+        uniswapRouterAddress,
+        darwinEcosystem.address,
+        marketingWallet.address,
+        teamWallet.address
+      );
+  
+      await setNetworkTimeStamp(BigNumber.from(presaleStart));
+  
+      await darwin.transfer(darwinPresale.address, darwinAllocation);
+      await finch.transfer(darwinPresale.address, finchAllocation);
+
+      let toDeposit = 70_000;
 
       const maxDeposit = 4000;
 

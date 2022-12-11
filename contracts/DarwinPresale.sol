@@ -16,8 +16,6 @@ import {IPausable} from "./interface/IPausable.sol";
 // TODO check if entire interface files need to be imported
 import "./interface/IDarwinEcosystem.sol";
 
-import "hardhat/console.sol";
-
 /// @title Darwin Presale
 contract DarwinPresale is IDarwinPresale, ReentrancyGuard, Ownable {
     /// @notice Min BNB deposit per user
@@ -125,8 +123,6 @@ contract DarwinPresale is IDarwinPresale, ReentrancyGuard, Ownable {
         if (darwinPairAddress == address(0) || finchPairAddress == address(0)) {
             revert PairNotFound();
         }
-
-        
     }
 
     /// @notice Deposits BNB into the presale
@@ -242,20 +238,20 @@ contract DarwinPresale is IDarwinPresale, ReentrancyGuard, Ownable {
         uint darwinToDeposit = lp * darwinDepositRate;
 
         _addLiquidity(address(darwin), darwinToDeposit, lp);
-        // _addLiquidity(address(finch), FINCH_LP_AMOUNT, finchLp);
+        _addLiquidity(address(finch), FINCH_LP_AMOUNT, finchLp);
         
-        // _transferBNB(teamWallet, team);
-        // _transferBNB(marketingWallet, marketing);
+        _transferBNB(teamWallet, team);
+        _transferBNB(marketingWallet, marketing);
 
-        // if (!darwin.transfer(owner(), darwin.balanceOf(address(this)))) {
-        //     revert TransferFailed();
-        // }
+        if (!darwin.transfer(owner(), darwin.balanceOf(address(this)))) {
+            revert TransferFailed();
+        }
 
-        // if (!finch.transfer(owner(), darwin.balanceOf(address(this)))) {
-        //     revert TransferFailed();
-        // }
+        if (!finch.transfer(owner(), darwin.balanceOf(address(this)))) {
+            revert TransferFailed();
+        }
 
-        // emit LpProvided(lp, darwinToDeposit);
+        emit LpProvided(lp, darwinToDeposit);
     }
 
     /// @notice Returns the current stage of the presale
@@ -384,11 +380,6 @@ contract DarwinPresale is IDarwinPresale, ReentrancyGuard, Ownable {
         if (!IERC20(tokenAddress).approve(address(router), tokenAmount)) {
             revert ApproveFailed();
         }
-
-        console.log("_add liquidity called");
-        console.log("router address ", address(router));
-        console.log("factory address", router.factory());
-        console.log("pair address", IUniswapV2Factory(router.factory()).getPair(address(darwin), router.WETH()));
 
         // add the liquidity
         router.addLiquidityETH{value: bnbAmount}(

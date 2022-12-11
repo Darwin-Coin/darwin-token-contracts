@@ -4,7 +4,9 @@ import { BigNumber, BigNumberish, BytesLike } from "ethers";
 
 import hardhat, { ethers, upgrades } from "hardhat";
 import { getUniswapRouterAddress } from "../scripts/helpers";
-import { Darwin, DarwinCommunity, MockDarwinCommunity, ProxyAdmin } from "../typechain";
+import { Darwin, DarwinCommunity, MockDarwinCommunity, 
+    //ProxyAdmin
+} from "../typechain";
 
 export const now = () => Math.floor(Date.now() / 1000)
 export const lastBlockTime = async () => (await ethers.provider.getBlock("latest")).timestamp
@@ -58,9 +60,9 @@ export const deployWithMockDarwinCommunity = async () => {
 
     let snapShotId = await ethers.provider.send("evm_snapshot", []);
 
-    const proxyAdmin = await getManifestAdmin(hardhat) as ProxyAdmin;
+    // const proxyAdmin = await getManifestAdmin(hardhat) as ProxyAdmin;
 
-    await proxyAdmin.transferOwnership(darwinCommunity.address);
+    // await proxyAdmin.transferOwnership(darwinCommunity.address);
 
     await darwinCommunity.setDarwinAddress(darwin.address);
 

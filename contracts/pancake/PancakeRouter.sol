@@ -427,8 +427,8 @@ library PancakeLibrary {
         address tokenB
     ) internal view returns (uint256 reserveA, uint256 reserveB) {
         (address token0, ) = sortTokens(tokenA, tokenB);
-        pairFor(factory, tokenA, tokenB);
-        (uint256 reserve0, uint256 reserve1, ) = IPancakePair(pairFor(factory, tokenA, tokenB)).getReserves();
+        address pair = IPancakeFactory(factory).getPair(tokenA, tokenB);
+        (uint256 reserve0, uint256 reserve1, ) = IPancakePair(pair).getReserves();
         (reserveA, reserveB) = tokenA == token0 ? (reserve0, reserve1) : (reserve1, reserve0);
     }
 
@@ -640,7 +640,9 @@ contract PancakeRouter is IPancakeRouter02 {
             amountTokenMin,
             amountETHMin
         );
-        address pair = PancakeLibrary.pairFor(factory, token, WETH);
+
+        (address token0, address token1) = PancakeLibrary.sortTokens(token, WETH);
+        address pair = IPancakeFactory(factory).getPair(token0, token1);
         TransferHelper.safeTransferFrom(token, msg.sender, pair, amountToken);
         IWETH(WETH).deposit{ value: amountETH }();
         assert(IWETH(WETH).transfer(pair, amountETH));
