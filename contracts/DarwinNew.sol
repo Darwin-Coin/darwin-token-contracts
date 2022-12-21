@@ -82,7 +82,7 @@ contract DarwinNew is IDarwinNew, Tokenomics2, OwnableUpgradeable, AccessControl
         __tokenomics2_init_unchained(_darwinCommunity, 5, 0);
         __darwin_init_unchained(uniswapV2RouterAddress, _devWallet, _darwinCommunity);
         __UUPSUpgradeable_init();
-        __ERC20_init_unchained("Darwin", "DARWIN");
+        __ERC20_init_unchained("Darwin Coin", "$DARWIN");
     }
 
     function __darwin_init_unchained(
