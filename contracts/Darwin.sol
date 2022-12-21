@@ -382,11 +382,11 @@ contract Darwin is IDarwin, OwnableUpgradeable, UUPSUpgradeable {
     }
 
     function name() public pure returns (string memory) {
-        return "Darwin";
+        return "Darwin Coin";
     }
 
     function symbol() public pure returns (string memory) {
-        return "DARWIN";
+        return "DARWIN COIN";
     }
 
     function decimals() public pure returns (uint256) {
