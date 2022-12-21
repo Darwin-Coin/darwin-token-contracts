@@ -11,7 +11,7 @@ import "@uniswap/v2-core/contracts/interfaces/IUniswapV2Factory.sol";
 import "@uniswap/v2-periphery/contracts/interfaces/IUniswapV2Router02.sol";
 import "./Tokenomics2.sol";
 
-contract DarwinNew is IDarwinNew, Tokenomics2, OwnableUpgradeable, AccessControlUpgradeable, UUPSUpgradeable {
+contract Darwin is IDarwin, Tokenomics2, OwnableUpgradeable, AccessControlUpgradeable, UUPSUpgradeable {
 
     // roles
     bytes32 public constant PAUSER_ROLE = keccak256("PAUSER_ROLE");

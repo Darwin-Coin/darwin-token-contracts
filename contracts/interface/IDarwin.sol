@@ -2,7 +2,7 @@ pragma solidity ^0.8.14;
 
 // SPDX-License-Identifier: Unlicensed
 
-interface IDarwinNew {
+interface IDarwin {
 
     /// @notice Accumulatively log sold tokens
     struct TokenSellLog {
