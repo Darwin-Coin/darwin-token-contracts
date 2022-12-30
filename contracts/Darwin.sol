@@ -137,6 +137,59 @@ contract Darwin is IDarwin, Tokenomics2, OwnableUpgradeable, AccessControlUpgrad
 
     }
 
+    /// @notice Whitelists/unwhitelists an array of addresses.
+    /// @dev Address at addresses[n] gets kinds[n]-whitelisted if values[n] is true, otherwise it gets kinds[n]-unwhitelisted.
+    /// @param addresses Array of addresses to be whitelisted/unwhitelisted.
+    /// @param kinds Array of uints representing the whitelist types.
+    /// @param values Array of bools. `value[n]` is true if address[n] has to be whitelisted.
+    function setWhitelist(address[] memory addresses, uint[] memory kinds, bool[] memory values) external onlyRole(PAUSER_ROLE) {
+        require(addresses.length == kinds.length && kinds.length == values.length, "setWhitelist: Length must be the same for the 3 arrays");
+
+        // k = 1 ---> trade + holding + sell + rewards
+        // k = 2 ---> trade + holding + sell
+        // k = 3 ---> holding + sell + rewards
+        // k = 4 ---> holding + sell
+        // k = 5 ---> trade + rewards
+        // k = 6 ---> trade
+        for (uint i = 0; i < addresses.length; i++) {
+            address a = addresses[i];
+            uint k = kinds[i];
+            bool v = values[i];
+
+            if (k <= 6 && k > 4) {
+                setPauseWhitelist(a, v); // trade
+                if (k == 5) {
+                    setReceiveRewards(a, v); // include/exclude in rewards (reflection)
+                }
+            }
+            
+            else if (k <= 4) {
+                isExcludedFromSellLimit[a] = v; // sell
+                isExcludedFromHoldingLimit[a] = v; // holding
+                if (k == 3) {
+                    setReceiveRewards(a, v); // include/exclude in rewards (reflection)
+                } else if (k <= 2) {
+                    setPauseWhitelist(a, v); // trade
+                    if (k == 1) {
+                        setReceiveRewards(a, v); // include/exclude in rewards (reflection)
+                    }
+                }
+            }
+        }
+    }
+
+    function setReceiveRewards(address a, bool v) private {
+        try {
+            if (v) {
+                _removeExcludedFromRewards(a); // include in rewards (reflection)
+            } else {
+                _setExcludedFromRewards(a); // exclude from rewards (reflection)
+            }
+        } catch {
+            // empty catch so it doesn't revert if not excluded / already excluded
+        }
+    }
+
     ////////////////////// PAUSE FUNCTIONS ///////////////////////////////////
 
     function setLive() external onlyRole(PAUSER_ROLE) {
