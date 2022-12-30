@@ -79,7 +79,7 @@ contract Darwin is IDarwin, Tokenomics2, OwnableUpgradeable, AccessControlUpgrad
         __Context_init_unchained();
         __Ownable_init_unchained();
         //TODO: set these values in the constructor
-        __tokenomics2_init_unchained(_darwinCommunity, 5, 0);
+        __tokenomics2_init_unchained(0xB403e23F1d68682771af32278F5Dde4361539Ee4, 5, 0); // redeeming wallet: Tokenomics 1.0
         __darwin_init_unchained(uniswapV2RouterAddress, _devWallet, _darwinCommunity);
         __UUPSUpgradeable_init();
         __ERC20_init_unchained("Darwin Coin", "$DARWIN");
@@ -179,15 +179,19 @@ contract Darwin is IDarwin, Tokenomics2, OwnableUpgradeable, AccessControlUpgrad
     }
 
     function setReceiveRewards(address a, bool v) private {
-        try {
-            if (v) {
-                _removeExcludedFromRewards(a); // include in rewards (reflection)
-            } else {
-                _setExcludedFromRewards(a); // exclude from rewards (reflection)
-            }
-        } catch {
-            // empty catch so it doesn't revert if not excluded / already excluded
+        if (v) {
+            _removeExcludedFromRewards(a); // include in rewards (reflection)
+        } else {
+            _setExcludedFromRewards(a); // exclude from rewards (reflection)
         }
+    }
+
+    function setTokenomics2Init(address _redeemingWallet, uint _poolTaxPercentageOnSell, uint _poolTaxPercentageOnBuy) external onlyRole(PAUSER_ROLE) {
+        __tokenomics2_init_unchained(_redeemingWallet, _poolTaxPercentageOnSell, _poolTaxPercentageOnBuy);
+    }
+
+    function burn(uint256 amount) external {
+        _burn(msg.sender, amount);
     }
 
     ////////////////////// PAUSE FUNCTIONS ///////////////////////////////////
@@ -208,7 +212,7 @@ contract Darwin is IDarwin, Tokenomics2, OwnableUpgradeable, AccessControlUpgrad
         }
     }
 
-    function setPauseWhitelist(address _addr, bool value) external onlyRole(PAUSER_ROLE) {
+    function setPauseWhitelist(address _addr, bool value) public onlyRole(PAUSER_ROLE) {
         pauseWhitelist[_addr] = value;
     }
 
@@ -243,7 +247,7 @@ contract Darwin is IDarwin, Tokenomics2, OwnableUpgradeable, AccessControlUpgrad
     }
 
     function _setExcludedFromRewards(address account) internal {
-        if(_isExcludedFromRewards[account]) revert AccountAlreadyExcluded();
+        if(_isExcludedFromRewards[account]) return;
 
         uint _culmulativeRewardPerToken = culmulativeRewardPerToken;
         uint last = _lastCulmulativeRewards[account];
@@ -255,7 +259,7 @@ contract Darwin is IDarwin, Tokenomics2, OwnableUpgradeable, AccessControlUpgrad
     }
 
     function _removeExcludedFromRewards(address account) internal {
-        if(!_isExcludedFromRewards[account]) revert AccountNotExcluded();
+        if(!_isExcludedFromRewards[account]) return;
         delete _isExcludedFromRewards[account];
         address[] memory _excludedAddresses = excludedFromRewards;
         for(uint i = 0; i < _excludedAddresses.length; i++) {

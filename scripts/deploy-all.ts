@@ -101,7 +101,7 @@ async function main() {
 
     await darwinToken.deployed();
 
-    console.log("NotCrypto deployed at:", darwinToken.address);
+    console.log("DarwinCoin deployed at:", darwinToken.address);
 
     await darwinCommunity.setDarwinAddress(darwinToken.address);
 

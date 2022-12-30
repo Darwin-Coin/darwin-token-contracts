@@ -16,7 +16,7 @@ import "./interface/IDarwin.old.sol";
 import "./interface/IDarwinCommunity.sol";
 
 /// @title Darwin Token
-contract Darwin is IDarwin, OwnableUpgradeable, UUPSUpgradeable {
+contract DarwinOld is IDarwin, OwnableUpgradeable, UUPSUpgradeable {
     using AddressUpgradeable for address;
 
     /// @notice Accumulatively log sold tokens

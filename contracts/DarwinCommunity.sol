@@ -2,11 +2,16 @@ pragma solidity 0.8.14;
 
 // SPDX-License-Identifier: MIT
 
-import "./interface/IDarwin.sol";
 import "./interface/IDarwinCommunity.sol";
 
 import "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/proxy/utils/UUPSUpgradeable.sol";
+
+interface IDarwin {
+    function bulkTransfer(address[] calldata recipients, uint256[] calldata amounts) external;
+    function balanceOf(address account) external view returns (uint256);
+    function transferFrom(address from, address to, uint256 amount) external returns (bool);
+}
 
 contract DarwinCommunity is OwnableUpgradeable, IDarwinCommunity, UUPSUpgradeable {
     enum ProposalState {
@@ -46,12 +51,6 @@ contract DarwinCommunity is OwnableUpgradeable, IDarwinCommunity, UUPSUpgradeabl
         uint256 id;
         address valueAddress;
         bool isActive;
-    }
-
-    modifier preAccess(address from, uint256 darwinAmount) {
-        require(minDarwinTransferToAccess <= darwinAmount, "DC::takeAccessFee: not enough $DARWIN sent");
-        require(darwin.transferFrom(from, address(this), darwinAmount), "DC::takeAccessFee: not enough $DARWIN sent");
-        _;
     }
 
     modifier isProposalIdValid(uint256 _id) {
@@ -285,7 +284,9 @@ contract DarwinCommunity is OwnableUpgradeable, IDarwinCommunity, UUPSUpgradeabl
         string memory description,
         string memory other,
         uint256 endTime
-    ) public preAccess(msg.sender, minDarwinTransferToAccess) returns (uint256) {
+    ) public returns (uint256) {
+        require(darwin.transferFrom(msg.sender, address(this), minDarwinTransferToAccess), "DC::propose: not enough $DARWIN in wallet");
+
         require(
             targets.length == values.length &&
                 targets.length == signatures.length &&
@@ -387,7 +388,11 @@ contract DarwinCommunity is OwnableUpgradeable, IDarwinCommunity, UUPSUpgradeabl
         uint256 proposalId,
         bool inSupport,
         uint256 darwinAmount
-    ) external preAccess(msg.sender, darwinAmount) {
+    ) external {
+        require(minDarwinTransferToAccess <= darwinAmount, "DC::castVote: not enough $DARWIN sent");
+
+        require(darwin.transferFrom(msg.sender, address(this), darwinAmount), "DC::castVote: not enough $DARWIN in wallet");
+
         castVoteInternal(_msgSender(), proposalId, darwinAmount, inSupport);
         emit VoteCast(_msgSender(), proposalId, inSupport);
     }

@@ -127,7 +127,7 @@ const config: HardhatUserConfig = {
                 url : "https://bsc-dataseed3.ninicoin.io/"
             },
             accounts: {
-                mnemonic: String(process.env.TEST_MNEMONICS),
+                // mnemonic: String(process.env.TEST_MNEMONICS),
                 count: 100,
                 initialIndex: 0
             }
