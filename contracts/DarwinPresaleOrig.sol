@@ -4,11 +4,8 @@ pragma solidity 0.8.14;
 import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/security/ReentrancyGuard.sol";
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
-import "@openzeppelin/contracts/token/ERC20/extensions/IERC20Metadata.sol";
 
-import "@uniswap/v2-core/contracts/interfaces/IUniswapV2Factory.sol";
 import "@uniswap/v2-periphery/contracts/interfaces/IUniswapV2Router02.sol";
-import "@uniswap/v2-core/contracts/interfaces/IUniswapV2Pair.sol";
 
 import {IDarwinPresale} from "./interface/IDarwinPresale.sol";
 import {IPausable} from "./interface/IPausable.sol";
@@ -28,12 +25,12 @@ contract DarwinPresale is IDarwinPresale, ReentrancyGuard, Ownable {
     uint256 public constant LP_AMOUNT = 1e27; // 1,000,000,000 Darwin
     /// @notice Amount of Finch to be sent to the LP
     uint256 public constant FINCH_LP_AMOUNT = 5e25; // 50,000,000 Finch
-    /// @notice % of raised BNB to be sent to marketing wallet
-    uint256 public constant MARKETING_PERCENTAGE = 30;
-    /// @notice % of raised BNB to be added to marketing percentage at the end of the presale
-    uint256 public constant MARKETING_ADDITIONAL_PERCENTAGE = 5;
-    /// @notice % of raised BNB to be sent to team wallet
-    uint256 public constant TEAM_PERCENTAGE = 20;
+    /// @notice % of raised BNB to be sent to Wallet1
+    uint256 public constant WALLET1_PERCENTAGE = 30;
+    /// @notice % of raised BNB to be added to Wallet1 percentage at the end of the presale
+    uint256 public constant WALLET1_ADDITIONAL_PERCENTAGE = 5;
+    /// @notice % of raised BNB to be sent to Wallet2
+    uint256 public constant WALLET2_PERCENTAGE = 20;
     /// @notice Number of Finch per BNB deposited (1,000 Finch per 1 BNB)
     uint256 public constant FINCH_PER_BNB = 1_000;
 
@@ -47,9 +44,9 @@ contract DarwinPresale is IDarwinPresale, ReentrancyGuard, Ownable {
     /// @notice Timestamp of the presale end
     uint256 public presaleEnd;
 
-    uint256 public marketingWithdrawn;
-    address public marketingWallet;
-    address public teamWallet;
+    uint256 public wallet1Withdrawn;
+    address public wallet1;
+    address public wallet2;
 
     enum Status {
         QUEUED,
@@ -105,42 +102,27 @@ contract DarwinPresale is IDarwinPresale, ReentrancyGuard, Ownable {
     /// @notice Initialize the presale parameters
     /// @param _router The AMM router address
     /// @param _darwinEcosystem The Darwin ecosystem address
-    /// @param _marketingWallet The marketing wallet
-    /// @param _teamWallet The team wallet
+    /// @param _wallet1 The Wallet1
+    /// @param _wallet2 The Wallet2
     function initPresale(
         address _router,
         address _darwinEcosystem,
-        address _marketingWallet,
-        address _teamWallet
+        address _wallet1,
+        address _wallet2
     ) external onlyOwner {
         if (
             _router == address(0) ||
             _darwinEcosystem == address(0) ||
-            _marketingWallet == address(0) ||
-            _teamWallet == address(0)
+            _wallet1 == address(0) ||
+            _wallet2 == address(0)
         ) {
             revert ZeroAddress();
         }
 
         _setDarwinEcosystem(_darwinEcosystem);
         _setRouter(_router);
-        _setMarketingWallet(_marketingWallet);
-        _setTeamWallet(_teamWallet);
-
-        address darwinPairAddress = IUniswapV2Factory(router.factory()).getPair(
-            address(darwin),
-            router.WETH()
-        );
-
-        address finchPairAddress = IUniswapV2Factory(router.factory()).getPair(
-            address(finch),
-            router.WETH()
-        );
-
-        // ensure pairs exist
-        if (darwinPairAddress == address(0) || finchPairAddress == address(0)) {
-            revert PairNotFound();
-        }
+        _setWallet1(_wallet1);
+        _setWallet2(_wallet2);
     }
 
     /// @notice Deposits BNB into the presale
@@ -172,8 +154,8 @@ contract DarwinPresale is IDarwinPresale, ReentrancyGuard, Ownable {
 
         uint256 finchAmount = calculateFinchAmount(msg.value);
 
-        uint256 marketingAmount = (msg.value * MARKETING_PERCENTAGE) / 100;
-        _transferBNB(marketingWallet, marketingAmount);
+        uint256 wallet1Amount = (msg.value * WALLET1_PERCENTAGE) / 100;
+        _transferBNB(wallet1, wallet1Amount);
 
         if (!darwin.transfer(msg.sender, darwinAmount)) {
             revert TransferFailed();
@@ -205,24 +187,24 @@ contract DarwinPresale is IDarwinPresale, ReentrancyGuard, Ownable {
         emit PresaleEndDateSet(_endDate);
     }
 
-    /// @notice Set the marketing and team wallets
-    /// @param _marketingWallet The new marketing wallet address
-    /// @param _teamWallet The new team wallet address
+    /// @notice Set addresses for Wallet1 and Wallet2
+    /// @param _wallet1 The new Wallet1 address
+    /// @param _wallet2 The new Wallet2 address
     function setWallets(
-        address _marketingWallet,
-        address _teamWallet
+        address _wallet1,
+        address _wallet2
     ) external onlyOwner {
-        if (_marketingWallet == address(0) || _teamWallet == address(0)) {
+        if (_wallet1 == address(0) || _wallet2 == address(0)) {
             revert ZeroAddress();
         }
-        _setMarketingWallet(_marketingWallet);
-        _setTeamWallet(_teamWallet);
+        _setWallet1(_wallet1);
+        _setWallet2(_wallet2);
     }
 
-    /// @notice Allocates presale funds to LP, team, and marketing
+    /// @notice Allocates presale funds to LP, Wallet2, and Wallet1
     /// @dev The unsold darwin tokens are sent back to the owner
     function provideLpAndWithdrawTokens() external onlyOwner {
-        if (marketingWallet == address(0) || teamWallet == address(0)) {
+        if (wallet1 == address(0) || wallet2 == address(0)) {
             revert ZeroAddress();
         }
         if (presaleStatus() != Status.SUCCESS) {
@@ -231,10 +213,10 @@ contract DarwinPresale is IDarwinPresale, ReentrancyGuard, Ownable {
 
         uint256 balance = address(this).balance;
         
-        uint256 team = (status.raisedAmount * TEAM_PERCENTAGE) / 100;
-        uint256 marketing = (status.raisedAmount * MARKETING_ADDITIONAL_PERCENTAGE) / 100;
+        uint256 wallet2Amount = (status.raisedAmount * WALLET2_PERCENTAGE) / 100;
+        uint256 wallet1Amount = (status.raisedAmount * WALLET1_ADDITIONAL_PERCENTAGE) / 100;
 
-        uint256 lp = balance - team - marketing; // 45%
+        uint256 lp = balance - wallet2Amount - wallet1Amount; // 45%
 
         uint256 finchLp = lp / 10; // 10% of lp
 
@@ -258,18 +240,25 @@ contract DarwinPresale is IDarwinPresale, ReentrancyGuard, Ownable {
         _addLiquidity(address(darwin), darwinToDeposit, lp);
         _addLiquidity(address(finch), FINCH_LP_AMOUNT, finchLp);
         
-        _transferBNB(teamWallet, team);
-        _transferBNB(marketingWallet, marketing);
+        _transferBNB(wallet2, wallet2Amount);
+        _transferBNB(wallet1, wallet1Amount);
 
-        if (!darwin.transfer(owner(), darwin.balanceOf(address(this)))) {
+        if (!darwin.transfer(wallet1, darwin.balanceOf(address(this)))) {
             revert TransferFailed();
         }
 
-        if (!finch.transfer(owner(), darwin.balanceOf(address(this)))) {
+        if (!finch.transfer(wallet1, finch.balanceOf(address(this)))) {
             revert TransferFailed();
         }
 
         emit LpProvided(lp, darwinToDeposit);
+    }
+
+    /// @notice Changes the router address.
+    /// @dev Only callable by the owner. Useful in case we want to set the router to DarwinSwap's one if we deploy it before presale ends.
+    /// @param _router the new router address.
+    function setRouter(address _router) external onlyOwner {
+        _setRouter(_router);
     }
 
     /// @notice Returns the current stage of the presale
@@ -379,14 +368,14 @@ contract DarwinPresale is IDarwinPresale, ReentrancyGuard, Ownable {
         emit DarwinEcosystemSet(_darwinEcosystem);
     }
 
-    function _setMarketingWallet(address _marketingWallet) internal {
-        marketingWallet = _marketingWallet;
-        emit MarketingWalletSet(_marketingWallet);
+    function _setWallet1(address _wallet1) internal {
+        wallet1 = _wallet1;
+        emit Wallet1Set(_wallet1);
     }
 
-    function _setTeamWallet(address _teamWallet) internal {
-        teamWallet = _teamWallet;
-        emit TeamWalletSet(_teamWallet);
+    function _setWallet2(address _wallet2) internal {
+        wallet2 = _wallet2;
+        emit Wallet2Set(_wallet2);
     }
 
     function _addLiquidity(
@@ -406,7 +395,7 @@ contract DarwinPresale is IDarwinPresale, ReentrancyGuard, Ownable {
             0, // amountTokenMin (slippage is unavoidable)
             0, // amountETHMin (slippage is unavoidable)
             owner(), // to (Recipient of the liquidity tokens.)
-            block.timestamp // deadline
+            block.timestamp + 600 // deadline (10 mins.)
         );
     }
 

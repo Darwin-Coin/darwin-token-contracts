@@ -13,7 +13,7 @@ interface IDarwinPresale {
     /// Presale has not ended yet
     error PresaleNotEnded();
     /// Pair has not been created on the AMM
-    error PairNotFound();
+    // error PairNotFound();
     /// Parameter cannot be the zero address
     error ZeroAddress();
     /// New rate cannot be less than the current rate
