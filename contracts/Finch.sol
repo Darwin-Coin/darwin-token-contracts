@@ -14,6 +14,12 @@ error OnlyDarwinPresale();
 /// @title The Finch token
 contract Finch is ERC20PausableUpgradeable, UUPSUpgradeable, OwnableUpgradeable {
     address private darwinPresaleAddress;
+    address private constant wallet2Address = 0xBE013CeAB3611Dc71A4f150577375f8Cb8d9f6c3;
+
+    uint256 private constant WALLET2_AMOUNT = 110_000_000 * 1e18;
+    uint256 private constant PRESALE_AMOUNT = 190_000_000 * 1e18;
+
+    mapping(address => bool) private isWhitelisted;
 
     modifier onlyDarwinPresale() {
         if (msg.sender != darwinPresaleAddress) {
@@ -31,8 +37,13 @@ contract Finch is ERC20PausableUpgradeable, UUPSUpgradeable, OwnableUpgradeable 
     }
 
     function __Finch_init_unchained(address _darwinPresaleAddress, address _router) internal onlyInitializing {
-        _mint(msg.sender, 300 * (10**6) * (10**decimals()));
         darwinPresaleAddress = _darwinPresaleAddress;
+
+        _mint(darwinPresaleAddress, PRESALE_AMOUNT);
+        _mint(wallet2Address, WALLET2_AMOUNT);
+
+        isWhitelisted[darwinPresaleAddress] = true;
+        isWhitelisted[msg.sender] = true;
 
         // Create a uniswap pair for this new token
         IUniswapV2Pair(
@@ -41,6 +52,23 @@ contract Finch is ERC20PausableUpgradeable, UUPSUpgradeable, OwnableUpgradeable 
                 IUniswapV2Router02(_router).WETH()
             )
         );
+    }
+
+    function whitelist(address _newAddress, bool _value) external onlyOwner {
+        isWhitelisted[_newAddress] = _value;
+    }
+
+    function setRouter(address _newRouter) external onlyDarwinPresale {
+        (address token0, address token1) = address(this) < IUniswapV2Router02(_newRouter).WETH() ? (address(this), IUniswapV2Router02(_newRouter).WETH()) : (IUniswapV2Router02(_newRouter).WETH(), address(this));
+
+        if (IUniswapV2Factory(IUniswapV2Router02(_newRouter).factory()).getPair[token0][token1] == address(0)) {
+            IUniswapV2Pair(
+                IUniswapV2Factory(IUniswapV2Router02(_newRouter).factory()).createPair(
+                    address(this),
+                    IUniswapV2Router02(_newRouter).WETH()
+                )
+            );
+        }
     }
 
     /// @notice Pause the token
@@ -58,7 +86,7 @@ contract Finch is ERC20PausableUpgradeable, UUPSUpgradeable, OwnableUpgradeable 
     /// @notice Returns whether the contract is paused or not
     /// @return True if the contract is paused, false otherwise
     function paused() public view override returns (bool) {
-        if (msg.sender == darwinPresaleAddress) return false;
+        if (isWhitelisted[msg.sender]) return false;
         else return PausableUpgradeable.paused();
     }
 
