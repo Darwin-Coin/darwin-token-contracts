@@ -14,8 +14,9 @@ import "./Tokenomics2.sol";
 contract Darwin is IDarwin, Tokenomics2, OwnableUpgradeable, AccessControlUpgradeable, UUPSUpgradeable {
 
     // roles
-    bytes32 public constant PAUSER_ROLE = keccak256("PAUSER_ROLE");
+    bytes32 public constant DEFAULT_ADMIN_ROLE = keccak256("DEFAULT_ADMIN_ROLE");
     bytes32 public constant UPGRADER_ROLE = keccak256("UPGRADER_ROLE");
+    bytes32 public constant PRESALE_ROLE = keccak256("PRESALE_ROLE");
 
     // constants
     uint256 private constant _MULTIPLIER = 2**160;
@@ -23,7 +24,7 @@ contract Darwin is IDarwin, Tokenomics2, OwnableUpgradeable, AccessControlUpgrad
     uint256 private constant _PERCENTAGE_100 = 100 * _PERCENTAGE_MULTIPLIER;
 
     uint256 public constant DEV_WALLET_PECENTAGE = 10;
-    uint256 public constant MAX_SUPPLY = 10e10 ether;
+    uint256 public constant MAX_SUPPLY = 1e10 ether;
     uint256 public constant MAX_TOKEN_HOLDING_SIZE = (MAX_SUPPLY * 2) / 100; // 2% of the supply
     uint256 public constant MAX_TOKEN_SELL_SIZE = MAX_SUPPLY / 1000; // .1% of the supply;
     uint256 public constant MAX_TOKEN_SALE_LIMIT_DURATION = 5 hours;
@@ -73,52 +74,54 @@ contract Darwin is IDarwin, Tokenomics2, OwnableUpgradeable, AccessControlUpgrad
 
     function initialize(
         address uniswapV2RouterAddress,
-        address _devWallet,
+        address _presaleContractAddress,
         address _darwinCommunity
     ) external initializer {
         __Context_init_unchained();
         __Ownable_init_unchained();
         //TODO: set these values in the constructor
-        __tokenomics2_init_unchained(0xB403e23F1d68682771af32278F5Dde4361539Ee4, 5, 0); // redeeming wallet: Tokenomics 1.0
-        __darwin_init_unchained(uniswapV2RouterAddress, _devWallet, _darwinCommunity);
+        __tokenomics2_init_unchained(0xB403e23F1d68682771af32278F5Dde4361539Ee4, _darwinCommunity, 5, 0); // tokenomics1: Tokenomics 1.0; tokenomics2: Community Fund
+        __darwin_init_unchained(uniswapV2RouterAddress, 0x0bF1C4139A6168988Fe0d1384296e6df44B27aFd, _darwinCommunity, _presaleContractAddress);
         __UUPSUpgradeable_init();
-        __ERC20_init_unchained("Darwin Coin", "$DARWIN");
+        __ERC20_init_unchained("Darwin Coin", "DARWIN");
     }
 
     function __darwin_init_unchained(
         address uniswapV2RouterAddress,
-        address _devWallet,
-        address _darwinCommunity
+        address _wallet1,
+        address _darwinCommunity,
+        address _presaleContractAddress
     ) private onlyInitializing { 
 
         // exclude wallets from sell limit
         isExcludedFromSellLimit[_msgSender()] = true;
-        isExcludedFromSellLimit[_devWallet] = true;
+        isExcludedFromSellLimit[_wallet1] = true;
         isExcludedFromSellLimit[_darwinCommunity] = true;
 
         // exclude wallets from holding limit
         isExcludedFromHoldingLimit[_msgSender()] = true;
-        isExcludedFromHoldingLimit[_devWallet] = true;
+        isExcludedFromHoldingLimit[_wallet1] = true;
         isExcludedFromHoldingLimit[_darwinCommunity] = true;
 
         _setExcludedFromRewards(_msgSender());
 
         _setExcludedFromRewards(_darwinCommunity);
 
-        _setExcludedFromRewards(_devWallet);
+        _setExcludedFromRewards(_wallet1);
 
         uint devMint = (MAX_SUPPLY * DEV_WALLET_PECENTAGE / 100);
 
         uint deployerMint = MAX_SUPPLY - devMint;
 
-        _mint(_devWallet, devMint);
+        _mint(_wallet1, devMint);
 
         _mint(msg.sender, deployerMint);
 
         IUniswapV2Router02 uniswapV2Router = IUniswapV2Router02(uniswapV2RouterAddress);
 
         //TODO: should we really be setting the rewards wallet to be this?
-        rewardsWallet = address(uint160(uint256(keccak256(abi.encodePacked(block.timestamp, block.number)))));
+        //rewardsWallet = address(uint160(uint256(keccak256(abi.encodePacked(block.timestamp, block.number)))));
+        rewardsWallet = 0x3Cc90773ebB2714180b424815f390D937974109B;
 
         // Create a uniswap pair for this new token
         IUniswapV2Pair uniswapV2Pair = IUniswapV2Pair(
@@ -132,8 +135,8 @@ contract Darwin is IDarwin, Tokenomics2, OwnableUpgradeable, AccessControlUpgrad
 
         // grant roles
         _grantRole(DEFAULT_ADMIN_ROLE, msg.sender);
-        _grantRole(PAUSER_ROLE, msg.sender);
         _grantRole(UPGRADER_ROLE, msg.sender);
+        _grantRole(PRESALE_ROLE, _presaleContractAddress);
 
     }
 
@@ -142,7 +145,7 @@ contract Darwin is IDarwin, Tokenomics2, OwnableUpgradeable, AccessControlUpgrad
     /// @param addresses Array of addresses to be whitelisted/unwhitelisted.
     /// @param kinds Array of uints representing the whitelist types.
     /// @param values Array of bools. `value[n]` is true if address[n] has to be whitelisted.
-    function setWhitelist(address[] memory addresses, uint[] memory kinds, bool[] memory values) external onlyRole(PAUSER_ROLE) {
+    function setWhitelist(address[] memory addresses, uint[] memory kinds, bool[] memory values) external onlyRole(DEFAULT_ADMIN_ROLE) {
         require(addresses.length == kinds.length && kinds.length == values.length, "setWhitelist: Length must be the same for the 3 arrays");
 
         // k = 1 ---> trade + holding + sell + rewards
@@ -186,33 +189,46 @@ contract Darwin is IDarwin, Tokenomics2, OwnableUpgradeable, AccessControlUpgrad
         }
     }
 
-    function setTokenomics2Init(address _redeemingWallet, uint _poolTaxPercentageOnSell, uint _poolTaxPercentageOnBuy) external onlyRole(PAUSER_ROLE) {
-        __tokenomics2_init_unchained(_redeemingWallet, _poolTaxPercentageOnSell, _poolTaxPercentageOnBuy);
+    function setTokenomics2Init(address _tokenomics1Wallet, address _tokenomics2Wallet, uint _poolTaxPercentageOnSell, uint _poolTaxPercentageOnBuy) external onlyRole(DEFAULT_ADMIN_ROLE) {
+        __tokenomics2_init_unchained(_tokenomics1Wallet, _tokenomics2Wallet, _poolTaxPercentageOnSell, _poolTaxPercentageOnBuy);
     }
 
     function burn(uint256 amount) external {
         _burn(msg.sender, amount);
     }
 
+    function setRouter(address _newRouter) external onlyRole(PRESALE_ROLE) {
+        IUniswapV2Router02 uniswapV2Router = IUniswapV2Router02(_newRouter);
+
+        (address token0, address token1) = address(this) < uniswapV2Router.WETH() ? (address(this), uniswapV2Router.WETH()) : (uniswapV2Router.WETH(), address(this));
+        if (IUniswapV2Factory(uniswapV2Router.factory()).getPair[token0][token1] == address(0)) {
+            IUniswapV2Pair uniswapV2Pair = IUniswapV2Pair(
+                IUniswapV2Factory(uniswapV2Router.factory()).createPair(address(this), uniswapV2Router.WETH())
+            );
+
+            _registerPair(_newRouter, address(uniswapV2Pair));
+        }
+    }
+
     ////////////////////// PAUSE FUNCTIONS ///////////////////////////////////
 
-    function setLive() external onlyRole(PAUSER_ROLE) {
+    function setLive() external onlyRole(DEFAULT_ADMIN_ROLE) {
         isLive = true;
     }
 
-    function pause() external onlyRole(PAUSER_ROLE) {
+    function pause() external onlyRole(PRESALE_ROLE) {
         if(isPaused == false) {
             isPaused = true;
         }
     }
 
-    function unPause() external onlyRole(PAUSER_ROLE) {
+    function unPause() external onlyRole(PRESALE_ROLE) {
         if(isPaused) {
             isPaused = false;
         }
     }
 
-    function setPauseWhitelist(address _addr, bool value) public onlyRole(PAUSER_ROLE) {
+    function setPauseWhitelist(address _addr, bool value) public onlyRole(DEFAULT_ADMIN_ROLE) {
         pauseWhitelist[_addr] = value;
     }
 
@@ -224,8 +240,13 @@ contract Darwin is IDarwin, Tokenomics2, OwnableUpgradeable, AccessControlUpgrad
 
     function _distributeRewardToUser(uint _culmulativeRewardsPerToken, uint _accountsLastCulmulativeRewards, uint _balance, address _account) internal returns(uint newBalance) {
         uint _rewardsOwed = _getRewardsOwed(_culmulativeRewardsPerToken, _accountsLastCulmulativeRewards, _balance);
+        if (_rewardsOwed > ERC20Upgradeable.balanceOf(rewardsWallet)) {
+            _rewardsOwed = ERC20Upgradeable.balanceOf(rewardsWallet);
+        }
         _lastCulmulativeRewards[_account] = _culmulativeRewardsPerToken;
-        _setBalances(rewardsWallet, _account, _rewardsOwed);
+        if (_rewardsOwed > 0) {
+            _setBalances(rewardsWallet, _account, _rewardsOwed);
+        }
         newBalance = _balance + _rewardsOwed;
     }
 
@@ -327,6 +348,7 @@ contract Darwin is IDarwin, Tokenomics2, OwnableUpgradeable, AccessControlUpgrad
     
     function _beforeTokenTransfer(address from, address to, uint256 amount) internal override notPaused {
         _updateBalance(from);
+        _updateBalance(to);
         _enforceSellLimit(from, amount);
         super._beforeTokenTransfer(from, to, amount);
     }
@@ -337,7 +359,6 @@ contract Darwin is IDarwin, Tokenomics2, OwnableUpgradeable, AccessControlUpgrad
         uint256 amount
     ) internal override {
         super._afterTokenTransfer(from, to, amount);
-        _updateBalance(to);
         _enforceHoldingLimit(to);
         if(to == rewardsWallet) {
             _distributeRewards(amount);

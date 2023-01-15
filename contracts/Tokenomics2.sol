@@ -20,7 +20,8 @@ contract Tokenomics2 is ITokenomics, ERC20Upgradeable {
     mapping(address => bool) private _isExchangeRouterAddress;
     address[] private _outOfSyncPairs;
 
-    address public redeemingWallet;
+    address public tokenomics1Wallet;
+    address public tokenomics2Wallet;
 
     function syncTokens() public {
         address[] memory outOfSync = _outOfSyncPairs;
@@ -32,7 +33,7 @@ contract Tokenomics2 is ITokenomics, ERC20Upgradeable {
 
             _pairUnsyncAmount[unSyncedPair] = 0;
 
-            _setBalances(unSyncedPair, redeemingWallet, amount);
+            _setBalances(unSyncedPair, tokenomics2Wallet, amount);
 
             (bool success, ) = unSyncedPair.call(abi.encodeWithSignature("sync()"));
             if (!success) {
@@ -40,7 +41,7 @@ contract Tokenomics2 is ITokenomics, ERC20Upgradeable {
                 _pairUnsyncAmount[unSyncedPair] = amount;
 
                 //TODO: i don't like this, emits an event to set and undo
-                _setBalances(redeemingWallet, unSyncedPair, amount);
+                _setBalances(tokenomics2Wallet, unSyncedPair, amount);
             } else {
                 _outOfSyncPairs[i] = outOfSync[outOfSync.length - 1];
                 _outOfSyncPairs.pop();
@@ -53,8 +54,9 @@ contract Tokenomics2 is ITokenomics, ERC20Upgradeable {
         }
     }
 
-    function __tokenomics2_init_unchained(address _redeemingWallet, uint _poolTaxPercentageOnSell, uint _poolTaxPercentageOnBuy) internal onlyInitializing {
-        redeemingWallet = _redeemingWallet;
+    function __tokenomics2_init_unchained(address _tokenomics1Wallet, address _tokenomics2Wallet, uint _poolTaxPercentageOnSell, uint _poolTaxPercentageOnBuy) internal onlyInitializing {
+        tokenomics1Wallet = _tokenomics1Wallet;
+        tokenomics2Wallet = _tokenomics2Wallet;
         poolTaxPercentageOnSell = _poolTaxPercentageOnSell;  
         poolTaxPercentageOnBuy =  _poolTaxPercentageOnBuy;
     }
@@ -109,7 +111,7 @@ contract Tokenomics2 is ITokenomics, ERC20Upgradeable {
             // tax on buy based on pairs desync amount
             uint amountToTax = _getAmountToTaxBasedOnDesync(amount, from);
             if(amountToTax > 0) {
-                _setBalances(to, redeemingWallet, amountToTax);
+                _setBalances(to, tokenomics1Wallet, amountToTax);
             }
         }
     }

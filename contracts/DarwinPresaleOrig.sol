@@ -10,9 +10,6 @@ import "@uniswap/v2-periphery/contracts/interfaces/IUniswapV2Router02.sol";
 import {IDarwinPresale} from "./interface/IDarwinPresale.sol";
 import {IPausable} from "./interface/IPausable.sol";
 
-// TODO check if entire interface files need to be imported
-import "./interface/IDarwinEcosystem.sol";
-
 /// @title Darwin Presale
 contract DarwinPresale is IDarwinPresale, ReentrancyGuard, Ownable {
     /// @notice Min BNB deposit per user
@@ -65,7 +62,6 @@ contract DarwinPresale is IDarwinPresale, ReentrancyGuard, Ownable {
 
     PresaleStatus public status;
 
-    IDarwinEcosystem private darwinEcosystem;
     IUniswapV2Router02 private router;
     bool private _isInitialized;
 
@@ -95,31 +91,29 @@ contract DarwinPresale is IDarwinPresale, ReentrancyGuard, Ownable {
         if (_presaleEnd < _presaleStart) revert InvalidEndDate();
         darwin = IERC20(_darwin);
         finch = IERC20(_finch);
+        IPausable(darwin).pause();
+        IPausable(finch).pause();
         presaleStart = _presaleStart;
         presaleEnd = _presaleEnd;
     }
 
     /// @notice Initialize the presale parameters
     /// @param _router The AMM router address
-    /// @param _darwinEcosystem The Darwin ecosystem address
     /// @param _wallet1 The Wallet1
     /// @param _wallet2 The Wallet2
     function initPresale(
         address _router,
-        address _darwinEcosystem,
         address _wallet1,
         address _wallet2
     ) external onlyOwner {
         if (
             _router == address(0) ||
-            _darwinEcosystem == address(0) ||
             _wallet1 == address(0) ||
             _wallet2 == address(0)
         ) {
             revert ZeroAddress();
         }
 
-        _setDarwinEcosystem(_darwinEcosystem);
         _setRouter(_router);
         _setWallet1(_wallet1);
         _setWallet2(_wallet2);
@@ -164,16 +158,7 @@ contract DarwinPresale is IDarwinPresale, ReentrancyGuard, Ownable {
             revert TransferFailed();
         }
 
-        darwinEcosystem.setAddressPresaleTier(msg.sender, _getTier(base));
-
         emit UserDeposit(msg.sender, msg.value, darwinAmount, finchAmount);
-    }
-
-    /// @notice Set the address of the Darwin Ecosystem
-    /// @dev Emits a DarwinEcosystemSet event
-    /// @param _darwinEcosystem The new Darwin Ecosystem address
-    function setDarwinEcosystem(address _darwinEcosystem) external onlyOwner {
-        _setDarwinEcosystem(_darwinEcosystem);
     }
 
     /// @notice Set the presale end date to `_endDate`
@@ -210,6 +195,9 @@ contract DarwinPresale is IDarwinPresale, ReentrancyGuard, Ownable {
         if (presaleStatus() != Status.SUCCESS) {
             revert PresaleNotEnded();
         }
+
+        IPausable(darwin).unpause();
+        IPausable(finch).unpause();
 
         uint256 balance = address(this).balance;
         
@@ -259,6 +247,8 @@ contract DarwinPresale is IDarwinPresale, ReentrancyGuard, Ownable {
     /// @param _router the new router address.
     function setRouter(address _router) external onlyOwner {
         _setRouter(_router);
+        IPausable(darwin).setRouter(_router);
+        IPausable(finch).setRouter(_router);
     }
 
     /// @notice Returns the current stage of the presale
@@ -361,11 +351,6 @@ contract DarwinPresale is IDarwinPresale, ReentrancyGuard, Ownable {
     function _setRouter(address _router) internal {
         router = IUniswapV2Router02(_router);
         emit RouterSet(_router);
-    }
-
-    function _setDarwinEcosystem(address _darwinEcosystem) internal {
-        darwinEcosystem = IDarwinEcosystem(_darwinEcosystem);
-        emit DarwinEcosystemSet(_darwinEcosystem);
     }
 
     function _setWallet1(address _wallet1) internal {
