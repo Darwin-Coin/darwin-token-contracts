@@ -9,7 +9,7 @@ import "./interface/ITokenomics2.sol";
 
 contract Tokenomics2 is ITokenomics, ERC20Upgradeable {
 
-    uint256 public poolTaxPercentageOnSell;
+    uint256 public userTaxPercentageOnSell;
     uint256 public poolTaxPercentageOnBuy;
 
     // darwin pair values
@@ -19,6 +19,9 @@ contract Tokenomics2 is ITokenomics, ERC20Upgradeable {
     //TODO: is this necessary
     mapping(address => bool) private _isExchangeRouterAddress;
     address[] private _outOfSyncPairs;
+
+    mapping(address => bool) private _isWhitelistedSellTax;
+    mapping(address => bool) private _isWhitelistedBuyTax;
 
     address public tokenomics1Wallet;
     address public tokenomics2Wallet;
@@ -54,11 +57,14 @@ contract Tokenomics2 is ITokenomics, ERC20Upgradeable {
         }
     }
 
-    function __tokenomics2_init_unchained(address _tokenomics1Wallet, address _tokenomics2Wallet, uint _poolTaxPercentageOnSell, uint _poolTaxPercentageOnBuy) internal onlyInitializing {
+    function __tokenomics2_init_unchained(address _tokenomics1Wallet, address _tokenomics2Wallet, address _presaleContractAddress, address uniswapV2RouterAddress, uint _userTaxPercentageOnSell, uint _poolTaxPercentageOnBuy) internal onlyInitializing {
         tokenomics1Wallet = _tokenomics1Wallet;
         tokenomics2Wallet = _tokenomics2Wallet;
-        poolTaxPercentageOnSell = _poolTaxPercentageOnSell;  
+        userTaxPercentageOnSell = _userTaxPercentageOnSell;
         poolTaxPercentageOnBuy =  _poolTaxPercentageOnBuy;
+
+        _isWhitelistedBuyTax[uniswapV2RouterAddress] = true;
+        _isWhitelistedSellTax[_presaleContractAddress] = true;
     }
 
     function _registerPair(address routerAddress, address pairAddress) internal virtual {
@@ -83,20 +89,21 @@ contract Tokenomics2 is ITokenomics, ERC20Upgradeable {
         emit ExchangedRemoved(pairAddress);
     }
 
-    function _beforeTokenTransfer(address from, address to, uint256 amount) internal virtual override {
+    function _beforeTokenTransfer(address from, address to, uint256 amount) internal virtual override returns(uint) {
         bool isBuy = _isPairAddress[from];
         if(!isBuy) {
             // this is not a buy so sync tokens
             syncTokens();
         }
-        if(_isPairAddress[to]) {
-            // this is a sell, so we tax the pool base on sell percent
-            _taxFromPool(to, amount, true);
-        } else if(isBuy) {
-            // this is a buy, so we tax the pool base on buy percent
-            _taxFromPool(to, amount, false);
+        if(_isPairAddress[to] && !_isWhitelistedSellTax[from]) {
+            // this is a sell, so we tax the user based on sell percent
+            amount = _taxFromUser(from, amount);
+        } else if(isBuy && !_isWhitelistedBuyTax[to]) {
+            // this is a buy, so we tax the pool based on buy percent
+            _taxFromPool(from, amount, false);
         }
         super._beforeTokenTransfer(from, to, amount);
+        return amount;
     }
  
     function _afterTokenTransfer(
@@ -107,19 +114,19 @@ contract Tokenomics2 is ITokenomics, ERC20Upgradeable {
 
         //TODO: figure out if we call super before or after this
         super._afterTokenTransfer(from, to, amount);
-        if(_isPairAddress[from]) {
+        /* if(_isPairAddress[from]) {
             // tax on buy based on pairs desync amount
             uint amountToTax = _getAmountToTaxBasedOnDesync(amount, from);
             if(amountToTax > 0) {
                 _setBalances(to, tokenomics1Wallet, amountToTax);
             }
-        }
+        } */
     }
 
     function _taxFromPool(address pair, uint amount, bool isSell) internal {
 
         // get the pool tax based on the direction of the swap
-        uint taxPercent = isSell ? poolTaxPercentageOnSell : poolTaxPercentageOnBuy;
+        uint taxPercent = isSell ? userTaxPercentageOnSell : poolTaxPercentageOnBuy;
         // no tax, return
         if(taxPercent == 0) return;
 
@@ -133,6 +140,15 @@ contract Tokenomics2 is ITokenomics, ERC20Upgradeable {
         _pairUnsyncAmount[pair] = currentUnsyncAmount + amountPoolToTax;
     }
 
+    function _taxFromUser(address user, uint amount) internal returns(uint) {
+
+        uint sellPercentageOfAmount = (amount / 100) * userTaxPercentageOnSell;
+        _setBalances(user, tokenomics1Wallet, sellPercentageOfAmount);
+
+        return amount - sellPercentageOfAmount;
+    }
+
+    /*
     function _getAmountToTaxBasedOnDesync(uint256 amount, address poolAddress) internal view returns (uint256 syncTax) {
 
         uint unsyncAmount = _pairUnsyncAmount[poolAddress];
@@ -160,6 +176,7 @@ contract Tokenomics2 is ITokenomics, ERC20Upgradeable {
         }
         
     }
+    */
 
     function _getAmountIn(
         uint256 amountOut,
@@ -175,6 +192,30 @@ contract Tokenomics2 is ITokenomics, ERC20Upgradeable {
         uint256 numerator = amountIn * reserveOut;
         uint256 denominator = reserveIn + amountIn;
         amountOut = numerator / denominator;
+    }
+
+    function _setBuyWhitelist(address user_, bool whitelist_) internal {
+        _isWhitelistedBuyTax[user_] = whitelist_;
+    }
+
+    function _setSellWhitelist(address user_, bool whitelist_) internal {
+        _isWhitelistedSellTax[user_] = whitelist_;
+    }
+
+    function _setTokenomics1Wallet(address tokenomics1_) internal {
+        tokenomics1Wallet = tokenomics1_;
+    }
+
+    function _setTokenomics2Wallet(address tokenomics2_) internal {
+        tokenomics2Wallet = tokenomics2_;
+    }
+
+    function _setPoolTaxBuy(uint256 tax_) internal {
+        poolTaxPercentageOnBuy = tax_;
+    }
+
+    function _setUserTaxSell(uint256 tax_) internal {
+        userTaxPercentageOnSell = tax_;
     }
 
 }

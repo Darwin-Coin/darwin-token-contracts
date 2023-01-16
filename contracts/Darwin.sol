@@ -1,6 +1,7 @@
 pragma solidity 0.8.14;
 
-// SPDX-License-Identifier: MIT
+//TODO: add proper license
+// SPDX-License-Identifier: Unlicensed
 
 import "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/proxy/utils/UUPSUpgradeable.sol";
@@ -14,7 +15,6 @@ import "./Tokenomics2.sol";
 contract Darwin is IDarwin, Tokenomics2, OwnableUpgradeable, AccessControlUpgradeable, UUPSUpgradeable {
 
     // roles
-    bytes32 public constant DEFAULT_ADMIN_ROLE = keccak256("DEFAULT_ADMIN_ROLE");
     bytes32 public constant UPGRADER_ROLE = keccak256("UPGRADER_ROLE");
     bytes32 public constant PRESALE_ROLE = keccak256("PRESALE_ROLE");
 
@@ -80,8 +80,8 @@ contract Darwin is IDarwin, Tokenomics2, OwnableUpgradeable, AccessControlUpgrad
         __Context_init_unchained();
         __Ownable_init_unchained();
         //TODO: set these values in the constructor
-        __tokenomics2_init_unchained(0xB403e23F1d68682771af32278F5Dde4361539Ee4, _darwinCommunity, 5, 0); // tokenomics1: Tokenomics 1.0; tokenomics2: Community Fund
-        __darwin_init_unchained(uniswapV2RouterAddress, 0x0bF1C4139A6168988Fe0d1384296e6df44B27aFd, _darwinCommunity, _presaleContractAddress);
+        __tokenomics2_init_unchained(0xB403e23F1d68682771af32278F5Dde4361539Ee4, 0x0000000000000000000000000000000000000000, _presaleContractAddress, uniswapV2RouterAddress, 5, 5); // tokenomics1: Tokenomics 1.0 Wallet (0xB403e23F1d68682771af32278F5Dde4361539Ee4); tokenomics2: Tokenomics 2.0 Wallet (NOT_SET_YET)
+        __darwin_init_unchained(uniswapV2RouterAddress, 0x0bF1C4139A6168988Fe0d1384296e6df44B27aFd, _darwinCommunity, _presaleContractAddress); // wallet1: Wallet 1 (0x0bF1C4139A6168988Fe0d1384296e6df44B27aFd)
         __UUPSUpgradeable_init();
         __ERC20_init_unchained("Darwin Coin", "DARWIN");
     }
@@ -119,7 +119,7 @@ contract Darwin is IDarwin, Tokenomics2, OwnableUpgradeable, AccessControlUpgrad
 
         IUniswapV2Router02 uniswapV2Router = IUniswapV2Router02(uniswapV2RouterAddress);
 
-        //TODO: should we really be setting the rewards wallet to be this?
+        /////TODO: should we really be setting the rewards wallet to be this?
         //rewardsWallet = address(uint160(uint256(keccak256(abi.encodePacked(block.timestamp, block.number)))));
         rewardsWallet = 0x3Cc90773ebB2714180b424815f390D937974109B;
 
@@ -189,10 +189,6 @@ contract Darwin is IDarwin, Tokenomics2, OwnableUpgradeable, AccessControlUpgrad
         }
     }
 
-    function setTokenomics2Init(address _tokenomics1Wallet, address _tokenomics2Wallet, uint _poolTaxPercentageOnSell, uint _poolTaxPercentageOnBuy) external onlyRole(DEFAULT_ADMIN_ROLE) {
-        __tokenomics2_init_unchained(_tokenomics1Wallet, _tokenomics2Wallet, _poolTaxPercentageOnSell, _poolTaxPercentageOnBuy);
-    }
-
     function burn(uint256 amount) external {
         _burn(msg.sender, amount);
     }
@@ -201,13 +197,15 @@ contract Darwin is IDarwin, Tokenomics2, OwnableUpgradeable, AccessControlUpgrad
         IUniswapV2Router02 uniswapV2Router = IUniswapV2Router02(_newRouter);
 
         (address token0, address token1) = address(this) < uniswapV2Router.WETH() ? (address(this), uniswapV2Router.WETH()) : (uniswapV2Router.WETH(), address(this));
-        if (IUniswapV2Factory(uniswapV2Router.factory()).getPair[token0][token1] == address(0)) {
+        if (IUniswapV2Factory(uniswapV2Router.factory()).getPair(token0, token1) == address(0)) {
             IUniswapV2Pair uniswapV2Pair = IUniswapV2Pair(
                 IUniswapV2Factory(uniswapV2Router.factory()).createPair(address(this), uniswapV2Router.WETH())
             );
 
             _registerPair(_newRouter, address(uniswapV2Pair));
         }
+
+        _setBuyWhitelist(_newRouter, true);
     }
 
     ////////////////////// PAUSE FUNCTIONS ///////////////////////////////////
@@ -337,6 +335,30 @@ contract Darwin is IDarwin, Tokenomics2, OwnableUpgradeable, AccessControlUpgrad
         (log.amount, log.lastSale) = (newAmount, currentTime);
     }
 
+    function setBuyWhitelist(address user_, bool whitelist_) external onlyRole(DEFAULT_ADMIN_ROLE) {
+        _setBuyWhitelist(user_, whitelist_);
+    }
+
+    function setSellWhitelist(address user_, bool whitelist_) external onlyRole(DEFAULT_ADMIN_ROLE) {
+        _setSellWhitelist(user_, whitelist_);
+    }
+
+    function setTokenomics1Wallet(address tokenomics1_) external onlyRole(DEFAULT_ADMIN_ROLE) {
+        _setTokenomics1Wallet(tokenomics1_);
+    }
+
+    function setTokenomics2Wallet(address tokenomics2_) external onlyRole(DEFAULT_ADMIN_ROLE) {
+        _setTokenomics2Wallet(tokenomics2_);
+    }
+
+    function setPoolTaxBuy(uint256 tax_) external onlyRole(DEFAULT_ADMIN_ROLE) {
+        _setPoolTaxBuy(tax_);
+    }
+
+    function setUserTaxSell(uint256 tax_) external onlyRole(DEFAULT_ADMIN_ROLE) {
+        _setUserTaxSell(tax_);
+    }
+
     /////////////////////// TRANSFER FUNCTIONS //////////////////////////////////////
 
     function balanceOf(address account) public view override returns (uint256 balance) {
@@ -346,11 +368,11 @@ contract Darwin is IDarwin, Tokenomics2, OwnableUpgradeable, AccessControlUpgrad
         }
     }
     
-    function _beforeTokenTransfer(address from, address to, uint256 amount) internal override notPaused {
+    function _beforeTokenTransfer(address from, address to, uint256 amount) internal override notPaused returns(uint) {
         _updateBalance(from);
         _updateBalance(to);
         _enforceSellLimit(from, amount);
-        super._beforeTokenTransfer(from, to, amount);
+        return super._beforeTokenTransfer(from, to, amount);
     }
 
     function _afterTokenTransfer(

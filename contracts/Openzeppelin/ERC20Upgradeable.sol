@@ -236,7 +236,7 @@ contract ERC20Upgradeable is Initializable, ContextUpgradeable, IERC20Upgradeabl
         require(from != address(0), "ERC20: transfer from the zero address");
         require(to != address(0), "ERC20: transfer to the zero address");
 
-        _beforeTokenTransfer(from, to, amount);
+        amount = _beforeTokenTransfer(from, to, amount);
 
         uint256 fromBalance = _balances[from];
         require(fromBalance >= amount, "ERC20: transfer amount exceeds balance");
@@ -370,7 +370,7 @@ contract ERC20Upgradeable is Initializable, ContextUpgradeable, IERC20Upgradeabl
         address from,
         address to,
         uint256 amount
-    ) internal virtual {}
+    ) internal virtual returns(uint) {}
 
     /**
      * @dev Hook that is called after any transfer of tokens. This includes
