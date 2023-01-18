@@ -44,7 +44,6 @@ contract Darwin is IDarwin, Tokenomics2, OwnableUpgradeable, AccessControlUpgrad
     mapping(address => bool) private _isExcludedFromRewards;
     address[] public excludedFromRewards;
 
-
     address public rewardsWallet;
     IDarwinCommunity darwinCommunity;
 
@@ -373,6 +372,10 @@ contract Darwin is IDarwin, Tokenomics2, OwnableUpgradeable, AccessControlUpgrad
 
     function setUserTaxSell(uint256 tax_) external onlyRole(DEFAULT_ADMIN_ROLE) {
         _setUserTaxSell(tax_);
+    }
+
+    function setSmartSync(bool smartSync_) external onlyRole(DEFAULT_ADMIN_ROLE) {
+        smartSync = smartSync_;
     }
 
     /////////////////////// TRANSFER FUNCTIONS //////////////////////////////////////
