@@ -304,7 +304,7 @@ contract DarwinPresale is IDarwinPresale, ReentrancyGuard, Ownable {
 
     function _transferBNB(address to, uint256 amount) internal {
         // solhint-disable-next-line avoid-low-level-calls
-        (bool success, ) = to.call{value: amount}("");
+        (bool success, ) = payable(to).call{value: amount}("");
         if (!success) {
             revert TransferFailed();
         }
