@@ -17,6 +17,7 @@ contract Darwin is IDarwin, Tokenomics2, OwnableUpgradeable, AccessControlUpgrad
     // roles
     bytes32 public constant UPGRADER_ROLE = keccak256("UPGRADER_ROLE");
     bytes32 public constant PRESALE_ROLE = keccak256("PRESALE_ROLE");
+    bytes32 public constant MINTER_ROLE = keccak256("MINTER_ROLE");
 
     // constants
     uint256 private constant _MULTIPLIER = 2**160;
@@ -24,7 +25,7 @@ contract Darwin is IDarwin, Tokenomics2, OwnableUpgradeable, AccessControlUpgrad
     uint256 private constant _PERCENTAGE_100 = 100 * _PERCENTAGE_MULTIPLIER;
 
     uint256 public constant DEV_WALLET_PECENTAGE = 10;
-    uint256 public constant MAX_SUPPLY = 1e10 ether;
+    uint256 public constant MAX_SUPPLY = 1e8 ether; // max supply: 100m
     uint256 public constant MAX_TOKEN_HOLDING_SIZE = (MAX_SUPPLY * 2) / 100; // 2% of the supply
     uint256 public constant MAX_TOKEN_SELL_SIZE = MAX_SUPPLY / 1000; // .1% of the supply;
     uint256 public constant MAX_TOKEN_SALE_LIMIT_DURATION = 5 hours;
@@ -335,6 +336,14 @@ contract Darwin is IDarwin, Tokenomics2, OwnableUpgradeable, AccessControlUpgrad
         (log.amount, log.lastSale) = (newAmount, currentTime);
     }
 
+    function setMinter(address user_, bool canMint_) external onlyRole(DEFAULT_ADMIN_ROLE) {
+        if (canMint_) {
+            _grantRole(MINTER_ROLE, user_);
+        } else {
+            _revokeRole(MINTER_ROLE, user_);
+        }
+    }
+
     function setBuyWhitelist(address user_, bool whitelist_) external onlyRole(DEFAULT_ADMIN_ROLE) {
         _setBuyWhitelist(user_, whitelist_);
     }
@@ -395,6 +404,10 @@ contract Darwin is IDarwin, Tokenomics2, OwnableUpgradeable, AccessControlUpgrad
                 ++i;
             }
         }
+    }
+
+    function mint(address account, uint256 amount) external onlyRole(MINTER_ROLE) {
+        _mint(address account, uint256 amount);
     }
 
     ////////////////////// COMMUNITY FUNCTIONS /////////////////////////////////////
