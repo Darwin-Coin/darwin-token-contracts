@@ -1,7 +1,7 @@
 pragma solidity 0.8.14;
 
 //TODO: add proper license
-// SPDX-License-Identifier: Unlicensed
+// SPDX-License-Identifier: UNLICENSED
 
 import "./Openzeppelin/ERC20Upgradeable.sol";
 import "@uniswap/v2-core/contracts/interfaces/IUniswapV2Pair.sol";
@@ -25,6 +25,8 @@ contract Tokenomics2 is ITokenomics, ERC20Upgradeable {
 
     address public tokenomics1Wallet;
     address public tokenomics2Wallet;
+
+    bool public smartSync;
 
     function syncTokens() public {
         address[] memory outOfSync = _outOfSyncPairs;
@@ -53,6 +55,32 @@ contract Tokenomics2 is ITokenomics, ERC20Upgradeable {
             }
             unchecked {
                 ++i;
+            }
+        }
+    }
+
+    function syncTokensSinglePair(address pair) public {
+        uint256 amount = _pairUnsyncAmount[pair];
+        if (amount == 0) return;
+
+        _pairUnsyncAmount[pair] = 0;
+
+        _setBalances(pair, tokenomics2Wallet, amount);
+
+        (bool success, ) = pair.call(abi.encodeWithSignature("sync()"));
+        if (!success) {
+            // undo changes
+            _pairUnsyncAmount[pair] = amount;
+
+            //TODO: i don't like this, emits an event to set and undo
+            _setBalances(tokenomics2Wallet, pair, amount);
+        } else {
+            for (uint i = 0; i < _outOfSyncPairs.length; i++) {
+                if (_outOfSyncPairs[i] == pair) {
+                    _outOfSyncPairs[i] = _outOfSyncPairs[_outOfSyncPairs.length - 1];
+                    _outOfSyncPairs.pop();
+                    break;
+                }
             }
         }
     }
@@ -91,9 +119,12 @@ contract Tokenomics2 is ITokenomics, ERC20Upgradeable {
 
     function _beforeTokenTransfer(address from, address to, uint256 amount) internal virtual override returns(uint) {
         bool isBuy = _isPairAddress[from];
-        if(!isBuy) {
-            // this is not a buy so sync tokens
+        if(!smartSync && !isBuy) {
+            // smartSync is disabled and this is not a buy, so sync tokens on all pairs
             syncTokens();
+        } else if (smartSync && _isPairAddress[to]) {
+            // smartSync is enabled and this is a sell, so sync tokens only on the interested pair
+            syncTokensSinglePair(to);
         }
         if(_isPairAddress[to] && !_isWhitelistedSellTax[from]) {
             // this is a sell, so we tax the user based on sell percent
