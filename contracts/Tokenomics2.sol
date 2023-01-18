@@ -1,7 +1,7 @@
 pragma solidity 0.8.14;
 
 //TODO: add proper license
-// SPDX-License-Identifier: Unlicensed
+// SPDX-License-Identifier: UNLICENSED
 
 import "./Openzeppelin/ERC20Upgradeable.sol";
 import "@uniswap/v2-core/contracts/interfaces/IUniswapV2Pair.sol";

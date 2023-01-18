@@ -1,7 +1,7 @@
 pragma solidity 0.8.14;
 
 //TODO: add proper license
-// SPDX-License-Identifier: Unlicensed
+// SPDX-License-Identifier: UNLICENSED
 
 import "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/proxy/utils/UUPSUpgradeable.sol";
@@ -25,9 +25,8 @@ contract Darwin is IDarwin, Tokenomics2, OwnableUpgradeable, AccessControlUpgrad
     uint256 private constant _PERCENTAGE_100 = 100 * _PERCENTAGE_MULTIPLIER;
 
     uint256 public constant DEV_WALLET_PECENTAGE = 10;
-    uint256 public constant MAX_SUPPLY = 1e8 ether; // max supply: 100m
-    uint256 public constant MAX_TOKEN_HOLDING_SIZE = (MAX_SUPPLY * 2) / 100; // 2% of the supply
-    uint256 public constant MAX_TOKEN_SELL_SIZE = MAX_SUPPLY / 1000; // .1% of the supply;
+    uint256 public constant INITIAL_SUPPLY = 1e8 ether; // initial supply: 100m
+    uint256 public constant MAX_SUPPLY = 1e9 ether; // max supply: 1b
     uint256 public constant MAX_TOKEN_SALE_LIMIT_DURATION = 5 hours;
 
     // limit exclusions
@@ -84,7 +83,7 @@ contract Darwin is IDarwin, Tokenomics2, OwnableUpgradeable, AccessControlUpgrad
         __tokenomics2_init_unchained(0xB403e23F1d68682771af32278F5Dde4361539Ee4, 0x0000000000000000000000000000000000000000, _presaleContractAddress, uniswapV2RouterAddress, 5, 5); // tokenomics1: Tokenomics 1.0 Wallet (0xB403e23F1d68682771af32278F5Dde4361539Ee4); tokenomics2: Tokenomics 2.0 Wallet (NOT_SET_YET)
         __darwin_init_unchained(uniswapV2RouterAddress, 0x0bF1C4139A6168988Fe0d1384296e6df44B27aFd, _darwinCommunity, _presaleContractAddress); // wallet1: Wallet 1 (0x0bF1C4139A6168988Fe0d1384296e6df44B27aFd)
         __UUPSUpgradeable_init();
-        __ERC20_init_unchained("Darwin Coin", "DARWIN");
+        __ERC20_init_unchained("Darwin Protocol", "DARWIN");
     }
 
     function __darwin_init_unchained(
@@ -110,9 +109,9 @@ contract Darwin is IDarwin, Tokenomics2, OwnableUpgradeable, AccessControlUpgrad
 
         _setExcludedFromRewards(_wallet1);
 
-        uint devMint = (MAX_SUPPLY * DEV_WALLET_PECENTAGE / 100);
+        uint devMint = (INITIAL_SUPPLY * DEV_WALLET_PECENTAGE / 100);
 
-        uint deployerMint = MAX_SUPPLY - devMint;
+        uint deployerMint = INITIAL_SUPPLY - devMint;
 
         _mint(_wallet1, devMint);
 
@@ -315,11 +314,19 @@ contract Darwin is IDarwin, Tokenomics2, OwnableUpgradeable, AccessControlUpgrad
         }
     }
 
+    function maxTokenHoldingSize() public view returns(uint256) {
+        return totalSupply() / 50; // 2% of the supply
+    }
+
     function _enforceHoldingLimit(address account) private view {
         if(isExcludedFromHoldingLimit[account]) return;
-        if (ERC20Upgradeable.balanceOf(account) > MAX_TOKEN_HOLDING_SIZE) {
+        if (ERC20Upgradeable.balanceOf(account) > maxTokenHoldingSize()) {
             revert HoldingLimitExceeded();
         }
+    }
+
+    function maxTokenSellSize() public view returns(uint256) {
+        return totalSupply() / 1000; // .1% of the supply
     }
 
     /// @notice inforce token sale limit over sale limit duration
@@ -332,7 +339,7 @@ contract Darwin is IDarwin, Tokenomics2, OwnableUpgradeable, AccessControlUpgrad
         if(timeSinceLastSell < MAX_TOKEN_SALE_LIMIT_DURATION) {
             newAmount += uint216(((MAX_TOKEN_SALE_LIMIT_DURATION - timeSinceLastSell) * log.amount) / MAX_TOKEN_SALE_LIMIT_DURATION);
         }
-        if(newAmount > MAX_TOKEN_SELL_SIZE) revert SellLimitExceeded();
+        if(newAmount > maxTokenSellSize()) revert SellLimitExceeded();
         (log.amount, log.lastSale) = (newAmount, currentTime);
     }
 
@@ -407,7 +414,8 @@ contract Darwin is IDarwin, Tokenomics2, OwnableUpgradeable, AccessControlUpgrad
     }
 
     function mint(address account, uint256 amount) external onlyRole(MINTER_ROLE) {
-        _mint(address account, uint256 amount);
+        if (totalSupply() + amount > MAX_SUPPLY) revert MaxSupplyReached();
+        _mint(account, amount);
     }
 
     ////////////////////// COMMUNITY FUNCTIONS /////////////////////////////////////

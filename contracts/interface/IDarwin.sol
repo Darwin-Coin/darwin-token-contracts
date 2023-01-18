@@ -1,6 +1,7 @@
 pragma solidity ^0.8.14;
 
-// SPDX-License-Identifier: Unlicensed
+//TODO: add proper license
+// SPDX-License-Identifier: UNLICENSED
 
 interface IDarwin {
 
@@ -51,4 +52,7 @@ interface IDarwin {
     error Paused();
     error AccountAlreadyExcluded();
     error AccountNotExcluded();
+
+    /// Max supply reached, cannot mint more Darwin
+    error MaxSupplyReached();
 }
