@@ -66,25 +66,22 @@ contract DarwinPresale is IDarwinPresale, ReentrancyGuard, Ownable {
         _;
     }
 
-    /// @dev Initializes the darwin address and presale start date
+    /// @dev Initializes the darwin address and presale start date, and sets presale end date to 90 days after it
     /// @param _darwin The darwin token address
     /// @param _presaleStart The presale start date
-    /// @param _presaleEnd The presale end date
     function init(
         address _darwin,
-        uint256 _presaleStart,
-        uint256 _presaleEnd
+        uint256 _presaleStart
     ) external onlyOwner {
         if (_isInitialized) revert AlreadyInitialized();
         _isInitialized = true;
         if (_darwin == address(0)) revert ZeroAddress();
         // solhint-disable-next-line not-rely-on-time
         if (_presaleStart < block.timestamp) revert InvalidStartDate();
-        if (_presaleEnd < _presaleStart) revert InvalidEndDate();
         darwin = IERC20(_darwin);
         IPausable(address(darwin)).pause();
         presaleStart = _presaleStart;
-        presaleEnd = _presaleEnd;
+        presaleEnd = _presaleStart + (90 days);
     }
 
     /// @notice Initialize the presale parameters
