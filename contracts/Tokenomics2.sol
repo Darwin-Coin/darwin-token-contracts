@@ -136,7 +136,9 @@ contract Tokenomics2 is ITokenomics, ERC20Upgradeable {
         super._beforeTokenTransfer(from, to, amount);
         return amount;
     }
- 
+
+    //TODO: since _getAmountToTaxBasedOnDesync does not work there's no need to override _afterTokenTransfer
+    /*
     function _afterTokenTransfer(
         address from,
         address to,
@@ -145,14 +147,15 @@ contract Tokenomics2 is ITokenomics, ERC20Upgradeable {
 
         //TODO: figure out if we call super before or after this
         super._afterTokenTransfer(from, to, amount);
-        /* if(_isPairAddress[from]) {
+        if(_isPairAddress[from]) {
             // tax on buy based on pairs desync amount
             uint amountToTax = _getAmountToTaxBasedOnDesync(amount, from);
             if(amountToTax > 0) {
                 _setBalances(to, tokenomics1Wallet, amountToTax);
             }
-        } */
+        }
     }
+    */
 
     function _taxFromPool(address pair, uint amount, bool isSell) internal {
 
@@ -179,6 +182,7 @@ contract Tokenomics2 is ITokenomics, ERC20Upgradeable {
         return amount - sellPercentageOfAmount;
     }
 
+    //TODO: currently does not work, needs to be fixed if we want to use it
     /*
     function _getAmountToTaxBasedOnDesync(uint256 amount, address poolAddress) internal view returns (uint256 syncTax) {
 
