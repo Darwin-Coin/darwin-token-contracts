@@ -137,7 +137,7 @@ contract Tokenomics2 is ITokenomics, ERC20Upgradeable {
         return amount;
     }
 
-    //TODO: since _getAmountToTaxBasedOnDesync does not work there's no need to override _afterTokenTransfer
+    //TODO: since _getAmountToTaxBasedOnDesync is nomore used there's no need to override _afterTokenTransfer
     /*
     function _afterTokenTransfer(
         address from,
@@ -211,7 +211,6 @@ contract Tokenomics2 is ITokenomics, ERC20Upgradeable {
         }
         
     }
-    */
 
     function _getAmountIn(
         uint256 amountOut,
@@ -228,6 +227,7 @@ contract Tokenomics2 is ITokenomics, ERC20Upgradeable {
         uint256 denominator = reserveIn + amountIn;
         amountOut = numerator / denominator;
     }
+    */
 
     function _setBuyWhitelist(address user_, bool whitelist_) internal {
         _isWhitelistedBuyTax[user_] = whitelist_;

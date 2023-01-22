@@ -214,9 +214,9 @@ contract DarwinPresale is IDarwinPresale, ReentrancyGuard, Ownable {
     /// @notice Changes the router address.
     /// @dev Only callable by the owner. Useful in case we want to set the router to DarwinSwap's one if we deploy it before presale ends.
     /// @param _router the new router address.
-    function setRouter(address _router) external onlyOwner {
+    function setRouter(address _router, bool _isDarwinSwap) external onlyOwner {
         _setRouter(_router);
-        IPausable(address(darwin)).setRouter(_router);
+        IPausable(address(darwin)).setRouter(_router, _isDarwinSwap);
     }
 
     /// @notice Returns the current stage of the presale

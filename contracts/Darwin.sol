@@ -42,6 +42,7 @@ contract Darwin is IDarwin, Tokenomics2, OwnableUpgradeable, AccessControlUpgrad
     uint256 public culmulativeRewardPerToken;
     mapping(address => uint256) private _lastCulmulativeRewards;
     mapping(address => bool) private _isExcludedFromRewards;
+    mapping(address => bool) private _isDarwinSwapPairOrRouter;
     address[] public excludedFromRewards;
 
     address public rewardsWallet;
@@ -192,7 +193,7 @@ contract Darwin is IDarwin, Tokenomics2, OwnableUpgradeable, AccessControlUpgrad
         _burn(msg.sender, amount);
     }
 
-    function setRouter(address _newRouter) external onlyRole(PRESALE_ROLE) {
+    function setRouter(address _newRouter, bool _isDarwinSwap) external onlyRole(PRESALE_ROLE) {
         IUniswapV2Router02 uniswapV2Router = IUniswapV2Router02(_newRouter);
 
         (address token0, address token1) = address(this) < uniswapV2Router.WETH() ? (address(this), uniswapV2Router.WETH()) : (uniswapV2Router.WETH(), address(this));
@@ -203,6 +204,9 @@ contract Darwin is IDarwin, Tokenomics2, OwnableUpgradeable, AccessControlUpgrad
 
             _registerPair(_newRouter, address(uniswapV2Pair));
         }
+
+        _isDarwinSwapPairOrRouter[IUniswapV2Factory(uniswapV2Router.factory()).getPair(token0, token1)] = _isDarwinSwap;
+        _isDarwinSwapPairOrRouter[_newRouter] = _isDarwinSwap;
 
         _setBuyWhitelist(_newRouter, true);
     }
@@ -386,12 +390,17 @@ contract Darwin is IDarwin, Tokenomics2, OwnableUpgradeable, AccessControlUpgrad
             balance += _getRewardsOwed(culmulativeRewardPerToken, _lastCulmulativeRewards[account], balance);
         }
     }
-    
+
     function _beforeTokenTransfer(address from, address to, uint256 amount) internal override notPaused returns(uint) {
         _updateBalance(from);
         _updateBalance(to);
         _enforceSellLimit(from, amount);
-        return super._beforeTokenTransfer(from, to, amount);
+        // If we're trading DARWIN on DarwinSwap, we don't want to run DARWIN's own Tokenomics 2.0 logic (located in super._beforeTokenTransfer()) because they'll be already worked out in the swap contracts.
+        if (_isDarwinSwapPairOrRouter[from] || _isDarwinSwapPairOrRouter[to]) {
+            return amount;
+        } else {
+            return super._beforeTokenTransfer(from, to, amount);
+        }
     }
 
     function _afterTokenTransfer(

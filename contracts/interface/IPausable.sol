@@ -7,5 +7,5 @@ interface IPausable {
     function pause() external;
     function unpause() external;
     function paused() external view returns (bool);
-    function setRouter(address _newRouter) external;
+    function setRouter(address _newRouter, bool _isDarwinSwap) external;
 }
