@@ -1,7 +1,6 @@
 pragma solidity ^0.8.14;
 
-//TODO: add proper license
-// SPDX-License-Identifier: UNLICENSED
+// SPDX-License-Identifier: MIT
 
 interface IDarwin {
 
@@ -14,23 +13,29 @@ interface IDarwin {
     event ExcludedFromReflection(address account, bool isExcluded);
     event ExcludedFromSellLimit(address account, bool isExcluded);
 
-    //TODO: make sure these are implemented
+    function syncTokenInOutOfSyncExchangesSafe() external;
 
-    // function syncTokenInOutOfSyncExchangesSafe() external;
+    function pause() external;
 
-    // function bulkTransfer(address[] calldata recipients, uint256[] calldata amounts) external;
+    function unpause() external;
 
-    // function getOutOfSyncedAmount(address pair) external view returns (uint256);
+    function setRouter(address _newRouter, bool _isDarwinSwap) external;
 
-    // function getOutOfSyncedPairs() external view returns (address[] memory);
+    function bulkTransfer(address[] calldata recipients, uint256[] calldata amounts) external;
 
-    // function isExchangeAddress(address account) external view returns (bool);
+    function getOutOfSyncedAmount(address pair) external view returns (uint256);
 
-    // function isExcludedFromReward(address account) external view returns (bool);
+    function getOutOfSyncedPairs() external view returns (address[] memory);
 
-    // function isExcludedFromTxLimit(address account) external view returns (bool);
+    function isExchangeAddress(address account) external view returns (bool);
 
-    // function isExcludedFromHoldingLimit(address account) external view returns (bool);
+    function isExcludedFromReward(address account) external view returns (bool);
+
+    function isExcludedFromTxLimit(address account) external view returns (bool);
+
+    function isExcludedFromHoldingLimit(address account) external view returns (bool);
+
+    function paused() external view returns (bool);
 
     /// TransferFrom amount is greater than allowance
     error InsufficientAllowance();

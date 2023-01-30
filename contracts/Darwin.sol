@@ -1,7 +1,6 @@
 pragma solidity 0.8.14;
 
-//TODO: add proper license
-// SPDX-License-Identifier: UNLICENSED
+// SPDX-License-Identifier: MIT
 
 import "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/proxy/utils/UUPSUpgradeable.sol";
@@ -91,7 +90,7 @@ contract Darwin is IDarwin, Tokenomics2, OwnableUpgradeable, AccessControlUpgrad
         address _wallet1,
         address _darwinCommunity,
         address _presaleContractAddress
-    ) private onlyInitializing { 
+    ) private onlyInitializing {
 
         // exclude wallets from sell limit
         isExcludedFromSellLimit[_msgSender()] = true;

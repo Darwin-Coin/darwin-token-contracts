@@ -1,37 +1,31 @@
 pragma solidity ^0.8.14;
 
-// SPDX-License-Identifier: Unlicensed
+// SPDX-License-Identifier: BUSL-1.1
 
 interface ITokenomics {
 
     event ExchangeAdded(address account);
     event ExchangedRemoved(address account);
 
+    function syncTokenInOutOfSyncExchangesSafe() external;
 
-    // event ExcludedFromReflection(address account, bool isExcluded);
-    // event ExcludedFromSellLimit(address account, bool isExcluded);
+    function bulkTransfer(address[] calldata recipients, uint256[] calldata amounts) external;
 
-    // //TODO: make sure these are implemented
+    function getOutOfSyncedAmount(address pair) external view returns (uint256);
 
-    // // function syncTokenInOutOfSyncExchangesSafe() external;
+    function getOutOfSyncedPairs() external view returns (address[] memory);
 
-    // // function bulkTransfer(address[] calldata recipients, uint256[] calldata amounts) external;
+    function isExchangeAddress(address account) external view returns (bool);
 
-    // // function getOutOfSyncedAmount(address pair) external view returns (uint256);
+    function isExcludedFromReward(address account) external view returns (bool);
 
-    // // function getOutOfSyncedPairs() external view returns (address[] memory);
+    function isExcludedFromTxLimit(address account) external view returns (bool);
 
-    // // function isExchangeAddress(address account) external view returns (bool);
+    function isExcludedFromHoldingLimit(address account) external view returns (bool);
 
-    // // function isExcludedFromReward(address account) external view returns (bool);
-
-    // // function isExcludedFromTxLimit(address account) external view returns (bool);
-
-    // // function isExcludedFromHoldingLimit(address account) external view returns (bool);
-
-    // /// Pair is already registered
+    // Pair is already registered
     error PairAlreadyRegistered();
-    // /// Pair is not registered
+    // Pair is not registered
     error PairNotRegistered();
   
 }

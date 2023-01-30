@@ -8,7 +8,7 @@ import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import "@uniswap/v2-periphery/contracts/interfaces/IUniswapV2Router02.sol";
 
 import {IDarwinPresale} from "./interface/IDarwinPresale.sol";
-import {IPausable} from "./interface/IPausable.sol";
+import {IDarwin} from "./interface/IDarwin.sol";
 
 /// @title Darwin Presale
 contract DarwinPresale is IDarwinPresale, ReentrancyGuard, Ownable {
@@ -79,7 +79,7 @@ contract DarwinPresale is IDarwinPresale, ReentrancyGuard, Ownable {
         // solhint-disable-next-line not-rely-on-time
         if (_presaleStart < block.timestamp) revert InvalidStartDate();
         darwin = IERC20(_darwin);
-        IPausable(address(darwin)).pause();
+        IDarwin(address(darwin)).pause();
         presaleStart = _presaleStart;
         presaleEnd = _presaleStart + (90 days);
     }
@@ -178,7 +178,7 @@ contract DarwinPresale is IDarwinPresale, ReentrancyGuard, Ownable {
             revert PresaleNotEnded();
         }
 
-        IPausable(address(darwin)).unpause();
+        IDarwin(address(darwin)).unpause();
 
         uint256 balance = address(this).balance;
 
@@ -216,7 +216,7 @@ contract DarwinPresale is IDarwinPresale, ReentrancyGuard, Ownable {
     /// @param _router the new router address.
     function setRouter(address _router, bool _isDarwinSwap) external onlyOwner {
         _setRouter(_router);
-        IPausable(address(darwin)).setRouter(_router, _isDarwinSwap);
+        IDarwin(address(darwin)).setRouter(_router, _isDarwinSwap);
     }
 
     /// @notice Returns the current stage of the presale
