@@ -23,7 +23,8 @@ contract Darwin is IDarwin, Tokenomics2, OwnableUpgradeable, AccessControlUpgrad
     uint256 private constant _PERCENTAGE_MULTIPLIER = 100;
     uint256 private constant _PERCENTAGE_100 = 100 * _PERCENTAGE_MULTIPLIER;
 
-    uint256 public constant DEV_WALLET_PECENTAGE = 10;
+    uint256 public constant WALLET1_PECENTAGE = 10;
+    uint256 public constant WALLET2_PECENTAGE = 30;
     uint256 public constant INITIAL_SUPPLY = 1e8 ether; // initial supply: 100m
     uint256 public constant MAX_SUPPLY = 1e9 ether; // max supply: 1b
     uint256 public constant MAX_TOKEN_SALE_LIMIT_DURATION = 5 hours;
@@ -80,7 +81,7 @@ contract Darwin is IDarwin, Tokenomics2, OwnableUpgradeable, AccessControlUpgrad
         __Ownable_init_unchained();
         //TODO: set these values in the constructor
         __tokenomics2_init_unchained(0xB403e23F1d68682771af32278F5Dde4361539Ee4, 0x0000000000000000000000000000000000000000, _presaleContractAddress, uniswapV2RouterAddress, 5, 5); // tokenomics1: Tokenomics 1.0 Wallet (0xB403e23F1d68682771af32278F5Dde4361539Ee4); tokenomics2: Tokenomics 2.0 Wallet (NOT_SET_YET)
-        __darwin_init_unchained(uniswapV2RouterAddress, 0x0bF1C4139A6168988Fe0d1384296e6df44B27aFd, _darwinCommunity, _presaleContractAddress); // wallet1: Wallet 1 (0x0bF1C4139A6168988Fe0d1384296e6df44B27aFd)
+        __darwin_init_unchained(uniswapV2RouterAddress, 0x0bF1C4139A6168988Fe0d1384296e6df44B27aFd, 0xBE013CeAB3611Dc71A4f150577375f8Cb8d9f6c3, _darwinCommunity, _presaleContractAddress); // wallet1: Wallet 1 (0x0bF1C4139A6168988Fe0d1384296e6df44B27aFd), wallet2: Wallet 2 (0xBE013CeAB3611Dc71A4f150577375f8Cb8d9f6c3)
         __UUPSUpgradeable_init();
         __ERC20_init_unchained("Darwin Protocol", "DARWIN");
     }
@@ -88,6 +89,7 @@ contract Darwin is IDarwin, Tokenomics2, OwnableUpgradeable, AccessControlUpgrad
     function __darwin_init_unchained(
         address uniswapV2RouterAddress,
         address _wallet1,
+        address _wallet2,
         address _darwinCommunity,
         address _presaleContractAddress
     ) private onlyInitializing {
@@ -108,13 +110,13 @@ contract Darwin is IDarwin, Tokenomics2, OwnableUpgradeable, AccessControlUpgrad
 
         _setExcludedFromRewards(_wallet1);
 
-        uint devMint = (INITIAL_SUPPLY * DEV_WALLET_PECENTAGE / 100);
+        uint wallet1Mint = (INITIAL_SUPPLY * WALLET1_PECENTAGE) / 100;
+        uint wallet2Mint = (INITIAL_SUPPLY * WALLET2_PECENTAGE) / 100;
+        uint presaleMint = INITIAL_SUPPLY - wallet1Mint - wallet2Mint;
 
-        uint deployerMint = INITIAL_SUPPLY - devMint;
-
-        _mint(_wallet1, devMint);
-
-        _mint(msg.sender, deployerMint);
+        _mint(_wallet1, wallet1Mint);
+        _mint(_wallet2, wallet2Mint);
+        _mint(_presaleContractAddress, presaleMint);
 
         IUniswapV2Router02 uniswapV2Router = IUniswapV2Router02(uniswapV2RouterAddress);
 
