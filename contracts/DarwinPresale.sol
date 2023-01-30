@@ -178,7 +178,7 @@ contract DarwinPresale is IDarwinPresale, ReentrancyGuard, Ownable {
             revert PresaleNotEnded();
         }
 
-        IDarwin(address(darwin)).unpause();
+        IDarwin(address(darwin)).unPause();
 
         uint256 balance = address(this).balance;
 

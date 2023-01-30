@@ -13,29 +13,19 @@ interface IDarwin {
     event ExcludedFromReflection(address account, bool isExcluded);
     event ExcludedFromSellLimit(address account, bool isExcluded);
 
-    function syncTokenInOutOfSyncExchangesSafe() external;
-
     function pause() external;
 
-    function unpause() external;
+    function unPause() external;
 
     function setRouter(address _newRouter, bool _isDarwinSwap) external;
 
     function bulkTransfer(address[] calldata recipients, uint256[] calldata amounts) external;
 
-    function getOutOfSyncedAmount(address pair) external view returns (uint256);
-
-    function getOutOfSyncedPairs() external view returns (address[] memory);
-
-    function isExchangeAddress(address account) external view returns (bool);
-
-    function isExcludedFromReward(address account) external view returns (bool);
-
-    function isExcludedFromTxLimit(address account) external view returns (bool);
-
     function isExcludedFromHoldingLimit(address account) external view returns (bool);
 
-    function paused() external view returns (bool);
+    function isExcludedFromSellLimit(address account) external view returns (bool);
+
+    function isPaused() external view returns (bool);
 
     /// TransferFrom amount is greater than allowance
     error InsufficientAllowance();
