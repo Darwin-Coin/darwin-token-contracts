@@ -147,7 +147,7 @@ contract DarwinPresale is IDarwinPresale, ReentrancyGuard, Ownable {
     /// @param _endDate The new presale end date
     function setPresaleEndDate(uint256 _endDate) external onlyOwner {
         // solhint-disable-next-line not-rely-on-time
-        if (_endDate < block.timestamp || _endDate < presaleStart) {
+        if (_endDate < block.timestamp || _endDate < presaleStart || _endDate > presaleEnd) {
             revert InvalidEndDate();
         }
         presaleEnd = _endDate;

@@ -74,6 +74,7 @@ contract Darwin is IDarwin, Tokenomics2, OwnableUpgradeable, AccessControlUpgrad
 
     function initialize(
         address uniswapV2RouterAddress,
+        bool _isDarwinSwap,
         address _presaleContractAddress,
         address _privateSaleContractAddress,
         address _darwinCommunity
@@ -82,13 +83,14 @@ contract Darwin is IDarwin, Tokenomics2, OwnableUpgradeable, AccessControlUpgrad
         __Ownable_init_unchained();
         //TODO: set these values in the constructor
         __tokenomics2_init_unchained(0xB403e23F1d68682771af32278F5Dde4361539Ee4, 0x0000000000000000000000000000000000000000, _presaleContractAddress, uniswapV2RouterAddress, 5, 5); // tokenomics1: Tokenomics 1.0 Wallet (0xB403e23F1d68682771af32278F5Dde4361539Ee4); tokenomics2: Tokenomics 2.0 Wallet (NOT_SET_YET)
-        __darwin_init_unchained(uniswapV2RouterAddress, 0x0bF1C4139A6168988Fe0d1384296e6df44B27aFd, 0xBE013CeAB3611Dc71A4f150577375f8Cb8d9f6c3, _darwinCommunity, _presaleContractAddress, _privateSaleContractAddress); // wallet1: Wallet 1 (0x0bF1C4139A6168988Fe0d1384296e6df44B27aFd), wallet2: Wallet 2 (0xBE013CeAB3611Dc71A4f150577375f8Cb8d9f6c3)
+        __darwin_init_unchained(uniswapV2RouterAddress, _isDarwinSwap, 0x0bF1C4139A6168988Fe0d1384296e6df44B27aFd, 0xBE013CeAB3611Dc71A4f150577375f8Cb8d9f6c3, _darwinCommunity, _presaleContractAddress, _privateSaleContractAddress); // wallet1: Wallet 1 (0x0bF1C4139A6168988Fe0d1384296e6df44B27aFd), wallet2: Wallet 2 (0xBE013CeAB3611Dc71A4f150577375f8Cb8d9f6c3)
         __UUPSUpgradeable_init();
         __ERC20_init_unchained("Darwin Protocol", "DARWIN");
     }
 
     function __darwin_init_unchained(
         address uniswapV2RouterAddress,
+        bool _isDarwinSwap,
         address _wallet1,
         address _wallet2,
         address _darwinCommunity,
@@ -96,21 +98,29 @@ contract Darwin is IDarwin, Tokenomics2, OwnableUpgradeable, AccessControlUpgrad
         address _privateSaleContractAddress
     ) private onlyInitializing {
 
+        _isDarwinSwapLive = _isDarwinSwap;
+
         // exclude wallets from sell limit
         isExcludedFromSellLimit[_msgSender()] = true;
         isExcludedFromSellLimit[_wallet1] = true;
         isExcludedFromSellLimit[_darwinCommunity] = true;
+        isExcludedFromSellLimit[_presaleContractAddress] = true;
 
         // exclude wallets from holding limit
         isExcludedFromHoldingLimit[_msgSender()] = true;
         isExcludedFromHoldingLimit[_wallet1] = true;
         isExcludedFromHoldingLimit[_darwinCommunity] = true;
+        isExcludedFromHoldingLimit[_presaleContractAddress] = true;
+        isExcludedFromHoldingLimit[_privateSaleContractAddress] = true;
 
         _setExcludedFromRewards(_msgSender());
-
         _setExcludedFromRewards(_darwinCommunity);
-
         _setExcludedFromRewards(_wallet1);
+        _setExcludedFromRewards(_presaleContractAddress);
+        _setExcludedFromRewards(_privateSaleContractAddress);
+
+        pauseWhitelist[_presaleContractAddress] = true;
+        pauseWhitelist[_privateSaleContractAddress] = true;
 
         uint privateSaleMint = INITIAL_SUPPLY / 500; // 0.2% of initial supply
         uint wallet1Mint = (INITIAL_SUPPLY * WALLET1_PECENTAGE) / 100;
@@ -208,9 +218,8 @@ contract Darwin is IDarwin, Tokenomics2, OwnableUpgradeable, AccessControlUpgrad
 
             _registerPair(_newRouter, address(uniswapV2Pair));
         }
-        if (_isDarwinSwap) {
-            _isDarwinSwapLive = true;
-        }
+
+        _isDarwinSwapLive = _isDarwinSwap;
 
         _setBuyWhitelist(_newRouter, true);
     }
