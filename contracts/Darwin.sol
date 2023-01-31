@@ -122,7 +122,7 @@ contract Darwin is IDarwin, Tokenomics2, OwnableUpgradeable, AccessControlUpgrad
         pauseWhitelist[_presaleContractAddress] = true;
         pauseWhitelist[_privateSaleContractAddress] = true;
 
-        uint privateSaleMint = INITIAL_SUPPLY / 500; // 0.2% of initial supply
+        uint privateSaleMint = INITIAL_SUPPLY / 400; // 0.25% of initial supply
         uint wallet1Mint = (INITIAL_SUPPLY * WALLET1_PECENTAGE) / 100;
         uint wallet2Mint = (INITIAL_SUPPLY * WALLET2_PECENTAGE) / 100 - privateSaleMint;
         uint presaleMint = INITIAL_SUPPLY - (wallet1Mint + wallet2Mint + privateSaleMint);

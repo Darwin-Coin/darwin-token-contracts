@@ -29,13 +29,12 @@ contract DarwinPresale is IDarwinPresale, ReentrancyGuard, Ownable {
 
     /// @notice The Darwin token
     IERC20 public darwin;
-    /// @notice Timestamp of the presale start (2021-10-01 00:00:00 UTC)
-    uint256 public presaleStart; // 2021-10-01 00:00:00 UTC
+    /// @notice Timestamp of the presale start
+    uint256 public presaleStart;
 
     /// @notice Timestamp of the presale end
     uint256 public presaleEnd;
 
-    uint256 public wallet1Withdrawn;
     address public wallet1;
     address public wallet2;
 
@@ -69,41 +68,24 @@ contract DarwinPresale is IDarwinPresale, ReentrancyGuard, Ownable {
     /// @dev Initializes the darwin address and presale start date, and sets presale end date to 90 days after it
     /// @param _darwin The darwin token address
     /// @param _presaleStart The presale start date
+    /// @param _router The AMM router address
     function init(
         address _darwin,
-        uint256 _presaleStart
+        uint256 _presaleStart,
+        address _router
     ) external onlyOwner {
         if (_isInitialized) revert AlreadyInitialized();
         _isInitialized = true;
-        if (_darwin == address(0)) revert ZeroAddress();
+        if (_darwin == address(0) || _router == address(0)) revert ZeroAddress();
         // solhint-disable-next-line not-rely-on-time
         if (_presaleStart < block.timestamp) revert InvalidStartDate();
         darwin = IERC20(_darwin);
         IDarwin(address(darwin)).pause();
+        _setRouter(_router);
+        _setWallet1(0x0bF1C4139A6168988Fe0d1384296e6df44B27aFd);
+        _setWallet2(0xBE013CeAB3611Dc71A4f150577375f8Cb8d9f6c3);
         presaleStart = _presaleStart;
         presaleEnd = _presaleStart + (90 days);
-    }
-
-    /// @notice Initialize the presale parameters
-    /// @param _router The AMM router address
-    /// @param _wallet1 The Wallet1
-    /// @param _wallet2 The Wallet2
-    function initPresale(
-        address _router,
-        address _wallet1,
-        address _wallet2
-    ) external onlyOwner {
-        if (
-            _router == address(0) ||
-            _wallet1 == address(0) ||
-            _wallet2 == address(0)
-        ) {
-            revert ZeroAddress();
-        }
-
-        _setRouter(_router);
-        _setWallet1(_wallet1);
-        _setWallet2(_wallet2);
     }
 
     /// @notice Deposits BNB into the presale
