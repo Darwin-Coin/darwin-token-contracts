@@ -556,5 +556,5 @@ contract DarwinCommunity is OwnableUpgradeable, IDarwinCommunity, UUPSUpgradeabl
         return restrictedProposalActionSignature[uint256(keccak256(bytes(signature)))];
     }
 
-    function _authorizeUpgrade(address newImplementation) internal override onlyOwner {}
+    function _authorizeUpgrade(address newImplementation) internal override onlyDarwinCommunity {}
 }
