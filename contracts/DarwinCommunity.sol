@@ -1,4 +1,4 @@
-pragma solidity 0.8.14;
+pragma solidity ^0.8.14;
 
 // SPDX-License-Identifier: MIT
 
@@ -9,8 +9,8 @@ import "@openzeppelin/contracts-upgradeable/proxy/utils/UUPSUpgradeable.sol";
 
 interface IDarwin {
     function bulkTransfer(address[] calldata recipients, uint256[] calldata amounts) external;
-    function balanceOf(address account) external view returns (uint256);
     function transferFrom(address from, address to, uint256 amount) external returns (bool);
+    function balanceOf(address account) external view returns (uint256);
 }
 
 contract DarwinCommunity is OwnableUpgradeable, IDarwinCommunity, UUPSUpgradeable {
@@ -93,7 +93,7 @@ contract DarwinCommunity is OwnableUpgradeable, IDarwinCommunity, UUPSUpgradeabl
     IDarwin public darwin;
 
     function initialize(
-        uint256[] calldata restrictedProposalSignatures,
+        string[] calldata restrictedProposalSignatures,
         string[] calldata fundProposals,
         address[] calldata fundAddress
     ) public initializer {
@@ -103,7 +103,7 @@ contract DarwinCommunity is OwnableUpgradeable, IDarwinCommunity, UUPSUpgradeabl
     }
 
     function __DarwinCommunity_init_unchained(
-        uint256[] calldata restrictedProposalSignatures,
+        string[] calldata restrictedProposalSignatures,
         string[] calldata fundProposals,
         address[] calldata fundAddress
     ) private initializer {
@@ -119,10 +119,11 @@ contract DarwinCommunity is OwnableUpgradeable, IDarwinCommunity, UUPSUpgradeabl
         gracePeriod = 72 hours;
         proposalMinVotesCountForAction = 1;
 
-        minDarwinTransferToAccess = 1 * 10**9; // 1 darwin
+        minDarwinTransferToAccess = 1e18; // 1 darwin
 
         for (uint256 i = 0; i < restrictedProposalSignatures.length; i++) {
-            restrictedProposalActionSignature[restrictedProposalSignatures[i]] = true;
+            uint256 signature = uint256(keccak256(bytes(restrictedProposalSignatures[i])));
+            restrictedProposalActionSignature[signature] = true;
         }
 
         for (uint256 i = 0; i < fundProposals.length; i++) {
@@ -380,7 +381,7 @@ contract DarwinCommunity is OwnableUpgradeable, IDarwinCommunity, UUPSUpgradeabl
     }
 
     /**
-     *  Cast a vote for a proposal
+     * @notice Cast a vote for a proposal
      * @param proposalId The id of the proposal to vote on
      * @param inSupport The support value for the vote. 0=against, 1=for, 2=abstain
      */

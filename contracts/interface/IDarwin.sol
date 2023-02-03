@@ -17,7 +17,7 @@ interface IDarwin {
 
     function unPause() external;
 
-    function setRouter(address _newRouter, bool _isDarwinSwap) external;
+    function setLive() external;
 
     function bulkTransfer(address[] calldata recipients, uint256[] calldata amounts) external;
 

@@ -8,20 +8,15 @@ import "@openzeppelin/contracts-upgradeable/access/AccessControlUpgradeable.sol"
 import "./interface/IDarwin.sol";
 import "./interface/IDarwinCommunity.sol";
 import "@uniswap/v2-core/contracts/interfaces/IUniswapV2Factory.sol";
-import "@uniswap/v2-core/contracts/interfaces/IUniswapV2Pair.sol";
 import "@uniswap/v2-periphery/contracts/interfaces/IUniswapV2Router02.sol";
-import "./Openzeppelin/ERC20Upgradeable.sol";
-// TODO: CHANGE THIS TO DARWINSWAP LIBRARY ONCE FACTORY IS DEPLOYED AND WE HAVE ITS INIT CODE HASH
-import {UniswapV2Library} from "@uniswap/v2-periphery/contracts/UniswapV2Router02.sol";
+import "./Tokenomics2.sol";
 
-contract Darwin is IDarwin, ERC20Upgradeable, OwnableUpgradeable, AccessControlUpgradeable, UUPSUpgradeable {
+contract DarwinWithTokenomics2 is IDarwin, Tokenomics2, OwnableUpgradeable, AccessControlUpgradeable, UUPSUpgradeable {
 
     // roles
-    bytes32 public constant COMMUNITY_ROLE = keccak256("COMMUNITY_ROLE");
+    bytes32 public constant UPGRADER_ROLE = keccak256("UPGRADER_ROLE");
     bytes32 public constant PRESALE_ROLE = keccak256("PRESALE_ROLE");
     bytes32 public constant MINTER_ROLE = keccak256("MINTER_ROLE");
-    bytes32 public constant MAINTENANCE_ROLE = keccak256("MAINTENANCE_ROLE");
-    bytes32 public constant SECURITY_ROLE = keccak256("SECURITY_ROLE");
 
     // constants
     uint256 private constant _MULTIPLIER = 2**160;
@@ -47,19 +42,26 @@ contract Darwin is IDarwin, ERC20Upgradeable, OwnableUpgradeable, AccessControlU
     uint256 public culmulativeRewardPerToken;
     mapping(address => uint256) private _lastCulmulativeRewards;
     mapping(address => bool) private _isExcludedFromRewards;
+    bool private _isDarwinSwapLive;
     address[] public excludedFromRewards;
 
-    // The rewards wallet
     address public rewardsWallet;
-
-    // How much DARWIN has been burnt
-    uint256 public totalBurnt;
+    IDarwinCommunity darwinCommunity;
 
     //TODO: should consider moving outside or inheriting from pausable
     // pausing
     bool public isPaused;
     bool public isLive;
     mapping(address => bool) private pauseWhitelist;
+
+    modifier onlyDarwinCommunity() {
+        if (msg.sender != address(darwinCommunity) &&
+            (address(darwinCommunity) != address(0) ||
+            msg.sender != owner())) {
+            revert OnlyDarwinCommunity();
+        }
+        _;
+    }
 
     modifier notPaused() {
         if(isPaused) {
@@ -72,97 +74,159 @@ contract Darwin is IDarwin, ERC20Upgradeable, OwnableUpgradeable, AccessControlU
 
     function initialize(
         address uniswapV2RouterAddress,
+        bool _isDarwinSwap,
         address _presaleContractAddress,
         address _privateSaleContractAddress,
-        address _darwinCommunity,
-        address _darwinDrop
+        address _darwinCommunity
     ) external initializer {
         __Context_init_unchained();
         __Ownable_init_unchained();
-        __darwin_init_unchained(uniswapV2RouterAddress, _presaleContractAddress, _privateSaleContractAddress, _darwinCommunity, _darwinDrop); // wallet1: Wallet 1 (0x0bF1C4139A6168988Fe0d1384296e6df44B27aFd), wallet2: Wallet 2 (0xBE013CeAB3611Dc71A4f150577375f8Cb8d9f6c3)
+        //TODO: set these values in the constructor
+        __tokenomics2_init_unchained(0xB403e23F1d68682771af32278F5Dde4361539Ee4, 0x0000000000000000000000000000000000000000, _presaleContractAddress, uniswapV2RouterAddress, 5, 5); // tokenomics1: Tokenomics 1.0 Wallet (0xB403e23F1d68682771af32278F5Dde4361539Ee4); tokenomics2: Tokenomics 2.0 Wallet (NOT_SET_YET)
+        __darwin_init_unchained(uniswapV2RouterAddress, _isDarwinSwap, 0x0bF1C4139A6168988Fe0d1384296e6df44B27aFd, 0xBE013CeAB3611Dc71A4f150577375f8Cb8d9f6c3, _darwinCommunity, _presaleContractAddress, _privateSaleContractAddress); // wallet1: Wallet 1 (0x0bF1C4139A6168988Fe0d1384296e6df44B27aFd), wallet2: Wallet 2 (0xBE013CeAB3611Dc71A4f150577375f8Cb8d9f6c3)
         __UUPSUpgradeable_init();
         __ERC20_init_unchained("Darwin Protocol", "DARWIN");
     }
 
     function __darwin_init_unchained(
         address uniswapV2RouterAddress,
-        address _presaleContractAddress,
-        address _privateSaleContractAddress,
+        bool _isDarwinSwap,
+        address _wallet1,
+        address _wallet2,
         address _darwinCommunity,
-        address _darwinDrop
+        address _presaleContractAddress,
+        address _privateSaleContractAddress
     ) private onlyInitializing {
-        // ecosystem addresses
-        rewardsWallet = 0x3Cc90773ebB2714180b424815f390D937974109B;
-        address _wallet1 = 0x0bF1C4139A6168988Fe0d1384296e6df44B27aFd;
-        address _wallet2 = 0xBE013CeAB3611Dc71A4f150577375f8Cb8d9f6c3;
-        address _kieran = 0xe4e672ED86b8f6782e889F125e977bcF54018232;
 
-        // get the DARWIN-WETH pair on the selected DEX without creating it, whitelist it from holding and selling limit and exclude it from rewards
-        IUniswapV2Router02 uniswapV2Router = IUniswapV2Router02(uniswapV2RouterAddress);
-        IUniswapV2Pair uniswapV2Pair = UniswapV2Library.pairFor(uniswapV2Router.factory(), address(this), uniswapV2Router.WETH());
-        _registerPair(address(uniswapV2Pair));
+        _isDarwinSwapLive = _isDarwinSwap;
 
-        // allow addresses to trade during the pre-launch pause
-        pauseWhitelist[_presaleContractAddress] = true;
-        pauseWhitelist[_privateSaleContractAddress] = true;
-        pauseWhitelist[_msgSender()] = true;
-        pauseWhitelist[_wallet1] = true;
-        pauseWhitelist[_kieran] = true;
-        pauseWhitelist[_darwinDrop] = true;
+        // exclude wallets from sell limit
+        isExcludedFromSellLimit[_msgSender()] = true;
+        isExcludedFromSellLimit[_wallet1] = true;
+        isExcludedFromSellLimit[_darwinCommunity] = true;
+        isExcludedFromSellLimit[_presaleContractAddress] = true;
 
-        // exclude addresses from holding limit
+        // exclude wallets from holding limit
         isExcludedFromHoldingLimit[_msgSender()] = true;
         isExcludedFromHoldingLimit[_wallet1] = true;
-        isExcludedFromHoldingLimit[_wallet2] = true;
         isExcludedFromHoldingLimit[_darwinCommunity] = true;
         isExcludedFromHoldingLimit[_presaleContractAddress] = true;
         isExcludedFromHoldingLimit[_privateSaleContractAddress] = true;
-        isExcludedFromHoldingLimit[_darwinDrop] = true;
-        isExcludedFromHoldingLimit[rewardsWallet] = true;
 
-        // exclude addresses from sell limit
-        isExcludedFromSellLimit[_msgSender()] = true;
-        isExcludedFromSellLimit[_wallet1] = true;
-        isExcludedFromSellLimit[_wallet2] = true;
-        isExcludedFromSellLimit[_darwinCommunity] = true;
-        isExcludedFromSellLimit[_presaleContractAddress] = true;
-        isExcludedFromSellLimit[_privateSaleContractAddress] = true;
-        isExcludedFromSellLimit[_darwinDrop] = true;
-        isExcludedFromSellLimit[rewardsWallet] = true;
-
-        // exclude addresses from receiving rewards
         _setExcludedFromRewards(_msgSender());
         _setExcludedFromRewards(_darwinCommunity);
         _setExcludedFromRewards(_wallet1);
-        _setExcludedFromRewards(_wallet2);
         _setExcludedFromRewards(_presaleContractAddress);
         _setExcludedFromRewards(_privateSaleContractAddress);
-        _setExcludedFromRewards(_darwinDrop);
 
-        // calculate mint allocations
+        pauseWhitelist[_presaleContractAddress] = true;
+        pauseWhitelist[_privateSaleContractAddress] = true;
+
         uint privateSaleMint = INITIAL_SUPPLY / 400; // 0.25% of initial supply
         uint wallet1Mint = (INITIAL_SUPPLY * WALLET1_PECENTAGE) / 100;
         uint wallet2Mint = (INITIAL_SUPPLY * WALLET2_PECENTAGE) / 100 - privateSaleMint;
         uint presaleMint = INITIAL_SUPPLY - (wallet1Mint + wallet2Mint + privateSaleMint);
 
-        // mint
         _mint(_wallet1, wallet1Mint);
         _mint(_wallet2, wallet2Mint);
         _mint(_privateSaleContractAddress, privateSaleMint);
         _mint(_presaleContractAddress, presaleMint);
 
+        IUniswapV2Router02 uniswapV2Router = IUniswapV2Router02(uniswapV2RouterAddress);
+
+        rewardsWallet = 0x3Cc90773ebB2714180b424815f390D937974109B;
+
+        // Create a uniswap pair for this new token
+        IUniswapV2Pair uniswapV2Pair = IUniswapV2Pair(
+            IUniswapV2Factory(uniswapV2Router.factory()).createPair(address(this), uniswapV2Router.WETH())
+        );
+
+        // add exchange wallets
+        _registerPair(uniswapV2RouterAddress, address(uniswapV2Pair));
+
+        darwinCommunity = IDarwinCommunity(_darwinCommunity);
+
         // grant roles
         _grantRole(DEFAULT_ADMIN_ROLE, msg.sender);
-        _grantRole(SECURITY_ROLE, msg.sender);
-        _grantRole(MAINTENANCE_ROLE, msg.sender);
-        _grantRole(COMMUNITY_ROLE, _darwinCommunity);
+        _grantRole(UPGRADER_ROLE, msg.sender);
         _grantRole(PRESALE_ROLE, _presaleContractAddress);
         _grantRole(PRESALE_ROLE, _privateSaleContractAddress);
+
     }
 
-    ////////////////////// PRESALE FUNCTIONS ///////////////////////////////////
+    /// @notice Whitelists/unwhitelists an array of addresses.
+    /// @dev Address at addresses[n] gets kinds[n]-whitelisted if values[n] is true, otherwise it gets kinds[n]-unwhitelisted.
+    /// @param addresses Array of addresses to be whitelisted/unwhitelisted.
+    /// @param kinds Array of uints representing the whitelist types.
+    /// @param values Array of bools. `value[n]` is true if address[n] has to be whitelisted.
+    function setWhitelist(address[] memory addresses, uint[] memory kinds, bool[] memory values) external onlyRole(DEFAULT_ADMIN_ROLE) {
+        require(addresses.length == kinds.length && kinds.length == values.length, "setWhitelist: Length must be the same for the 3 arrays");
 
-    function setLive() external onlyRole(PRESALE_ROLE) {
+        // k = 1 ---> trade + holding + sell + rewards
+        // k = 2 ---> trade + holding + sell
+        // k = 3 ---> holding + sell + rewards
+        // k = 4 ---> holding + sell
+        // k = 5 ---> trade + rewards
+        // k = 6 ---> trade
+        for (uint i = 0; i < addresses.length; i++) {
+            address a = addresses[i];
+            uint k = kinds[i];
+            bool v = values[i];
+
+            if (k <= 6 && k > 4) {
+                setPauseWhitelist(a, v); // trade
+                if (k == 5) {
+                    setReceiveRewards(a, v); // include/exclude in rewards (reflection)
+                }
+            }
+            
+            else if (k <= 4) {
+                isExcludedFromSellLimit[a] = v; // sell
+                isExcludedFromHoldingLimit[a] = v; // holding
+                if (k == 3) {
+                    setReceiveRewards(a, v); // include/exclude in rewards (reflection)
+                } else if (k <= 2) {
+                    setPauseWhitelist(a, v); // trade
+                    if (k == 1) {
+                        setReceiveRewards(a, v); // include/exclude in rewards (reflection)
+                    }
+                }
+            }
+        }
+    }
+
+    function setReceiveRewards(address a, bool v) private {
+        if (v) {
+            _removeExcludedFromRewards(a); // include in rewards (reflection)
+        } else {
+            _setExcludedFromRewards(a); // exclude from rewards (reflection)
+        }
+    }
+
+    function burn(uint256 amount) external {
+        _burn(msg.sender, amount);
+    }
+
+    function setRouter(address _newRouter, bool _isDarwinSwap) external onlyRole(PRESALE_ROLE) {
+        IUniswapV2Router02 uniswapV2Router = IUniswapV2Router02(_newRouter);
+
+        (address token0, address token1) = address(this) < uniswapV2Router.WETH() ? (address(this), uniswapV2Router.WETH()) : (uniswapV2Router.WETH(), address(this));
+        if (IUniswapV2Factory(uniswapV2Router.factory()).getPair(token0, token1) == address(0)) {
+            IUniswapV2Pair uniswapV2Pair = IUniswapV2Pair(
+                IUniswapV2Factory(uniswapV2Router.factory()).createPair(address(this), uniswapV2Router.WETH())
+            );
+
+            _registerPair(_newRouter, address(uniswapV2Pair));
+        }
+
+        _isDarwinSwapLive = _isDarwinSwap;
+
+        _setBuyWhitelist(_newRouter, true);
+    }
+
+    ////////////////////// PAUSE FUNCTIONS ///////////////////////////////////
+
+    function setLive() external onlyRole(DEFAULT_ADMIN_ROLE) {
         isLive = true;
     }
 
@@ -178,25 +242,11 @@ contract Darwin is IDarwin, ERC20Upgradeable, OwnableUpgradeable, AccessControlU
         }
     }
 
-    function setPauseWhitelist(address _addr, bool value) public onlyRole(MAINTENANCE_ROLE) {
+    function setPauseWhitelist(address _addr, bool value) public onlyRole(DEFAULT_ADMIN_ROLE) {
         pauseWhitelist[_addr] = value;
     }
 
-    ////////////////////// MAINTENANCE FUNCTIONS /////////////////////////////////////
-
-    function maintenancePause() external onlyRole(MAINTENANCE_ROLE) {
-        if(isPaused == false) {
-            isPaused = true;
-        }
-    }
-
-    function maintenanceUnPause() external onlyRole(MAINTENANCE_ROLE) {
-        if(isPaused) {
-            isPaused = false;
-        }
-    }
-
-    ////////////////////// REWARDS FUNCTIONS /////////////////////////////////////
+    ////////////////////// NEW FUNCTIONS /////////////////////////////////////
 
     function _getRewardsOwed(uint _cumulativeRewardsPerToken, uint _lastCumulativeRewards, uint _balance) internal pure returns(uint) {
         return ((_cumulativeRewardsPerToken - _lastCumulativeRewards) * _balance) /_MULTIPLIER;
@@ -214,7 +264,7 @@ contract Darwin is IDarwin, ERC20Upgradeable, OwnableUpgradeable, AccessControlU
         newBalance = _balance + _rewardsOwed;
     }
 
-    function distributeRewards(uint256 amount) external {
+    function distributeRewards(uint256 amount) public onlyDarwinCommunity {
         _updateBalance(msg.sender);
         _setBalances(msg.sender, rewardsWallet, amount);
         _distributeRewards(amount);
@@ -257,10 +307,18 @@ contract Darwin is IDarwin, ERC20Upgradeable, OwnableUpgradeable, AccessControlU
         _lastCulmulativeRewards[account] = culmulativeRewardPerToken;
     }
 
-    function _registerPair(address pairAddress) internal {
+    function _registerPair(address routerAddress, address pairAddress) internal override {
+        super._registerPair(routerAddress, pairAddress);
         isExcludedFromSellLimit[pairAddress] = true;
         isExcludedFromHoldingLimit[pairAddress] = true;
         _setExcludedFromRewards(pairAddress);
+    }
+
+    function _unRegisterPair(address routerAddress, address pairAddress) internal override {
+        super._unRegisterPair(routerAddress, pairAddress);
+        delete isExcludedFromSellLimit[pairAddress];
+        delete isExcludedFromHoldingLimit[pairAddress];
+        _removeExcludedFromRewards(pairAddress);
     }
 
     function _updateBalance(address account) internal {
@@ -271,8 +329,6 @@ contract Darwin is IDarwin, ERC20Upgradeable, OwnableUpgradeable, AccessControlU
             _distributeRewardToUser(_culmulativeRewardPerToken, _lastCulmulativeReward, ERC20Upgradeable.balanceOf(account), account);
         }
     }
-
-    ////////////////////// LIMITS FUNCTIONS /////////////////////////////////////
 
     function maxTokenHoldingSize() public view returns(uint256) {
         return totalSupply() / 50; // 2% of the supply
@@ -303,12 +359,40 @@ contract Darwin is IDarwin, ERC20Upgradeable, OwnableUpgradeable, AccessControlU
         (log.amount, log.lastSale) = (newAmount, currentTime);
     }
 
-    function setMinter(address user_, bool canMint_) external onlyRole(SECURITY_ROLE) {
+    function setMinter(address user_, bool canMint_) external onlyRole(DEFAULT_ADMIN_ROLE) {
         if (canMint_) {
             _grantRole(MINTER_ROLE, user_);
         } else {
             _revokeRole(MINTER_ROLE, user_);
         }
+    }
+
+    function setBuyWhitelist(address user_, bool whitelist_) external onlyRole(DEFAULT_ADMIN_ROLE) {
+        _setBuyWhitelist(user_, whitelist_);
+    }
+
+    function setSellWhitelist(address user_, bool whitelist_) external onlyRole(DEFAULT_ADMIN_ROLE) {
+        _setSellWhitelist(user_, whitelist_);
+    }
+
+    function setTokenomics1Wallet(address tokenomics1_) external onlyRole(DEFAULT_ADMIN_ROLE) {
+        _setTokenomics1Wallet(tokenomics1_);
+    }
+
+    function setTokenomics2Wallet(address tokenomics2_) external onlyRole(DEFAULT_ADMIN_ROLE) {
+        _setTokenomics2Wallet(tokenomics2_);
+    }
+
+    function setPoolTaxBuy(uint256 tax_) external onlyRole(DEFAULT_ADMIN_ROLE) {
+        _setPoolTaxBuy(tax_);
+    }
+
+    function setUserTaxSell(uint256 tax_) external onlyRole(DEFAULT_ADMIN_ROLE) {
+        _setUserTaxSell(tax_);
+    }
+
+    function setSmartSync(bool smartSync_) external onlyRole(DEFAULT_ADMIN_ROLE) {
+        smartSync = smartSync_;
     }
 
     /////////////////////// TRANSFER FUNCTIONS //////////////////////////////////////
@@ -324,7 +408,12 @@ contract Darwin is IDarwin, ERC20Upgradeable, OwnableUpgradeable, AccessControlU
         _updateBalance(from);
         _updateBalance(to);
         _enforceSellLimit(from, amount);
-        return amount;
+        // If DarwinSwap is live, we don't want to run DARWIN's own Tokenomics 2.0 logic (located in super._beforeTokenTransfer()) nomore because they'll be already worked out in the swap contracts.
+        if (_isDarwinSwapLive) {
+            return amount;
+        } else {
+            return super._beforeTokenTransfer(from, to, amount);
+        }
     }
 
     function _afterTokenTransfer(
@@ -354,31 +443,16 @@ contract Darwin is IDarwin, ERC20Upgradeable, OwnableUpgradeable, AccessControlU
         _mint(account, amount);
     }
 
-    function burn(uint256 amount) external {
-        _burn(msg.sender, amount);
-        totalBurnt += amount;
-    }
-
     ////////////////////// COMMUNITY FUNCTIONS /////////////////////////////////////
 
-    function excludeFromRewards(address account) external onlyRole(COMMUNITY_ROLE) {
+    function excludeFromRewards(address account) external onlyDarwinCommunity {
         _setExcludedFromRewards(account);
     }
 
-    function reIncludeInRewards(address account) external onlyRole(COMMUNITY_ROLE) {
-        _removeExcludedFromRewards(account);
+    function registerPair(address routerAddress, address pairAddress) public onlyDarwinCommunity {
+        _registerPair(routerAddress, pairAddress);
     }
 
-    function communityUnPause() external onlyRole(COMMUNITY_ROLE) {
-        if(isPaused) {
-            isPaused = false;
-        }
-    }
-
-    function registerPair(address pairAddress) external onlyRole(COMMUNITY_ROLE) {
-        _registerPair(pairAddress);
-    }
-
-    function _authorizeUpgrade(address newImplementation) internal override onlyRole(COMMUNITY_ROLE){}
+    function _authorizeUpgrade(address newImplementation) internal override onlyRole(UPGRADER_ROLE){}
 
 }

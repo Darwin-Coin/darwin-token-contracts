@@ -7,8 +7,6 @@
 
 import { HardhatUpgrades } from "@openzeppelin/hardhat-upgrades";
 import { getManifestAdmin } from "@openzeppelin/hardhat-upgrades/dist/admin";
-import { BigNumber } from "ethers";
-import { keccak256, toUtf8Bytes } from "ethers/lib/utils";
 import hardhat, { ethers, upgrades } from "hardhat";
 import { Darwin, DarwinCommunity, Darwin__factory, ProxyAdmin, ProxyAdmin__factory } from "../typechain";
 import { getUniswapRouterAddress } from "./helpers";
@@ -68,13 +66,7 @@ async function main() {
         }
     ]
 
-    const restrictedProposalSignatures = [
-        proxyAdminContract.interface.functions["upgrade(address,address)"],
-        proxyAdminContract.interface.functions["upgradeAndCall(address,address,bytes)"],
-    ].map(it => it.format())
-        .map(it => keccak256(toUtf8Bytes(it)))
-        .map(it => BigNumber.from(it))
-
+    const restrictedProposalSignatures = ["upgradeTo(address)", "upgradeToAndCall(address,bytes)"]
 
     const fundProposals = proposalCandidates.map(it => it.proposal);
     const fundProposalsAddresses = proposalCandidates.map(it => it.address);
