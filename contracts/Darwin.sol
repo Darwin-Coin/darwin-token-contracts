@@ -8,11 +8,7 @@ import "@openzeppelin/contracts-upgradeable/access/AccessControlUpgradeable.sol"
 import "./interface/IDarwin.sol";
 import "./interface/IDarwinCommunity.sol";
 import "@uniswap/v2-core/contracts/interfaces/IUniswapV2Factory.sol";
-import "@uniswap/v2-core/contracts/interfaces/IUniswapV2Pair.sol";
-import "@uniswap/v2-periphery/contracts/interfaces/IUniswapV2Router02.sol";
 import "./Openzeppelin/ERC20Upgradeable.sol";
-// TODO: CHANGE THIS TO DARWINSWAP LIBRARY ONCE FACTORY IS DEPLOYED AND WE HAVE ITS INIT CODE HASH
-import {UniswapV2Library} from "@uniswap/v2-periphery/contracts/UniswapV2Router02.sol";
 
 contract Darwin is IDarwin, ERC20Upgradeable, OwnableUpgradeable, AccessControlUpgradeable, UUPSUpgradeable {
 
@@ -22,6 +18,7 @@ contract Darwin is IDarwin, ERC20Upgradeable, OwnableUpgradeable, AccessControlU
     bytes32 public constant MINTER_ROLE = keccak256("MINTER_ROLE");
     bytes32 public constant MAINTENANCE_ROLE = keccak256("MAINTENANCE_ROLE");
     bytes32 public constant SECURITY_ROLE = keccak256("SECURITY_ROLE");
+    bytes32 public constant FACTORY_ROLE = keccak256("FACTORY_ROLE");
 
     // constants
     uint256 private constant _MULTIPLIER = 2**160;
@@ -61,6 +58,9 @@ contract Darwin is IDarwin, ERC20Upgradeable, OwnableUpgradeable, AccessControlU
     bool public isLive;
     mapping(address => bool) private pauseWhitelist;
 
+    // The DarwinSwap factory address
+    IUniswapV2Factory public darwinSwapFactory;
+
     modifier notPaused() {
         if(isPaused) {
             if(isLive || pauseWhitelist[msg.sender] == false) revert Paused();
@@ -71,7 +71,6 @@ contract Darwin is IDarwin, ERC20Upgradeable, OwnableUpgradeable, AccessControlU
     //////////////////////// Initializers /////////////////////////////////
 
     function initialize(
-        address uniswapV2RouterAddress,
         address _presaleContractAddress,
         address _privateSaleContractAddress,
         address _darwinCommunity,
@@ -79,13 +78,12 @@ contract Darwin is IDarwin, ERC20Upgradeable, OwnableUpgradeable, AccessControlU
     ) external initializer {
         __Context_init_unchained();
         __Ownable_init_unchained();
-        __darwin_init_unchained(uniswapV2RouterAddress, _presaleContractAddress, _privateSaleContractAddress, _darwinCommunity, _darwinDrop); // wallet1: Wallet 1 (0x0bF1C4139A6168988Fe0d1384296e6df44B27aFd), wallet2: Wallet 2 (0xBE013CeAB3611Dc71A4f150577375f8Cb8d9f6c3)
+        __darwin_init_unchained(_presaleContractAddress, _privateSaleContractAddress, _darwinCommunity, _darwinDrop); // wallet1: Wallet 1 (0x0bF1C4139A6168988Fe0d1384296e6df44B27aFd), wallet2: Wallet 2 (0xBE013CeAB3611Dc71A4f150577375f8Cb8d9f6c3)
         __UUPSUpgradeable_init();
         __ERC20_init_unchained("Darwin Protocol", "DARWIN");
     }
 
     function __darwin_init_unchained(
-        address uniswapV2RouterAddress,
         address _presaleContractAddress,
         address _privateSaleContractAddress,
         address _darwinCommunity,
@@ -96,11 +94,6 @@ contract Darwin is IDarwin, ERC20Upgradeable, OwnableUpgradeable, AccessControlU
         address _wallet1 = 0x0bF1C4139A6168988Fe0d1384296e6df44B27aFd;
         address _wallet2 = 0xBE013CeAB3611Dc71A4f150577375f8Cb8d9f6c3;
         address _kieran = 0xe4e672ED86b8f6782e889F125e977bcF54018232;
-
-        // get the DARWIN-WETH pair on the selected DEX without creating it, whitelist it from holding and selling limit and exclude it from rewards
-        IUniswapV2Router02 uniswapV2Router = IUniswapV2Router02(uniswapV2RouterAddress);
-        IUniswapV2Pair uniswapV2Pair = UniswapV2Library.pairFor(uniswapV2Router.factory(), address(this), uniswapV2Router.WETH());
-        _registerPair(address(uniswapV2Pair));
 
         // allow addresses to trade during the pre-launch pause
         pauseWhitelist[_presaleContractAddress] = true;
@@ -158,6 +151,18 @@ contract Darwin is IDarwin, ERC20Upgradeable, OwnableUpgradeable, AccessControlU
         _grantRole(COMMUNITY_ROLE, _darwinCommunity);
         _grantRole(PRESALE_ROLE, _presaleContractAddress);
         _grantRole(PRESALE_ROLE, _privateSaleContractAddress);
+    }
+
+    ////////////////////// SWAP FUNCTIONS ///////////////////////////////////
+
+    function setDarwinSwapFactory(address _darwinSwapFactory) external onlyRole(SECURITY_ROLE) {
+        require(address(darwinSwapFactory) == address(0), "DARWIN: DarwinSwap Factory address already set");
+        darwinSwapFactory = IUniswapV2Factory(_darwinSwapFactory);
+        _grantRole(FACTORY_ROLE, _darwinSwapFactory);
+    }
+
+    function registerDarwinSwapPair(address _pair) external onlyRole(FACTORY_ROLE) {
+        _registerPair(_pair);
     }
 
     ////////////////////// PRESALE FUNCTIONS ///////////////////////////////////
