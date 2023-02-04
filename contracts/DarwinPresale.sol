@@ -65,27 +65,29 @@ contract DarwinPresale is IDarwinPresale, ReentrancyGuard, Ownable {
         _;
     }
 
-    /// @dev Initializes the darwin address and presale start date, and sets presale end date to 90 days after it
-    /// @param _darwin The darwin token address
-    /// @param _presaleStart The presale start date
-    /// @param _router The AMM router address
+    /// @dev Initializes the Darwin Protocol address
+    /// @param _darwin The Darwin Protocol address
     function init(
-        address _darwin,
-        uint256 _presaleStart,
-        address _router
+        address _darwin
     ) external onlyOwner {
         if (_isInitialized) revert AlreadyInitialized();
-        _isInitialized = true;
-        if (_darwin == address(0) || _router == address(0)) revert ZeroAddress();
-        // solhint-disable-next-line not-rely-on-time
-        if (_presaleStart < block.timestamp) revert InvalidStartDate();
+        if (_darwin == address(0)) revert ZeroAddress();
+
         darwin = IERC20(_darwin);
-        IDarwin(address(darwin)).pause();
-        _setRouter(_router);
+        if (!IDarwin(_darwin).isPaused())
+            IDarwin(_darwin).pause();
+
         _setWallet1(0x0bF1C4139A6168988Fe0d1384296e6df44B27aFd);
         _setWallet2(0xBE013CeAB3611Dc71A4f150577375f8Cb8d9f6c3);
-        presaleStart = _presaleStart;
-        presaleEnd = _presaleStart + (90 days);
+    }
+
+    /// @dev Initializes the presale start date, and sets presale end date to 90 days after it
+    function startPresale() external onlyOwner {
+        if (_isInitialized) revert AlreadyInitialized();
+        _isInitialized = true;
+
+        presaleStart = block.timestamp;
+        presaleEnd = presaleStart + (90 days);
     }
 
     /// @notice Deposits BNB into the presale
@@ -195,10 +197,11 @@ contract DarwinPresale is IDarwinPresale, ReentrancyGuard, Ownable {
     }
 
     /// @notice Changes the router address.
-    /// @dev Only callable by the owner. Useful in case we want to set the router to DarwinSwap's one if we deploy it before presale ends.
+    /// @dev Only callable by the owner. Useful when we want to set the router to DarwinSwap's one, since we're deploying it during presale.
     /// @param _router the new router address.
     function setRouter(address _router) external onlyOwner {
-        _setRouter(_router);
+        router = IUniswapV2Router02(_router);
+        emit RouterSet(_router);
     }
 
     /// @notice Returns the current stage of the presale
@@ -287,11 +290,6 @@ contract DarwinPresale is IDarwinPresale, ReentrancyGuard, Ownable {
         if (!success) {
             revert TransferFailed();
         }
-    }
-
-    function _setRouter(address _router) internal {
-        router = IUniswapV2Router02(_router);
-        emit RouterSet(_router);
     }
 
     function _setWallet1(address _wallet1) internal {

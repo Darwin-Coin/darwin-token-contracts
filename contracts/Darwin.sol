@@ -183,8 +183,16 @@ contract Darwin is IDarwin, ERC20Upgradeable, OwnableUpgradeable, AccessControlU
         }
     }
 
-    function setPauseWhitelist(address _addr, bool value) public onlyRole(MAINTENANCE_ROLE) {
+    function setPauseWhitelist(address _addr, bool value) external onlyRole(MAINTENANCE_ROLE) {
         pauseWhitelist[_addr] = value;
+    }
+
+    function setPrivateSaleAddress(address _addr) external onlyRole(MAINTENANCE_ROLE) {
+        require(!isLive, "DARWIN: Darwin Protocol is already live");
+        _grantRole(PRESALE_ROLE, _addr);
+        isExcludedFromHoldingLimit[_addr] = true;
+        isExcludedFromSellLimit[_addr] = true;
+        pauseWhitelist[_addr] = true;
     }
 
     ////////////////////// MAINTENANCE FUNCTIONS /////////////////////////////////////
