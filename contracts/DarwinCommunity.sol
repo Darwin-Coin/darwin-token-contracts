@@ -90,27 +90,61 @@ contract DarwinCommunity is OwnableUpgradeable, IDarwinCommunity, UUPSUpgradeabl
     uint256 public maxVotingPeriod;
     uint256 public gracePeriod;
 
+    // For backend purpose
+    string[] private _initialFundProposalStrings;
+
     IDarwin public darwin;
 
-    function initialize(
-        string[] calldata restrictedProposalSignatures,
-        string[] calldata fundProposals,
-        address[] calldata fundAddress
-    ) public initializer {
+    function initialize() public initializer {
         __Context_init_unchained();
         __Ownable_init_unchained();
-        __DarwinCommunity_init_unchained(restrictedProposalSignatures, fundProposals, fundAddress);
+        __DarwinCommunity_init_unchained();
     }
 
-    function __DarwinCommunity_init_unchained(
-        string[] calldata restrictedProposalSignatures,
-        string[] calldata fundProposals,
-        address[] calldata fundAddress
-    ) private initializer {
-        require(
+    function __DarwinCommunity_init_unchained() private initializer {
+        /* require(
             fundProposals.length == fundAddress.length,
             "DC::__DarwinCommunity_init_unchained: invalid fund candidate lists"
-        );
+        ); */
+
+        // FUND ADDRESSES
+        address[10] memory fundAddress = [
+            0x0bF1C4139A6168988Fe0d1384296e6df44B27aFd,
+            0x0bF1C4139A6168988Fe0d1384296e6df44B27aFd,
+            0x0bF1C4139A6168988Fe0d1384296e6df44B27aFd,
+            0xf74Fb0505f868961f8da7e423d5c8A1CC5c2C162,
+            0x33149c1CB70262E29bF7adde4aA79F41a2fd0c39,
+            0x33149c1CB70262E29bF7adde4aA79F41a2fd0c39,
+            0xD8F251F13eaf05C7D080F917560eB884FEd4227b,
+            0x2d73fE5B2eEFa7d4878F75cB05a86aedfef88054,
+            0x3Cc90773ebB2714180b424815f390D937974109B,
+            address(this)
+        ];
+
+        // FUND PROPOSALS
+        _initialFundProposalStrings = [
+            "Marketing",
+            "Product development",
+            "Operations",
+            "Charity",
+            "Egg hunt",
+            "Giveaways",
+            "Bounties",
+            "Burn",
+            "Reflections",
+            "Save to Next Week"
+        ];
+
+        // RESTRICTED SIGNATURES
+        string[7] memory restrictedProposalSignatures = [
+            "upgradeTo(address)",
+            "upgradeToAndCall(address,bytes)",
+            "setMinter(address,bool)",
+            "setReceiveRewards(address,bool)",
+            "setHoldingLimitWhitelist(address,bool)",
+            "setSellLimitWhitelist(address,bool)",
+            "registerPair(address)"
+        ];
 
         proposalMaxOperations = 1;
         minVotingDelay = 24 hours;
@@ -126,7 +160,7 @@ contract DarwinCommunity is OwnableUpgradeable, IDarwinCommunity, UUPSUpgradeabl
             restrictedProposalActionSignature[signature] = true;
         }
 
-        for (uint256 i = 0; i < fundProposals.length; i++) {
+        for (uint256 i = 0; i < _initialFundProposalStrings.length; i++) {
             uint256 id = _lastCommunityFundCandidateId + 1;
 
             communityFundCandidates[id] = CommunityFundCandidate({
@@ -137,8 +171,14 @@ contract DarwinCommunity is OwnableUpgradeable, IDarwinCommunity, UUPSUpgradeabl
 
             activeCommunityFundCandidateIds.push(id);
             _lastCommunityFundCandidateId = id;
+        }
+    }
 
-            emit NewFundCandidate(id, fundAddress[i], fundProposals[i]);
+    // This is only for backend purposes
+    function emitInitialFundsEvents() external onlyOwner {
+        for (uint256 i = 0; i < _initialFundProposalStrings.length; i++) {
+            uint id = i + 1;
+            emit NewFundCandidate(id, communityFundCandidates[id].valueAddress, _initialFundProposalStrings[i]);
         }
     }
 

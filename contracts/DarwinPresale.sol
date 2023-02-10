@@ -232,6 +232,10 @@ contract DarwinPresale is IDarwinPresale, ReentrancyGuard, Ownable {
     /// @notice Returns the current presale status
     /// @return The current presale status
     function presaleStatus() public view returns (Status) {
+        if (!_isInitialized) {
+            return Status.QUEUED;
+        }
+
         // solhint-disable-next-line not-rely-on-time
         if (status.raisedAmount >= HARDCAP || block.timestamp > presaleEnd) {
             return Status.SUCCESS; // Wonderful, presale has ended

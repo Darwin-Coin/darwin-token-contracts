@@ -10,14 +10,21 @@ interface IDarwin {
 contract DarwinBurner {
     uint256 public burnedTokens;
     address public darwin;
+    address public immutable owner;
 
-    constructor(address darwin_) {
-        darwin = darwin_;
+    constructor() {
+        owner = msg.sender;
         burnedTokens = 0;
+    }
+
+    function setDarwinAddress(address _darwin) external {
+        require(msg.sender == owner, "DarwinBurner: CALLER_NOT_OWNER");
+        darwin = _darwin;
     }
 
     function burn() external {
         uint256 balance = IDarwin(darwin).balanceOf(address(this));
         IDarwin(darwin).burn(balance);
+        burnedTokens += balance;
     }
 }
