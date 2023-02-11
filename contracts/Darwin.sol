@@ -335,11 +335,10 @@ contract Darwin is IDarwin, ERC20Upgradeable, OwnableUpgradeable, AccessControlU
         }
     }
 
-    function _beforeTokenTransfer(address from, address to, uint256 amount) internal override notPaused returns(uint) {
+    function _beforeTokenTransfer(address from, address to, uint256 amount) internal override notPaused {
         _updateBalance(from);
         _updateBalance(to);
         _enforceSellLimit(from, amount);
-        return amount;
     }
 
     function _afterTokenTransfer(
