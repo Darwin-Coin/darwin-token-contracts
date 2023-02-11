@@ -74,8 +74,7 @@ contract DarwinPresale is IDarwinPresale, ReentrancyGuard, Ownable {
         if (_darwin == address(0)) revert ZeroAddress();
 
         darwin = IERC20(_darwin);
-        if (!IDarwin(_darwin).isPaused())
-            IDarwin(_darwin).pause();
+        IDarwin(_darwin).pause();
 
         _setWallet1(0x0bF1C4139A6168988Fe0d1384296e6df44B27aFd);
         _setWallet2(0xBE013CeAB3611Dc71A4f150577375f8Cb8d9f6c3);
