@@ -8,14 +8,9 @@ import '@openzeppelin/hardhat-upgrades';
 import * as dotenv from "dotenv";
 dotenv.config();
 
-
-// const TEST_MNEMONICS = String(process.env.TEST_MNEMONICS)
-const TEST_MNEMONICS = "test test test test test test test test test test test junk"
-
 const config: HardhatUserConfig = {
 
     solidity: {
-
         compilers: [
             {
                 version: "0.5.16",
@@ -73,7 +68,6 @@ const config: HardhatUserConfig = {
                     },
                 }
             }
-
         ],
     },
 
@@ -86,7 +80,7 @@ const config: HardhatUserConfig = {
                 initialIndex: 0
             }
         },
-        localMainNetFork: {
+        localMainnetFork: {
             url: "http://127.0.0.1:8545",
             accounts: {
                 mnemonic: String(process.env.TEST_MNEMONICS),
@@ -94,8 +88,7 @@ const config: HardhatUserConfig = {
                 initialIndex: 0
             }
         },
-
-        localBscTestNetFork: {
+        localBscTestnetFork: {
             url: "http://127.0.0.1:8545",
             accounts: {
                 mnemonic: String(process.env.TEST_MNEMONICS),
@@ -103,31 +96,25 @@ const config: HardhatUserConfig = {
                 initialIndex: 6
             }
         },
-        bscTestNet: {
-            url: "https://data-seed-prebsc-2-s1.binance.org:8545/",
+
+        bscTestnet: {
+            url: "https://data-seed-prebsc-2-s3.binance.org:8545/",
             chainId: 97,
-            accounts:{
-                mnemonic: String(process.env.TEST_MNEMONICS),
-                count:1
-            }
+            accounts: [String(process.env.BSC_TESTNET_PRIVATEKEY)]
         },
-        bscMainNet: {
-            url: "https://bsc-dataseed1.binance.org/",
+        bscMainnet: {
+            url: "https://bsc-dataseed.binance.org/",
             chainId: 56,
-            accounts:{
-                mnemonic: String(process.env.DEPLOYER_MNEMONICS),
-                count:1
-            }
+            accounts: [String(process.env.BSC_MAINNET_PRIVATEKEY)]
         },
+
         hardhat: {
             loggingEnabled: false,
-            // gasMultiplier:1,
-            forking:{
-                enabled:false,
-                url : "https://bsc-dataseed3.ninicoin.io/"
+            forking: {
+                enabled: false,
+                url: "https://bsc-dataseed3.ninicoin.io/"
             },
             accounts: {
-                // mnemonic: String(process.env.TEST_MNEMONICS),
                 count: 100,
                 initialIndex: 0
             }
@@ -138,9 +125,14 @@ const config: HardhatUserConfig = {
         enabled: Boolean(process.env.REPORT_GAS),
         currency: "USD",
     },
+
     etherscan: {
-        apiKey: process.env.ETHERSCAN_API_KEY,
+        apiKey: {
+            bsc: String(process.env.BSCSCAN_API_KEY),
+            bscTestnet: String(process.env.BSCSCAN_API_KEY)
+        }
     },
+
     mocha: {
         parallel: false
     }
