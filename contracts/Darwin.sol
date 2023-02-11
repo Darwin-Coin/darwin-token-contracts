@@ -137,6 +137,7 @@ contract Darwin is IDarwin, ERC20Upgradeable, OwnableUpgradeable, AccessControlU
         _setExcludedFromRewards(_giveaway);
         _setExcludedFromRewards(_bounties);
         _setExcludedFromRewards(_darwinCommunity);
+        _setExcludedFromRewards(_wallet1);
         _setExcludedFromRewards(_wallet2);
         _setExcludedFromRewards(_darwinDrop);
         _setExcludedFromRewards(rewardsWallet);
