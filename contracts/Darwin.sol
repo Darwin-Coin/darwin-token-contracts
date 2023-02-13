@@ -108,6 +108,7 @@ contract Darwin is IDarwin, ERC20Upgradeable, OwnableUpgradeable, AccessControlU
         pauseWhitelist[_wallet1] = true;
         pauseWhitelist[_kieran] = true;
         pauseWhitelist[_darwinDrop] = true;
+        pauseWhitelist[_darwinCommunity] = true;
 
         // exclude addresses from holding limit
         isExcludedFromHoldingLimit[_msgSender()] = true;

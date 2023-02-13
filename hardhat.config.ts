@@ -115,6 +115,7 @@ const config: HardhatUserConfig = {
                 url: "https://bsc-dataseed3.ninicoin.io/"
             },
             accounts: {
+                accountsBalance: "100000000000000000000000000",
                 count: 100,
                 initialIndex: 0
             }
