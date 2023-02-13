@@ -25,8 +25,12 @@ contract Darwin is IDarwin, ERC20Upgradeable, OwnableUpgradeable, AccessControlU
     uint256 private constant _PERCENTAGE_MULTIPLIER = 100;
     uint256 private constant _PERCENTAGE_100 = 100 * _PERCENTAGE_MULTIPLIER;
 
-    uint256 public constant WALLET1_PECENTAGE = 10;
-    uint256 public constant WALLET2_PECENTAGE = 30;
+    uint256 public constant PRIVATESALE_PERCENTAGE = 25; // 0.25%
+    uint256 public constant PRESALE_PERCENTAGE = 6000; // 60%
+    uint256 public constant KIERAN_PERCENTAGE = 20; // 0.20%
+    uint256 public constant WALLET1_PECENTAGE = 1000; // 10%
+    uint256 public constant WALLET2_PECENTAGE = 2955; // 29.55%
+
     uint256 public constant INITIAL_SUPPLY = 1e8 ether; // initial supply: 100m
     uint256 public constant MAX_SUPPLY = 1e9 ether; // max supply: 1b
     uint256 public constant MAX_TOKEN_SALE_LIMIT_DURATION = 5 hours;
@@ -142,17 +146,21 @@ contract Darwin is IDarwin, ERC20Upgradeable, OwnableUpgradeable, AccessControlU
         _setExcludedFromRewards(_darwinDrop);
         _setExcludedFromRewards(rewardsWallet);
 
+        { // scope to avoid stack too deep errors
         // calculate mint allocations
-        uint privateSaleMint = INITIAL_SUPPLY / 400; // 0.25% of initial supply
-        uint wallet1Mint = (INITIAL_SUPPLY * WALLET1_PECENTAGE) / 100;
-        uint wallet2Mint = (INITIAL_SUPPLY * WALLET2_PECENTAGE) / 100 - privateSaleMint;
-        uint presaleMint = INITIAL_SUPPLY - (wallet1Mint + wallet2Mint + privateSaleMint);
+        uint privateSaleMint = (INITIAL_SUPPLY * PRIVATESALE_PERCENTAGE) / 10000;
+        uint presaleMint = (INITIAL_SUPPLY * PRESALE_PERCENTAGE) / 10000;
+        uint kieranMint = (INITIAL_SUPPLY * KIERAN_PERCENTAGE) / 10000;
+        uint wallet1Mint = (INITIAL_SUPPLY * WALLET1_PECENTAGE) / 10000;
+        uint wallet2Mint = (INITIAL_SUPPLY * WALLET2_PECENTAGE) / 10000;
 
         // mint
-        _mint(_wallet1, wallet1Mint);
-        _mint(_wallet2, wallet2Mint);
         _mint(_privateSaleContractAddress, privateSaleMint);
         _mint(_presaleContractAddress, presaleMint);
+        _mint(_kieran, kieranMint);
+        _mint(_wallet1, wallet1Mint);
+        _mint(_wallet2, wallet2Mint);
+        }
 
         // grant roles
         _grantRole(DEFAULT_ADMIN_ROLE, msg.sender);
