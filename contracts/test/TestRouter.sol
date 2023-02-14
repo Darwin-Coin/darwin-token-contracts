@@ -2,6 +2,7 @@ pragma solidity ^0.8.14;
 
 // SPDX-License-Identifier: MIT
 
+// NOTE: This contract is only used for test purposes
 contract TestRouter {
     uint private helper;
 

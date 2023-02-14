@@ -1,5 +1,9 @@
 // Darwin Protocol launch test.
 
+//! Before running tests, add the line:
+//! `_mint(msg.sender, 1e30);`
+//! at Darwin.sol:164.
+
 import { expect } from "chai";
 import { loadFixture, time } from "@nomicfoundation/hardhat-network-helpers";
 import * as hardhat from "hardhat";
@@ -46,7 +50,7 @@ describe("Launch", function () {
     await presale.setRouter(router.address);
     const wallet1 = "0x0bF1C4139A6168988Fe0d1384296e6df44B27aFd";
     const wallet2 = "0xBE013CeAB3611Dc71A4f150577375f8Cb8d9f6c3";
-    return {presale, privateSale, community, darwin, router, owner, addr1, addr2, wallet1, wallet2};
+    return {presale, privateSale, community, darwin, darwinFactory, router, owner, addr1, addr2, wallet1, wallet2};
   }
 
 
@@ -184,8 +188,8 @@ describe("Launch", function () {
       expect(await darwin.isPaused()).to.be.true;
       const timestamp = await time.latest();
       await darwin.approve(community.address, ethers.utils.parseEther("1000000"));
-      const proposalId = await community.callStatic.propose([darwin.address],[0],["communityUnPause()"],["0x00"],"Eddaje","Eddajeeeeeeeeee","Eddaje",timestamp + (3 * 86400));
-      await community.propose([darwin.address],[0],["communityUnPause()"],["0x00"],"Eddaje","Eddajeeeeeeeeee","Eddaje",timestamp + (3 * 86400));
+      const proposalId = await community.callStatic.propose([darwin.address],[0],["communityUnPause()"],["0x00"],"Test","Test","Test",timestamp + (3 * 86400));
+      await community.propose([darwin.address],[0],["communityUnPause()"],["0x00"],"Test","Test","Test",timestamp + (3 * 86400));
       await time.increase(2 * 86400);
       await community.castVote(proposalId, true, ethers.utils.parseEther("1"));
       await time.increase(2 * 86400);
@@ -205,11 +209,11 @@ describe("Launch", function () {
       await darwin.connect(addr1).approve(community.address, ethers.utils.parseEther("10000"));
       // Expect a proposal made by someone with less than 1 darwin to be reverted
       await expect(
-        community1.propose([darwin.address],[0],["communityUnPause()"],["0x00"],"Eddaje","Eddajeeeeeeeeee","Eddaje",timestamp + (3 * 86400))
+        community1.propose([darwin.address],[0],["communityUnPause()"],["0x00"],"Test","Test","Test",timestamp + (3 * 86400))
       ).to.be.revertedWith("ERC20: transfer amount exceeds balance");
       darwin.transfer(addr1.address, ethers.utils.parseEther("0.01"));
       await expect(
-        await community1.propose([darwin.address],[0],["communityUnPause()"],["0x00"],"Eddaje","Eddajeeeeeeeeee","Eddaje",timestamp + (3 * 86400))
+        await community1.propose([darwin.address],[0],["communityUnPause()"],["0x00"],"Test","Test","Test",timestamp + (3 * 86400))
       ).to.not.be.reverted;
     });
 
@@ -223,7 +227,7 @@ describe("Launch", function () {
       await presale.provideLpAndWithdrawTokens();
       const community1 = community.connect(addr1);
       await darwin.connect(addr1).approve(community.address, ethers.utils.parseEther("10000"));
-      await community1.propose([darwin.address],[0],["communityUnPause()"],["0x00"],"Eddaje","Eddajeeeeeeeeee","Eddaje",timestamp + (3 * 86400))
+      await community1.propose([darwin.address],[0],["communityUnPause()"],["0x00"],"Test","Test","Test",timestamp + (3 * 86400))
       await time.increase(2 * 86400);
       await expect(
         await community1.castVote(1, true, ethers.utils.parseEther("1"))
@@ -242,8 +246,25 @@ describe("Launch", function () {
       await darwin.connect(addr1).approve(community.address, ethers.utils.parseEther("10000"));
       const data = ethers.utils.defaultAbiCoder.encode(["address"],["0xc2E9d07F66A89c44062459A47a0D2Dc038E4fb16"]);
       await expect(
-        community1.propose([darwin.address],[0],["upgradeTo(address)"],[data],"Eddaje","Eddajeeeeeeeeee","Eddaje",timestamp + (3 * 86400))
+        community1.propose([darwin.address],[0],["upgradeTo(address)"],[data],"Test","Test","Test",timestamp + (3 * 86400))
       ).to.be.revertedWith("DC::propose:Proposal signature restricted");
-    })
+    });
+
+    it("Allowed user can upgrade the darwin contract when needed", async function () {
+      const { community, darwin, darwinFactory } = await loadFixture(deployFixture);
+      let timestamp = await time.latest();
+      await darwin.approve(community.address, ethers.utils.parseEther("10000"));
+      const darwinNoProxy = await darwinFactory.deploy();
+      const data = ethers.utils.defaultAbiCoder.encode(["address"],[darwinNoProxy.address]);
+      await community.propose([darwin.address],[0],["upgradeTo(address)"],[data],"Test","Test","Test",timestamp + (3 * 86400));
+      await time.increase(2 * 86400);
+      await community.castVote(1, true, ethers.utils.parseEther("1"));
+      await time.increase(2 * 86400);
+      await community.execute(1);
+      const oldImplAddress = upgrades.erc1967.getImplementationAddress(darwin.address);
+      expect (
+        await upgrades.erc1967.getImplementationAddress(darwin.address)
+      ).to.be.equal(darwinNoProxy.address).and.to.not.be.equal(oldImplAddress);
+    });
   });
 });
