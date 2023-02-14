@@ -174,7 +174,7 @@ contract Darwin is IDarwin, ERC20Upgradeable, OwnableUpgradeable, AccessControlU
 
     ////////////////////// SWAP FUNCTIONS ///////////////////////////////////
 
-    function setDarwinSwapFactory(address _darwinSwapFactory) external onlyRole(SECURITY_ROLE) {
+    function setDarwinSwapFactory(address _darwinSwapFactory) external onlyRole(MAINTENANCE_ROLE) {
         require(address(darwinSwapFactory) == address(0), "DARWIN: DarwinSwap Factory address already set");
         darwinSwapFactory = IUniswapV2Factory(_darwinSwapFactory);
         _grantRole(FACTORY_ROLE, _darwinSwapFactory);
@@ -214,15 +214,15 @@ contract Darwin is IDarwin, ERC20Upgradeable, OwnableUpgradeable, AccessControlU
         pauseWhitelist[_addr] = true;
     }
 
-    ////////////////////// MAINTENANCE FUNCTIONS /////////////////////////////////////
+    ////////////////////// SECURITY FUNCTIONS /////////////////////////////////////
 
-    function maintenancePause() external onlyRole(MAINTENANCE_ROLE) {
+    function emergencyPause() external onlyRole(SECURITY_ROLE) {
         if(isPaused == false) {
             isPaused = true;
         }
     }
 
-    function maintenanceUnPause() external onlyRole(MAINTENANCE_ROLE) {
+    function emergencyUnPause() external onlyRole(SECURITY_ROLE) {
         if(isPaused) {
             isPaused = false;
         }

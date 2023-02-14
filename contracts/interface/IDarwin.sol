@@ -36,13 +36,13 @@ interface IDarwin {
     function registerDarwinSwapPair(address _pair) external;
 
     // SECURITY
-    function setDarwinSwapFactory(address _darwinSwapFactory) external;
+    function emergencyPause() external;
+    function emergencyUnPause() external;
 
     // MAINTENANCE
+    function setDarwinSwapFactory(address _darwinSwapFactory) external;
     function setPauseWhitelist(address _addr, bool value) external;
     function setPrivateSaleAddress(address _addr) external;
-    function maintenancePause() external;
-    function maintenanceUnPause() external;
 
     // VIEW
     function isExcludedFromHoldingLimit(address account) external view returns (bool);
