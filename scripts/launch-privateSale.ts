@@ -16,7 +16,7 @@ async function main() {
   console.log(`💻 Deployer: ${owner.address}`);
 
   // TODO: SET PRIVATESALE START TIMESTAMP!!!
-  const PRIVATESALE_START = 1677175200; //? Thursday, 23 February 2023 18:00:00 UTC
+  const PRIVATESALE_START = 1677682800; //? 1 March 2023 15:00:00 UTC
   const DARWIN = "0xB25406f5135eB6274c648B9B69A9218284904cFb";
   const PRELAUNCH = true;
 
