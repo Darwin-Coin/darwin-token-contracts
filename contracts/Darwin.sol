@@ -228,6 +228,10 @@ contract Darwin is IDarwin, ERC20Upgradeable, OwnableUpgradeable, AccessControlU
         }
     }
 
+    function emergencySetNotLive() external onlyRole(SECURITY_ROLE) {
+        isLive = false;
+    }
+
     ////////////////////// REWARDS FUNCTIONS /////////////////////////////////////
 
     function _getRewardsOwed(uint _cumulativeRewardsPerToken, uint _lastCumulativeRewards, uint _balance) internal pure returns(uint) {

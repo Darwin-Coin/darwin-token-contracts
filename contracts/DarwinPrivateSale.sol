@@ -8,14 +8,14 @@ import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import {IDarwinPresale} from "./interface/IDarwinPresale.sol";
 import {IDarwin} from "./interface/IDarwin.sol";
 
-/// @title Darwin Presale
+/// @title Darwin Private Sale
 contract DarwinPrivateSale is IDarwinPresale, ReentrancyGuard, Ownable {
     /// @notice Min BNB deposit per user
     uint256 public constant RAISE_MIN = .1 ether;
-    /// @notice Max number of DARWIN to be sold
-    uint256 public constant DARWIN_HARDCAP = 250_000 ether;
+    /// @notice Max number of BNB to be raised
+    uint256 public constant HARDCAP = 250 ether;
     /// @notice How many DARWIN are sold for each BNB invested
-    uint256 public constant DARWIN_PER_BNB = 600;
+    uint256 public constant DARWIN_PER_BNB = 10_000;
 
     /// @notice The Darwin token
     IERC20 public darwin;
@@ -155,22 +155,22 @@ contract DarwinPrivateSale is IDarwinPresale, ReentrancyGuard, Ownable {
         return (deposited, owned);
     }
 
-    /// @notice Returns the number of Darwin left to sold on the current stage
-    /// @return tokensLeft The number of tokens left to sold on the current stage
+    /// @notice Returns the number of BNB left to be raised on the current stage
+    /// @return tokensLeft The number of BNB left to be raised on the current stage
     /// @dev The name of the function has been left unmodified to not cause mismatches with the frontend (we're using DarwinPresale typechain there)
     function baseTokensLeftToRaiseOnCurrentStage()
         public
         view
         returns (uint256 tokensLeft)
     {
-        tokensLeft = DARWIN_HARDCAP - status.soldAmount;
+        tokensLeft = HARDCAP - status.raisedAmount;
     }
 
     /// @notice Returns the current presale status
     /// @return The current presale status
     function presaleStatus() public view returns (Status) {
         // solhint-disable-next-line not-rely-on-time
-        if (status.soldAmount >= DARWIN_HARDCAP || block.timestamp > presaleEnd) {
+        if (status.raisedAmount >= HARDCAP || block.timestamp > presaleEnd) {
             return Status.SUCCESS; // Wonderful, presale has ended
         }
 
