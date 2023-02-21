@@ -7,14 +7,15 @@ import * as hardhat from "hardhat";
 import { ethers } from "hardhat";
 import { DarwinCommunity } from "../typechain-types";
 import { Darwin } from "../typechain-types/contracts";
+import { ADDRESSES } from "./constants";
 
 
 async function main() {
   // Hardhat always runs the compile task when running scripts with its command
   const [owner] = await hardhat.ethers.getSigners();
 
-  const COMMUNITY = "0x8c439c6e3C6006b3a7d2e7cff77bd92B337271e5";
-  const DARWIN = "0xB25406f5135eB6274c648B9B69A9218284904cFb";
+  const COMMUNITY = ADDRESSES.community;
+  const DARWIN = ADDRESSES.darwin;
   const PROP_ID = 1;
   const PRELAUNCH = true;
 

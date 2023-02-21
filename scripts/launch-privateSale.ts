@@ -7,6 +7,7 @@ import * as hardhat from "hardhat";
 import { ethers, upgrades } from "hardhat";
 import { DarwinCommunity } from "../typechain-types";
 import { Darwin, DarwinPrivateSale } from "../typechain-types/contracts";
+import { ADDRESSES } from "./constants";
 
 
 async function main() {
@@ -17,7 +18,8 @@ async function main() {
 
   // TODO: SET PRIVATESALE START TIMESTAMP!!!
   const PRIVATESALE_START = 1677682800; //? 1 March 2023 15:00:00 UTC
-  const DARWIN = "0xB25406f5135eB6274c648B9B69A9218284904cFb";
+  const PRIVATESALE_AMOUNT = 2_500_000;
+  const DARWIN = ADDRESSES.darwin;
   const PRELAUNCH = true;
 
   // DECLARE FACTORIES
@@ -46,6 +48,9 @@ async function main() {
     const set = await darwin.emergencySetNotLive();
     await set.wait();
   }
+
+  const send = await darwin.transfer(privateSale.address, ethers.utils.parseEther(PRIVATESALE_AMOUNT.toString()));
+  await send.wait();
 
   //* [INIT] PRIVATE SALE
   await privateSale.init(darwin.address, PRIVATESALE_START);
