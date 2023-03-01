@@ -4,9 +4,8 @@
 // When running the script with `npx hardhat run <script>` you'll find the Hardhat
 // Runtime Environment's members available in the global scope.
 import * as hardhat from "hardhat";
-import { ethers, upgrades } from "hardhat";
-import { DarwinCommunity } from "../typechain-types";
-import { Darwin, DarwinPrivateSale, DarwinVester } from "../typechain-types/contracts";
+import { ethers } from "hardhat";
+import { DarwinPrivateSale, DarwinVester } from "../typechain-types/contracts";
 import { ADDRESSES } from "./constants";
 
 
@@ -17,7 +16,7 @@ async function main() {
   console.log(`💻 Deployer: ${owner.address}`);
 
   // TODO: SET PRIVATESALE START TIMESTAMP!!!
-  const PRIVATESALE_START = 1677682800; //? 1 March 2023 15:00:00 UTC
+  const PRIVATESALE_START = 1677747600; //? 2 March 2023 09:00:00 UTC
   const PRIVATESALE_AMOUNT = 10_000_000;
   const DARWIN = ADDRESSES.darwin;
   const PRELAUNCH = false;
