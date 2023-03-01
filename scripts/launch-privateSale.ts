@@ -6,7 +6,7 @@
 import * as hardhat from "hardhat";
 import { ethers, upgrades } from "hardhat";
 import { DarwinCommunity } from "../typechain-types";
-import { Darwin, DarwinPrivateSale } from "../typechain-types/contracts";
+import { Darwin, DarwinPrivateSale, DarwinVester } from "../typechain-types/contracts";
 import { ADDRESSES } from "./constants";
 
 
@@ -18,13 +18,14 @@ async function main() {
 
   // TODO: SET PRIVATESALE START TIMESTAMP!!!
   const PRIVATESALE_START = 1677682800; //? 1 March 2023 15:00:00 UTC
-  const PRIVATESALE_AMOUNT = 2_500_000;
+  const PRIVATESALE_AMOUNT = 10_000_000;
   const DARWIN = ADDRESSES.darwin;
-  const PRELAUNCH = true;
+  const PRELAUNCH = false;
 
   // DECLARE FACTORIES
   const darwinPrivateSaleFactory = await ethers.getContractFactory("DarwinPrivateSale");
   const darwinFactory = await ethers.getContractFactory("Darwin");
+  const vesterFactory = await ethers.getContractFactory("DarwinVester");
 
   const darwin = darwinFactory.attach(DARWIN);
 
@@ -32,10 +33,9 @@ async function main() {
   //! [DEPLOY] PRIVATE SALE
   const privateSale = await darwinPrivateSaleFactory.deploy() as DarwinPrivateSale;
   console.log(`🔨 Deployed Darwin Private-Sale at: ${privateSale.address}`);
-
-  //? [VERIFY] PRIVATE SALE
   await privateSale.deployed();
 
+  //? [VERIFY] PRIVATE SALE
   try {
   await hardhat.run("verify:verify", {
     address: privateSale.address,
@@ -49,11 +49,45 @@ async function main() {
     await set.wait();
   }
 
+
+  //! [DEPLOY] VESTER
+  const vester = await vesterFactory.deploy(darwin.address) as DarwinVester;
+  console.log(`🔨 Deployed Vester at: ${vester.address}`);
+  await vester.deployed();
+
+  //? [VERIFY] VESTER
+  try {
+  await hardhat.run("verify:verify", {
+    address: vester.address,
+    constructorArguments: [darwin.address]
+  }); } catch {
+    console.log("❌ Verification Failed")
+  }
+
+
+  //* [ADD] PRIVATE SALE
+  const vAdd = await darwin.setPrivateSaleAddress(privateSale.address);
+  await vAdd.wait();
+  console.log(`🏁 Private-Sale added to Darwin`);
+
+  //* [ADD] VESTER
+  const pAdd = await darwin.setPrivateSaleAddress(vester.address);
+  await pAdd.wait();
+  console.log(`🏁 Vester added to Darwin`);
+
+  //* [INIT] VESTER
+  const vInit = await vester.init(privateSale.address);
+  await vInit.wait();
+  console.log(`🏁 Vester Initialized`);
+
+  //* [SEND] 10M DARWIN TO PRIVATESALE
   const send = await darwin.transfer(privateSale.address, ethers.utils.parseEther(PRIVATESALE_AMOUNT.toString()));
   await send.wait();
+  console.log(`🏁 10m $DARWIN sent to Private-Sale`);
 
   //* [INIT] PRIVATE SALE
-  await privateSale.init(darwin.address, PRIVATESALE_START);
+  const pInit = await privateSale.init(darwin.address, vester.address, PRIVATESALE_START);
+  await pInit.wait();
   console.log(`🏁 Private-Sale initialized`);
 
   console.log("✅ PRESALE LAUNCH COMPLETED");

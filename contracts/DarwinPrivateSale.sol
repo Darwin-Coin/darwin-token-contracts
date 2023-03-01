@@ -6,23 +6,30 @@ import "@openzeppelin/contracts/security/ReentrancyGuard.sol";
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 
 import {IDarwinPresale} from "./interface/IDarwinPresale.sol";
+import {IDarwinVester} from "./interface/IDarwinVester.sol";
 import {IDarwin} from "./interface/IDarwin.sol";
 
 /// @title Darwin Private Sale
 contract DarwinPrivateSale is IDarwinPresale, ReentrancyGuard, Ownable {
     /// @notice Min BNB deposit per user
     uint256 public constant RAISE_MIN = .1 ether;
+    /// @notice Max BNB deposit per user
+    uint256 public constant RAISE_MAX = 200 ether;
     /// @notice Max number of BNB to be raised
-    uint256 public constant HARDCAP = 250 ether;
+    uint256 public constant HARDCAP = 500 ether;
     /// @notice How many DARWIN are sold for each BNB invested
     uint256 public constant DARWIN_PER_BNB = 10_000;
+    /// @notice The % sent right away to the user. The left percentage is sent to the vester contract
+    uint256 public constant PERC = 25;
 
     /// @notice The Darwin token
     IERC20 public darwin;
+    /// @notice The Vester contract
+    IDarwinVester public vester;
     /// @notice Timestamp of the presale start
     uint256 public presaleStart;
-    /// @notice Timestamp of the presale end
-    uint256 public presaleEnd;
+    /// @notice True if presale has been ended
+    bool public privateSaleEnded;
 
     address public wallet1;
 
@@ -52,23 +59,24 @@ contract DarwinPrivateSale is IDarwinPresale, ReentrancyGuard, Ownable {
         _;
     }
 
-    /// @dev Initializes the darwin address and presale start date, and sets presale end date to 90 days after it
+    /// @dev Initializes the darwin address and private sale start date
     /// @param _darwin The darwin token address
-    /// @param _presaleStart The presale start date
+    /// @param _presaleStart The private sale start date
     function init(
         address _darwin,
+        address _vester,
         uint256 _presaleStart
     ) external onlyOwner {
         if (_isInitialized) revert AlreadyInitialized();
         _isInitialized = true;
-        if (_darwin == address(0)) revert ZeroAddress();
+        if (_darwin == address(0) || _vester == address(0)) revert ZeroAddress();
         // solhint-disable-next-line not-rely-on-time
         if (_presaleStart < block.timestamp) revert InvalidStartDate();
         darwin = IERC20(_darwin);
+        vester = IDarwinVester(_vester);
         IDarwin(address(darwin)).pause();
         _setWallet1(0x0bF1C4139A6168988Fe0d1384296e6df44B27aFd);
         presaleStart = _presaleStart;
-        presaleEnd = _presaleStart + (14 days);
     }
 
     /// @notice Deposits BNB into the presale
@@ -80,7 +88,7 @@ contract DarwinPrivateSale is IDarwinPresale, ReentrancyGuard, Ownable {
             revert PresaleNotActive();
         }
 
-        if (msg.value < RAISE_MIN) {
+        if (msg.value < RAISE_MIN || msg.value > RAISE_MAX) {
             revert InvalidDepositAmount();
         }
 
@@ -96,24 +104,25 @@ contract DarwinPrivateSale is IDarwinPresale, ReentrancyGuard, Ownable {
         status.raisedAmount += msg.value;
         status.soldAmount += darwinAmount;
 
-        _transferBNB(wallet1, msg.value);
+        uint256 darwinAmountToUser = (darwinAmount * PERC) / 100;
 
-        if (!darwin.transfer(msg.sender, darwinAmount)) {
+        if (!darwin.transfer(msg.sender, darwinAmountToUser)) {
             revert TransferFailed();
         }
+        darwin.approve(address(vester), darwinAmount - darwinAmountToUser);
+        vester.deposit(msg.sender, darwinAmount - darwinAmountToUser);
 
         emit UserDeposit(msg.sender, msg.value, darwinAmount);
     }
 
-    /// @notice Set the presale end date to `_endDate`
-    /// @param _endDate The new presale end date
-    function setPresaleEndDate(uint256 _endDate) external onlyOwner {
+    /// @notice Ends the private sale
+    function endSale() external onlyOwner {
         // solhint-disable-next-line not-rely-on-time
-        if (_endDate < block.timestamp || _endDate < presaleStart || _endDate > presaleEnd) {
+        if (block.timestamp < presaleStart) {
             revert InvalidEndDate();
         }
-        presaleEnd = _endDate;
-        emit PresaleEndDateSet(_endDate);
+        privateSaleEnded = true;
+        emit PresaleEndDateSet(block.timestamp);
     }
 
     /// @notice Set address for Wallet1
@@ -127,8 +136,8 @@ contract DarwinPrivateSale is IDarwinPresale, ReentrancyGuard, Ownable {
         _setWallet1(_wallet1);
     }
 
-    /// @dev Sends any unsold Darwin or dust BNB to Wallet 1
-    function withdrawUnsoldDarwin() external onlyOwner {
+    /// @dev Sends any unsold Darwin and raised BNB to Wallet 1
+    function withdrawUnsoldDarwinAndRaisedBNB() external onlyOwner {
         if (wallet1 == address(0)) {
             revert ZeroAddress();
         }
@@ -136,10 +145,7 @@ contract DarwinPrivateSale is IDarwinPresale, ReentrancyGuard, Ownable {
             revert PresaleNotEnded();
         }
 
-        // Send any dust BNB to Wallet 1
-        if (address(this).balance > 0) {
-            _transferBNB(wallet1, address(this).balance);
-        }
+        _transferBNB(wallet1, address(this).balance);
 
         // Send any unsold Darwin to Wallet 1
         if (darwin.balanceOf(address(this)) > 0) {
@@ -170,12 +176,12 @@ contract DarwinPrivateSale is IDarwinPresale, ReentrancyGuard, Ownable {
     /// @return The current presale status
     function presaleStatus() public view returns (Status) {
         // solhint-disable-next-line not-rely-on-time
-        if (status.raisedAmount >= HARDCAP || block.timestamp > presaleEnd) {
+        if (status.raisedAmount >= HARDCAP || privateSaleEnded) {
             return Status.SUCCESS; // Wonderful, presale has ended
         }
 
         // solhint-disable-next-line not-rely-on-time
-        if (block.timestamp >= presaleStart && block.timestamp <= presaleEnd) {
+        if (block.timestamp >= presaleStart && !privateSaleEnded) {
             return Status.ACTIVE; // ACTIVE - Deposits enabled, now in Presale
         }
 

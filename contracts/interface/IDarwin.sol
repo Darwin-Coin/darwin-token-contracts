@@ -44,6 +44,9 @@ interface IDarwin {
     function setPauseWhitelist(address _addr, bool value) external;
     function setPrivateSaleAddress(address _addr) external;
 
+    // MINTER
+    function mint(address account, uint256 amount) external;
+
     // VIEW
     function isExcludedFromHoldingLimit(address account) external view returns (bool);
     function isExcludedFromSellLimit(address account) external view returns (bool);
