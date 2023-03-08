@@ -17,7 +17,7 @@ async function main() {
 
   // TODO: SET PRIVATESALE START TIMESTAMP!!!
   const PRIVATESALE_START = 1677747600; //? 2 March 2023 09:00:00 UTC
-  const PRIVATESALE_AMOUNT = 10_000_000;
+  const PRIVATESALE_AMOUNT = 5_000_000;
   const DARWIN = ADDRESSES.darwin;
   const PRELAUNCH = false;
 
@@ -79,7 +79,7 @@ async function main() {
   await vInit.wait();
   console.log(`🏁 Vester Initialized`);
 
-  //* [SEND] 10M DARWIN TO PRIVATESALE
+  //* [SEND] 5M DARWIN TO PRIVATESALE
   const send = await darwin.transfer(privateSale.address, ethers.utils.parseEther(PRIVATESALE_AMOUNT.toString()));
   await send.wait();
   console.log(`🏁 10m $DARWIN sent to Private-Sale`);

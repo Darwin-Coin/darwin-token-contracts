@@ -5,6 +5,7 @@ export const ADDRESSES = {
     drop: "0xD04cB36A3e97150311Cf71798C40C3ae56b16339",
     presale: "",
     privateSales: [
-        ""
-    ]
+        "0xE757E8aBeD6d2Ff8C2273D6BE76D89AB791Da257"
+    ],
+    vester: "0x5732dEe4Cfe9E30F7E400aCB442749A0C9C1Bac6"
 }

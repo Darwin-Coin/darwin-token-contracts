@@ -6,7 +6,7 @@
 import * as hardhat from "hardhat";
 import { ethers } from "hardhat";
 import { DarwinCommunity } from "../typechain-types";
-import { Darwin } from "../typechain-types/contracts";
+import { Darwin, DarwinVester } from "../typechain-types/contracts";
 import { ADDRESSES } from "./constants";
 
 
@@ -16,43 +16,43 @@ async function main() {
 
   const COMMUNITY = ADDRESSES.community;
   const DARWIN = ADDRESSES.darwin;
-  const PROP_ID = 2;
-  const PRELAUNCH = true;
+  const VESTER = ADDRESSES.vester;
 
   console.log(`💻 Owner: ${owner.address}`);
 
   // DECLARE FACTORIES
   const darwinCommunityFactory = await ethers.getContractFactory("DarwinCommunity");
   const darwinFactory = await ethers.getContractFactory("Darwin");
+  const vesterFactory = await ethers.getContractFactory("DarwinVester");
 
   const community = darwinCommunityFactory.attach(COMMUNITY) as DarwinCommunity;
-  const darwinProxy = darwinFactory.attach(DARWIN) as Darwin;
+  const darwin = darwinFactory.attach(DARWIN) as Darwin;
+  const vester = vesterFactory.attach(VESTER) as DarwinVester;
 
-  if (PRELAUNCH) {
-  const unpause = await darwinProxy.emergencyUnPause();
+  const PAUSED = await darwin.isPaused();
+
+  if (PAUSED) {
+  const unpause = await darwin.emergencyUnPause();
   await unpause.wait();
   console.log("✅ UNPAUSED");
+  }
 
-  const approve = await darwinProxy.approve(community.address, ethers.utils.parseEther("1000000"));
+  const approve = await darwin.approve(community.address, ethers.utils.parseEther("1000000"));
   await approve.wait();
   console.log("✅ APPROVED");
-  }
 
-  try {
-  const vote = await community.castVote(PROP_ID, true, ethers.utils.parseEther("1"));
-  await vote.wait();
-  console.log("✅ VOTED");
-  } catch {
-    console.log("❌ VOTE FAILED");
-  }
+  const data = ethers.utils.defaultAbiCoder.encode(["address","bool"],[vester.address,true]);
+  const prop = await community.propose([DARWIN], [0], ["setMinter(address,bool)"], [data], "Set Vester as Minter", "Set Vester as Minter", "", Math.floor(Date.now() / 1000) + (3600 * 48) + 120);
+  await prop.wait();
+  console.log("✅ PROPOSED");
 
-  if (PRELAUNCH) {
-  const pause = await darwinProxy.emergencyPause();
+  if (PAUSED) {
+  const pause = await darwin.emergencyPause();
   await pause.wait();
   console.log("✅ PAUSED");
   }
 
-  console.log("✅ VOTE CASTED");
+  console.log("✅ PROPOSAL MADE");
 }
 
 // We recommend this pattern to be able to use async/await everywhere
