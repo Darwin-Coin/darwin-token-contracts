@@ -10,6 +10,8 @@ interface IDarwinVester {
     error NotInitialized();
     /// Caller is not private sale
     error NotPrivateSale();
+    /// Caller is not vester
+    error NotVestUser();
     /// Parameter cannot be the zero address
     error ZeroAddress();
     /// Selected amount exceeds the withdrawable amount
@@ -29,6 +31,4 @@ interface IDarwinVester {
         uint256 vestTimestamp;
         uint256 claimed;
     }
-
-    function deposit(address _user, uint _amount) external;
 }

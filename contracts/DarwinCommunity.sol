@@ -4,8 +4,7 @@ pragma solidity ^0.8.14;
 
 import "./interface/IDarwinCommunity.sol";
 
-import "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
-import "@openzeppelin/contracts-upgradeable/proxy/utils/UUPSUpgradeable.sol";
+import "@openzeppelin/contracts/access/AccessControl.sol";
 
 interface IDarwin {
     function bulkTransfer(address[] calldata recipients, uint256[] calldata amounts) external;
@@ -13,7 +12,16 @@ interface IDarwin {
     function balanceOf(address account) external view returns (uint256);
 }
 
-contract DarwinCommunity is OwnableUpgradeable, IDarwinCommunity, UUPSUpgradeable {
+contract DarwinCommunity is IDarwinCommunity, AccessControl {
+
+    // roles
+    bytes32 public constant OWNER = keccak256("OWNER_ROLE");
+    bytes32 public constant ADMIN = keccak256("ADMIN_ROLE");
+    bytes32 public constant SENIOR_PROPOSER = keccak256("SENIOR_PROPOSER_ROLE");
+    bytes32 public constant PROPOSER = keccak256("PROPOSER_ROLE");
+
+    bytes32[] public roles = [OWNER,ADMIN,SENIOR_PROPOSER,PROPOSER];
+
     enum ProposalState {
         Pending,
         Active,
@@ -60,8 +68,21 @@ contract DarwinCommunity is OwnableUpgradeable, IDarwinCommunity, UUPSUpgradeabl
 
     modifier onlyDarwinCommunity() {
         require(_msgSender() == address(this), "DC::onlyDarwinCommunity: only DarwinCommunity can access");
-
         _;
+    }
+
+    // overrides AccessControl's hasRole to allow more important roles act like they also have less important roles' permissions
+    function hasRole(bytes32 _role, address _addr) public view override returns(bool) {
+        bool passed = false;
+        for (uint i = roles.length - 1; i >= 0; i --) {
+            if (!passed && _role == roles[i]) {
+                passed = true;
+            }
+            if (passed && super.hasRole(roles[i], _addr)) {
+                return true;
+            }
+        }
+        return false;
     }
 
     mapping(uint256 => CommunityFundCandidate) private communityFundCandidates;
@@ -95,17 +116,16 @@ contract DarwinCommunity is OwnableUpgradeable, IDarwinCommunity, UUPSUpgradeabl
 
     IDarwin public darwin;
 
-    function initialize() public initializer {
-        __Context_init_unchained();
-        __Ownable_init_unchained();
-        __DarwinCommunity_init_unchained();
+    constructor(address _kieran) {
+        _grantRole(OWNER, msg.sender);
+        _grantRole(OWNER, _kieran); // Team Lead
+        _grantRole(OWNER, 0x745309f30deB0a8271F5f521925222F5E1280641); // Tech Lead
     }
 
-    function __DarwinCommunity_init_unchained() private initializer {
-        /* require(
-            fundProposals.length == fundAddress.length,
-            "DC::__DarwinCommunity_init_unchained: invalid fund candidate lists"
-        ); */
+    function init(address _darwin) external onlyRole(OWNER) {
+        require(address(_darwin) != address(0), "DC::init: ZERO_ADDRESS");
+        require(address(darwin) == address(0), "DC::init: already initialized");
+        darwin = IDarwin(_darwin);
 
         // FUND ADDRESSES
         address[10] memory fundAddress = [
@@ -136,14 +156,18 @@ contract DarwinCommunity is OwnableUpgradeable, IDarwinCommunity, UUPSUpgradeabl
         ];
 
         // RESTRICTED SIGNATURES
-        string[7] memory restrictedProposalSignatures = [
+        string[11] memory restrictedProposalSignatures = [
             "upgradeTo(address)",
             "upgradeToAndCall(address,bytes)",
             "setMinter(address,bool)",
+            "setMaintenance(address,bool)",
+            "setSecurity(address,bool)",
+            "setUpgrader(address,bool)",
             "setReceiveRewards(address,bool)",
             "setHoldingLimitWhitelist(address,bool)",
             "setSellLimitWhitelist(address,bool)",
-            "registerPair(address)"
+            "registerPair(address)",
+            "communityPause()"
         ];
 
         proposalMaxOperations = 1;
@@ -151,7 +175,7 @@ contract DarwinCommunity is OwnableUpgradeable, IDarwinCommunity, UUPSUpgradeabl
         minVotingPeriod = 24 hours;
         maxVotingPeriod = 1 weeks;
         gracePeriod = 72 hours;
-        proposalMinVotesCountForAction = 1;
+        proposalMinVotesCountForAction = 1000;
 
         minDarwinTransferToAccess = 1e18; // 1 darwin
 
@@ -175,27 +199,22 @@ contract DarwinCommunity is OwnableUpgradeable, IDarwinCommunity, UUPSUpgradeabl
     }
 
     // This is only for backend purposes
-    function emitInitialFundsEvents() external onlyOwner {
+    function emitInitialFundsEvents() external onlyRole(OWNER) {
         for (uint256 i = 0; i < _initialFundProposalStrings.length; i++) {
             uint id = i + 1;
             emit NewFundCandidate(id, communityFundCandidates[id].valueAddress, _initialFundProposalStrings[i]);
         }
     }
 
-    function setDarwinAddress(address account) public override {
-        if (address(darwin) == address(0)) {
-            require(msg.sender == owner(), "DC::setDarwinAddress: only owner initialize");
-        } else {
-            require(msg.sender == address(this), "DC::setDarwinAddress: private access only");
-        }
-        darwin = IDarwin(account);
+    function setDarwinAddress(address _darwin) external onlyDarwinCommunity {
+        darwin = IDarwin(_darwin);
     }
 
     function randomBoolean() private view returns (bool) {
         return uint256(keccak256(abi.encodePacked(block.difficulty, block.timestamp))) % 2 > 0;
     }
 
-    function deactivateFundCandidate(uint256 _id) public onlyDarwinCommunity {
+    function deactivateFundCandidate(uint256 _id) external onlyDarwinCommunity {
         require(communityFundCandidates[_id].isActive, "DC::deactivateFundCandidate: not active");
 
         communityFundCandidates[_id].isActive = false;
@@ -297,7 +316,7 @@ contract DarwinCommunity is OwnableUpgradeable, IDarwinCommunity, UUPSUpgradeabl
         uint256[] calldata votes,
         uint256 totalVoteCount,
         uint256 tokensToDistribute
-    ) public onlyOwner {
+    ) external onlyRole(OWNER) {
         require(candidates.length == votes.length, "DC::distributeCommunityFund: candidates and votes length mismatch");
         require(candidates.length > 0, "DC::distributeCommunityFund: empty candidates");
 
@@ -325,7 +344,7 @@ contract DarwinCommunity is OwnableUpgradeable, IDarwinCommunity, UUPSUpgradeabl
         string memory description,
         string memory other,
         uint256 endTime
-    ) public returns (uint256) {
+    ) external onlyRole(PROPOSER) returns (uint256) {
         require(darwin.transferFrom(msg.sender, address(this), minDarwinTransferToAccess), "DC::propose: not enough $DARWIN in wallet");
 
         require(
@@ -353,7 +372,7 @@ contract DarwinCommunity is OwnableUpgradeable, IDarwinCommunity, UUPSUpgradeabl
             uint256 signature = uint256(keccak256(bytes(signatures[i])));
 
             if (restrictedProposalActionSignature[signature]) {
-                require(msg.sender == owner(), "DC::propose:Proposal signature restricted");
+                require(hasRole(SENIOR_PROPOSER, msg.sender), "DC::propose: proposal signature restricted");
             }
         }
 
@@ -413,7 +432,7 @@ contract DarwinCommunity is OwnableUpgradeable, IDarwinCommunity, UUPSUpgradeabl
 
         Proposal storage proposal = proposals[proposalId];
 
-        require(_msgSender() == proposal.proposer || _msgSender() == owner(), "DC::cancel: cannot cancel proposal");
+        require(_msgSender() == proposal.proposer || hasRole(ADMIN, _msgSender()), "DC::cancel: cannot cancel proposal");
 
         proposal.canceled = true;
 
@@ -474,7 +493,7 @@ contract DarwinCommunity is OwnableUpgradeable, IDarwinCommunity, UUPSUpgradeabl
      * @notice Executes a queued proposal if eta has passed
      * @param proposalId The id of the proposal to execute
      */
-    function execute(uint256 proposalId) external payable onlyOwner {
+    function execute(uint256 proposalId) external payable onlyRole(ADMIN) {
         Proposal storage proposal = proposals[proposalId];
 
         require(
@@ -546,31 +565,63 @@ contract DarwinCommunity is OwnableUpgradeable, IDarwinCommunity, UUPSUpgradeabl
         }
     }
 
-    function setProposalMaxOperations(uint256 count) public onlyDarwinCommunity {
+    function setProposalMaxOperations(uint256 count) external onlyDarwinCommunity {
         proposalMaxOperations = count;
     }
 
-    function setMinVotingDelay(uint256 delay) public onlyDarwinCommunity {
+    function setMinVotingDelay(uint256 delay) external onlyDarwinCommunity {
         minVotingDelay = delay;
     }
 
-    function setMinVotingPeriod(uint256 value) public onlyDarwinCommunity {
+    function setMinVotingPeriod(uint256 value) external onlyDarwinCommunity {
         minVotingPeriod = value;
     }
 
-    function setMaxVotingPeriod(uint256 value) public onlyDarwinCommunity {
+    function setMaxVotingPeriod(uint256 value) external onlyDarwinCommunity {
         maxVotingPeriod = value;
     }
 
-    function setGracePeriod(uint256 value) public onlyDarwinCommunity {
+    function setGracePeriod(uint256 value) external onlyDarwinCommunity {
         gracePeriod = value;
     }
 
-    function setProposalMinVotesCountForAction(uint256 count) public onlyDarwinCommunity {
+    function setProposalMinVotesCountForAction(uint256 count) external onlyDarwinCommunity {
         proposalMinVotesCountForAction = count;
     }
 
-    function getActiveFundCandidates() public view returns (CommunityFundCandidate[] memory) {
+    function setOwner(address _account, bool _hasRole) external onlyDarwinCommunity {
+        if (_hasRole) {
+            _grantRole(OWNER, _account);
+        } else {
+            _revokeRole(OWNER, _account);
+        }
+    }
+
+    function setAdmin(address _account, bool _hasRole) external onlyDarwinCommunity {
+        if (_hasRole) {
+            _grantRole(ADMIN, _account);
+        } else {
+            _revokeRole(ADMIN, _account);
+        }
+    }
+
+    function setSeniorProposer(address _account, bool _hasRole) external onlyDarwinCommunity {
+        if (_hasRole) {
+            _grantRole(SENIOR_PROPOSER, _account);
+        } else {
+            _revokeRole(SENIOR_PROPOSER, _account);
+        }
+    }
+
+    function setProposer(address _account, bool _hasRole) external onlyDarwinCommunity {
+        if (_hasRole) {
+            _grantRole(PROPOSER, _account);
+        } else {
+            _revokeRole(PROPOSER, _account);
+        }
+    }
+
+    function getActiveFundCandidates() external view returns (CommunityFundCandidate[] memory) {
         CommunityFundCandidate[] memory candidates = new CommunityFundCandidate[](
             activeCommunityFundCandidateIds.length
         );
@@ -580,21 +631,19 @@ contract DarwinCommunity is OwnableUpgradeable, IDarwinCommunity, UUPSUpgradeabl
         return candidates;
     }
 
-    function getActiveFundDandidateIds() public view returns (uint256[] memory) {
+    function getActiveFundDandidateIds() external view returns (uint256[] memory) {
         return activeCommunityFundCandidateIds;
     }
 
-    function getProposal(uint256 id) public view isProposalIdValid(id) returns (Proposal memory) {
+    function getProposal(uint256 id) external view isProposalIdValid(id) returns (Proposal memory) {
         return proposals[id];
     }
 
-    function getVoteReceipt(uint256 id) public view isProposalIdValid(id) returns (DarwinCommunity.Receipt memory) {
+    function getVoteReceipt(uint256 id) external view isProposalIdValid(id) returns (DarwinCommunity.Receipt memory) {
         return voteReceipts[id][_msgSender()];
     }
 
-    function isProposalSignatureRestricted(string calldata signature) public view returns (bool) {
+    function isProposalSignatureRestricted(string calldata signature) external view returns (bool) {
         return restrictedProposalActionSignature[uint256(keccak256(bytes(signature)))];
     }
-
-    function _authorizeUpgrade(address newImplementation) internal override onlyDarwinCommunity {}
 }

@@ -16,7 +16,7 @@ async function main() {
 
   const COMMUNITY = ADDRESSES.community;
   const DARWIN = ADDRESSES.darwin;
-  const PROP_ID = 2;
+  const PROP_ID = 3;
   const PRELAUNCH = true;
 
   console.log(`💻 Owner: ${owner.address}`);
@@ -32,11 +32,11 @@ async function main() {
   const unpause = await darwinProxy.emergencyUnPause();
   await unpause.wait();
   console.log("✅ UNPAUSED");
+  }
 
   const approve = await darwinProxy.approve(community.address, ethers.utils.parseEther("1000000"));
   await approve.wait();
   console.log("✅ APPROVED");
-  }
 
   try {
   const vote = await community.castVote(PROP_ID, true, ethers.utils.parseEther("1"));

@@ -4,6 +4,7 @@ import '@nomicfoundation/hardhat-chai-matchers';
 import '@nomiclabs/hardhat-solhint';
 import { } from "@openzeppelin/hardhat-upgrades";
 import '@openzeppelin/hardhat-upgrades';
+import 'hardhat-change-network';
 
 import * as dotenv from "dotenv";
 dotenv.config();
@@ -100,12 +101,23 @@ const config: HardhatUserConfig = {
         bscTestnet: {
             url: "https://data-seed-prebsc-2-s3.binance.org:8545/",
             chainId: 97,
-            accounts: [String(process.env.BSC_TESTNET_PRIVATEKEY)]
+            accounts: [String(process.env.TESTNET_PRIVATEKEY)]
         },
-        bscMainnet: {
+        bsc: {
             url: "https://bsc-dataseed.binance.org/",
             chainId: 56,
-            accounts: [String(process.env.BSC_MAINNET_PRIVATEKEY)]
+            accounts: [String(process.env.MAINNET_PRIVATEKEY)]
+        },
+
+        arbitrumGoerli: {
+            url: "https://endpoints.omniatech.io/v1/arbitrum/goerli/public",
+            chainId: 421613,
+            accounts: [String(process.env.TESTNET_PRIVATEKEY)]
+        },
+        arbitrum: {
+            url: "https://endpoints.omniatech.io/v1/arbitrum/one/public",
+            chainId: 42161,
+            accounts: [String(process.env.MAINNET_PRIVATEKEY)]
         },
 
         hardhat: {
@@ -130,7 +142,8 @@ const config: HardhatUserConfig = {
     etherscan: {
         apiKey: {
             bsc: String(process.env.BSCSCAN_API_KEY),
-            bscTestnet: String(process.env.BSCSCAN_API_KEY)
+            bscTestnet: String(process.env.BSCSCAN_API_KEY),
+            arbitrum: String(process.env.ARBISCAN_API_KEY)
         }
     },
 

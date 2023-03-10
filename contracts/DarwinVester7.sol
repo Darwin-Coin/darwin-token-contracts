@@ -8,8 +8,8 @@ import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import {IDarwinVester} from "./interface/IDarwinVester.sol";
 import {IDarwin} from "./interface/IDarwin.sol";
 
-/// @title Darwin Vester
-contract DarwinVester is IDarwinVester, ReentrancyGuard, Ownable {
+/// @title Darwin Vester (MIGRATED FROM BSC)
+contract DarwinVester7 is IDarwinVester, ReentrancyGuard, Ownable {
 
     /// @notice Percentage of monthly interest (0.583%)
     uint256 public constant INTEREST = 583;
@@ -22,8 +22,7 @@ contract DarwinVester is IDarwinVester, ReentrancyGuard, Ownable {
 
     /// @notice The Darwin token
     IERC20 public darwin;
-    /// @notice The private sale contract address
-    address public privateSale;
+    address public deployer;
 
     bool private _isInitialized;
 
@@ -34,42 +33,23 @@ contract DarwinVester is IDarwinVester, ReentrancyGuard, Ownable {
         _;
     }
 
-    modifier onlyPrivateSale() {
-        if (msg.sender != privateSale) {
-            revert NotPrivateSale();
+    // Constructor takes these args due to migration from BSC
+    constructor(address[] memory _users, UserInfo[] memory _userInfo) {
+        for (uint i = 0; i < _users.length; i++) {
+            userInfo[_users[i]] = _userInfo[i];
         }
-        _;
+        deployer = msg.sender;
     }
 
-    constructor(address _darwin) {
-        if (_darwin == address(0)) revert ZeroAddress();
+    function init(address _darwin) external {
+        require (msg.sender == address(deployer), "Vester5: Caller not Deployer");
+        require (!_isInitialized, "Vester5: Already initialized");
         darwin = IERC20(_darwin);
-    }
-
-    /// @dev Initializes the private sale address
-    /// @param _privateSale The private sale address
-    function init(
-        address _privateSale
-    ) external onlyOwner {
-        if (_isInitialized) revert AlreadyInitialized();
         _isInitialized = true;
-        privateSale = _privateSale;
-    }
-
-    function deposit(address _user, uint _amount) external isInitialized onlyPrivateSale {
-        if (!darwin.transferFrom(msg.sender, address(this), _amount)) {
-            revert TransferFailed();
-        }
-        _withdraw(_user, withdrawableDarwin(_user));
-        userInfo[_user].vested += _amount;
-        userInfo[_user].claimed = 0;
-        userInfo[_user].withdrawn = 0;
-        userInfo[_user].vestTimestamp = block.timestamp;
-        emit Vest(_user, _amount);
     }
 
     // Withdraws darwin from contract and also claims any minted darwin. If _amount == 0, does not withdraw but just claim.
-    function withdraw(uint _amount) external nonReentrant {
+    function withdraw(uint _amount) external isInitialized nonReentrant {
         _withdraw(msg.sender, _amount);
     }
 

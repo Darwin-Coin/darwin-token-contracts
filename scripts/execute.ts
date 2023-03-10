@@ -16,7 +16,7 @@ async function main() {
 
   const COMMUNITY = ADDRESSES.community;
   const DARWIN = ADDRESSES.darwin;
-  const PROP_ID = 1;
+  const PROP_ID = 3;
   const PRELAUNCH = true;
 
   console.log(`💻 Owner: ${owner.address}`);

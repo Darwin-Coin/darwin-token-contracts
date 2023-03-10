@@ -74,7 +74,7 @@ contract DarwinPrivateSale is IDarwinPresale, ReentrancyGuard, Ownable {
         if (_presaleStart < block.timestamp) revert InvalidStartDate();
         darwin = IERC20(_darwin);
         vester = IDarwinVester(_vester);
-        IDarwin(address(darwin)).pause();
+        // IDarwin(address(darwin)).pause();
         _setWallet1(0x0bF1C4139A6168988Fe0d1384296e6df44B27aFd);
         presaleStart = _presaleStart;
     }
@@ -110,7 +110,7 @@ contract DarwinPrivateSale is IDarwinPresale, ReentrancyGuard, Ownable {
             revert TransferFailed();
         }
         darwin.approve(address(vester), darwinAmount - darwinAmountToUser);
-        vester.deposit(msg.sender, darwinAmount - darwinAmountToUser);
+        // vester.deposit(msg.sender, darwinAmount - darwinAmountToUser);
 
         emit UserDeposit(msg.sender, msg.value, darwinAmount);
     }

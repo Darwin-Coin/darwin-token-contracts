@@ -17,32 +17,32 @@ interface IDarwin {
     function distributeRewards(uint256 amount) external;
     function bulkTransfer(address[] calldata recipients, uint256[] calldata amounts) external;
 
-    // PRESALE
-    function pause() external;
-    function unPause() external;
-    function setLive() external;
-
     // COMMUNITY
     // function upgradeTo(address newImplementation) external; RESTRICTED
     // function upgradeToAndCall(address newImplementation, bytes memory data) external payable; RESTRICTED
     function setMinter(address user_, bool canMint_) external; // RESTRICTED
+    function setMaintenance(address _addr, bool _hasRole) external; // RESTRICTED
+    function setSecurity(address _addr, bool _hasRole) external; // RESTRICTED
+    function setUpgrader(address _account, bool _hasRole) external; // RESTRICTED
     function setReceiveRewards(address account, bool shouldReceive) external; // RESTRICTED
     function setHoldingLimitWhitelist(address account, bool whitelisted) external; // RESTRICTED
     function setSellLimitWhitelist(address account, bool whitelisted) external; // RESTRICTED
     function registerPair(address pairAddress) external; // RESTRICTED
+    function communityPause() external; // RESTRICTED
     function communityUnPause() external;
 
     // FACTORY
     function registerDarwinSwapPair(address _pair) external;
 
-    // SECURITY
-    function emergencyPause() external;
-    function emergencyUnPause() external;
-
     // MAINTENANCE
     function setDarwinSwapFactory(address _darwinSwapFactory) external;
     function setPauseWhitelist(address _addr, bool value) external;
-    function setPrivateSaleAddress(address _addr) external;
+    function setPresaleAddress(address _addr) external;
+    function setLive() external;
+
+    // SECURITY
+    function emergencyPause() external;
+    function emergencyUnPause() external;
 
     // MINTER
     function mint(address account, uint256 amount) external;
