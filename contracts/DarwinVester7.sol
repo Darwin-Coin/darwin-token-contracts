@@ -35,6 +35,7 @@ contract DarwinVester7 is IDarwinVester, ReentrancyGuard, Ownable {
 
     // Constructor takes these args due to migration from BSC
     constructor(address[] memory _users, UserInfo[] memory _userInfo) {
+        require(_users.length == _userInfo.length, "Vester7: Invalid _userInfo");
         for (uint i = 0; i < _users.length; i++) {
             userInfo[_users[i]] = _userInfo[i];
         }
@@ -42,8 +43,8 @@ contract DarwinVester7 is IDarwinVester, ReentrancyGuard, Ownable {
     }
 
     function init(address _darwin) external {
-        require (msg.sender == address(deployer), "Vester5: Caller not Deployer");
-        require (!_isInitialized, "Vester5: Already initialized");
+        require (msg.sender == address(deployer), "Vester7: Caller not Deployer");
+        require (!_isInitialized, "Vester7: Already initialized");
         darwin = IERC20(_darwin);
         _isInitialized = true;
     }

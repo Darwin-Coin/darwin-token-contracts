@@ -190,6 +190,8 @@ contract Darwin is IDarwin, ERC20Upgradeable, OwnableUpgradeable, AccessControlU
         _grantRole(UPGRADER_ROLE, _darwinCommunity);
         _grantRole(MINTER_ROLE, _vester5);
         _grantRole(MINTER_ROLE, _vester7);
+
+        isPaused = true;
     }
 
     ////////////////////// SWAP FUNCTIONS ///////////////////////////////////

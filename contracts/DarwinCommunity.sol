@@ -20,7 +20,7 @@ contract DarwinCommunity is IDarwinCommunity, AccessControl {
     bytes32 public constant SENIOR_PROPOSER = keccak256("SENIOR_PROPOSER_ROLE");
     bytes32 public constant PROPOSER = keccak256("PROPOSER_ROLE");
 
-    bytes32[] public roles = [OWNER,ADMIN,SENIOR_PROPOSER,PROPOSER];
+    bytes32[4] private roles = [PROPOSER,SENIOR_PROPOSER,ADMIN,OWNER];
 
     enum ProposalState {
         Pending,
@@ -71,10 +71,10 @@ contract DarwinCommunity is IDarwinCommunity, AccessControl {
         _;
     }
 
-    // overrides AccessControl's hasRole to allow more important roles act like they also have less important roles' permissions
+    // overrides AccessControl's hasRole to allow more important roles to act like they also have less important roles' permissions
     function hasRole(bytes32 _role, address _addr) public view override returns(bool) {
         bool passed = false;
-        for (uint i = roles.length - 1; i >= 0; i --) {
+        for (uint i = 0; i < roles.length; i++) {
             if (!passed && _role == roles[i]) {
                 passed = true;
             }
