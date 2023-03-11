@@ -111,7 +111,7 @@ contract DarwinCommunity is IDarwinCommunity, AccessControl {
     uint256 public maxVotingPeriod;
     uint256 public gracePeriod;
 
-    // For backend purpose
+    // This is only for backend purpose
     string[] private _initialFundProposalStrings;
 
     IDarwin public darwin;
@@ -122,53 +122,12 @@ contract DarwinCommunity is IDarwinCommunity, AccessControl {
         _grantRole(OWNER, 0x745309f30deB0a8271F5f521925222F5E1280641); // Tech Lead
     }
 
-    function init(address _darwin) external onlyRole(OWNER) {
+    function init(address _darwin, address[] memory fundAddress, string[] memory initialFundProposalStrings, string[] memory restrictedProposalSignatures) external onlyRole(OWNER) {
         require(address(_darwin) != address(0), "DC::init: ZERO_ADDRESS");
         require(address(darwin) == address(0), "DC::init: already initialized");
+
         darwin = IDarwin(_darwin);
-
-        // FUND ADDRESSES
-        address[10] memory fundAddress = [
-            0x0bF1C4139A6168988Fe0d1384296e6df44B27aFd,
-            0x0bF1C4139A6168988Fe0d1384296e6df44B27aFd,
-            0x0bF1C4139A6168988Fe0d1384296e6df44B27aFd,
-            0xf74Fb0505f868961f8da7e423d5c8A1CC5c2C162,
-            0x33149c1CB70262E29bF7adde4aA79F41a2fd0c39,
-            0x33149c1CB70262E29bF7adde4aA79F41a2fd0c39,
-            0xD8F251F13eaf05C7D080F917560eB884FEd4227b,
-            0x2d73fE5B2eEFa7d4878F75cB05a86aedfef88054,
-            0x3Cc90773ebB2714180b424815f390D937974109B,
-            address(this)
-        ];
-
-        // FUND PROPOSALS
-        _initialFundProposalStrings = [
-            "Marketing",
-            "Product development",
-            "Operations",
-            "Charity",
-            "Egg hunt",
-            "Giveaways",
-            "Bounties",
-            "Burn",
-            "Reflections",
-            "Save to Next Week"
-        ];
-
-        // RESTRICTED SIGNATURES
-        string[11] memory restrictedProposalSignatures = [
-            "upgradeTo(address)",
-            "upgradeToAndCall(address,bytes)",
-            "setMinter(address,bool)",
-            "setMaintenance(address,bool)",
-            "setSecurity(address,bool)",
-            "setUpgrader(address,bool)",
-            "setReceiveRewards(address,bool)",
-            "setHoldingLimitWhitelist(address,bool)",
-            "setSellLimitWhitelist(address,bool)",
-            "registerPair(address)",
-            "communityPause()"
-        ];
+        _initialFundProposalStrings = initialFundProposalStrings;
 
         proposalMaxOperations = 1;
         minVotingDelay = 24 hours;

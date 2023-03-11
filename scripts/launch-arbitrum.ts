@@ -6,7 +6,7 @@
 import { BigNumber } from "ethers";
 import * as hardhat from "hardhat";
 import { ethers, upgrades } from "hardhat";
-import { DarwinCommunity } from "../typechain-types";
+import { DarwinBurner, DarwinCommunity } from "../typechain-types";
 import { Darwin, DarwinPrivateSale, DarwinVester5, DarwinVester7 } from "../typechain-types/contracts";
 import { ADDRESSES, ADDRESSES_ARB } from "./constants";
 
@@ -49,12 +49,13 @@ async function main() {
   const darwinVester5Factory = await ethers.getContractFactory("DarwinVester5");
   const darwinCommunityFactory = await ethers.getContractFactory("DarwinCommunity");
   const darwinFactory = await ethers.getContractFactory("Darwin");
+  const darwinBurnerFactory = await ethers.getContractFactory("DarwinBurner");
 
 
   //! [DEPLOY] VESTER5
   const vester5 = await darwinVester5Factory.deploy(ADDRESSES_ARB.kieran) as DarwinVester5;
-  console.log(`🔨 Deployed Vester5 at: ${vester5.address}`);
   await vester5.deployed();
+  console.log(`🔨 Deployed Vester5 at: ${vester5.address}`);
 
   //? [VERIFY] VESTER5
   await hardhat.run("verify:verify", {
@@ -65,8 +66,8 @@ async function main() {
 
   //! [DEPLOY] VESTER7
   const vester7 = await darwinVester7Factory.deploy(privateSaleBuyers, buyersInfo) as DarwinVester7;
-  console.log(`🔨 Deployed Vester7 at: ${vester7.address}`);
   await vester7.deployed();
+  console.log(`🔨 Deployed Vester7 at: ${vester7.address}`);
 
   //? [VERIFY] VESTER7
   await hardhat.run("verify:verify", {
@@ -77,8 +78,8 @@ async function main() {
 
   //! [DEPLOY] COMMUNITY
   const community = await darwinCommunityFactory.deploy(ADDRESSES_ARB.kieran) as DarwinCommunity;
-  console.log(`🔨 Deployed Darwin Community at: ${community.address}`);
   await community.deployed();
+  console.log(`🔨 Deployed Darwin Community at: ${community.address}`);
 
   //? [VERIFY] COMMUNITY
   await hardhat.run("verify:verify", {
@@ -95,7 +96,6 @@ async function main() {
       vester5.address,
       vester7.address,
       ADDRESSES_ARB.wallet1,
-      ADDRESSES_ARB.wallet2,
       ADDRESSES_ARB.kieran,
       ADDRESSES_ARB.charity,
       ADDRESSES_ARB.giveaway,
@@ -107,14 +107,74 @@ async function main() {
       initializer: "initialize"
     }
   ) as Darwin;
+  await darwin.deployed();
   console.log(`🔨 Deployed Darwin Protocol at: ${darwin.address}`);
 
   //? [VERIFY] DARWIN PROTOCOL
-  await darwin.deployed();
   await hardhat.run("verify:verify", {
     address: darwin.address,
     constructorArguments: []
   });
+
+
+  //! [DEPLOY] DARWIN BURNER
+  const burner = await darwinBurnerFactory.deploy(darwin.address) as DarwinBurner;
+  console.log(`🔨 Deployed Darwin Burner at: ${burner.address}`);
+  await burner.deployed();
+
+  //? [VERIFY] DARWIN BURNER
+  await hardhat.run("verify:verify", {
+    address: burner.address,
+    constructorArguments: [darwin.address]
+  });
+
+
+
+
+  //! [CONST] FUND ADDRESSES
+  const fundAddress: string[] = [
+    ADDRESSES_ARB.wallet1,
+    ADDRESSES_ARB.wallet1,
+    ADDRESSES_ARB.wallet1,
+    ADDRESSES_ARB.charity,
+    ADDRESSES_ARB.giveaway,
+    ADDRESSES_ARB.giveaway,
+    ADDRESSES_ARB.bounties,
+    burner.address,
+    ADDRESSES_ARB.rewardsWallet,
+    community.address
+  ];
+
+  //! [CONST] FUND PROPOSALS
+  const initialFundProposalStrings: string[] = [
+    "Marketing",
+    "Product development",
+    "Operations",
+    "Charity",
+    "Egg hunt",
+    "Giveaways",
+    "Bounties",
+    "Burn",
+    "Reflections",
+    "Save to Next Week"
+  ];
+
+  //! [CONST] RESTRICTED SIGNATURES
+  const restrictedProposalSignatures: string[] = [
+    "upgradeTo(address)",
+    "upgradeToAndCall(address,bytes)",
+    "setMinter(address,bool)",
+    "setMaintenance(address,bool)",
+    "setSecurity(address,bool)",
+    "setUpgrader(address,bool)",
+    "setReceiveRewards(address,bool)",
+    "setHoldingLimitWhitelist(address,bool)",
+    "setSellLimitWhitelist(address,bool)",
+    "registerPair(address)",
+    "communityPause()"
+  ];
+
+
 
 
   //* [INIT] VESTER5
@@ -126,7 +186,7 @@ async function main() {
   console.log(`🏁 Presale initialized`);
 
   //* [INIT] COMMUNITY
-  await community.init(darwin.address);
+  await community.init(darwin.address, fundAddress, initialFundProposalStrings, restrictedProposalSignatures);
   console.log(`🏁 Community initialized`);
 
   console.log("✅ DARWIN PROTOCOL ARBITRUM LAUNCH COMPLETED");

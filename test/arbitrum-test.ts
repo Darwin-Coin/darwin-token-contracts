@@ -5,8 +5,9 @@ import * as hardhat from "hardhat";
 import { ethers, upgrades } from "hardhat";
 import { expect } from "chai";
 
-import { DarwinCommunity } from "../typechain-types";
+import { DarwinBurner, DarwinCommunity } from "../typechain-types";
 import { Darwin, DarwinVester5, DarwinVester7 } from "../typechain-types/contracts";
+import { ADDRESSES_ARB } from "../scripts/constants";
 
 describe("Launch", function () {
   async function deployFixture() {
@@ -15,6 +16,7 @@ describe("Launch", function () {
     const darwinVester7Factory = await ethers.getContractFactory("DarwinVester7");
     const darwinCommunityFactory = await ethers.getContractFactory("DarwinCommunity");
     const darwinFactory = await ethers.getContractFactory("Darwin");
+    const darwinBurnerFactory = await ethers.getContractFactory("DarwinBurner");
     const vester5 = await darwinVester5Factory.deploy(owner.address) as DarwinVester5;
     await vester5.deployed();
     const vester7 = await darwinVester7Factory.deploy([], []) as DarwinVester7;
@@ -27,22 +29,60 @@ describe("Launch", function () {
         community.address,
         vester5.address,
         vester7.address,
-        owner.address,
-        owner.address,
-        owner.address,
-        owner.address,
-        owner.address,
-        owner.address,
-        owner.address,
-        0
+        owner.address, //ADDRESSES_ARB.wallet1,
+        owner.address, //ADDRESSES_ARB.kieran,
+        owner.address, //ADDRESSES_ARB.charity,
+        owner.address, //ADDRESSES_ARB.giveaway,
+        owner.address, //ADDRESSES_ARB.bounties,
+        owner.address, //ADDRESSES_ARB.drop,
+        0 //privateSoldDarwin
       ],
       {
         initializer: "initialize"
       }
     ) as Darwin;
+    const burner = await darwinBurnerFactory.deploy(darwin.address) as DarwinBurner;
+    await burner.deployed();
     await vester5.init(darwin.address);
     await vester7.init(darwin.address);
-    await community.init(darwin.address);
+    const fundAddress: string[] = [
+      owner.address, //ADDRESSES_ARB.wallet1,
+      owner.address, //ADDRESSES_ARB.wallet1,
+      owner.address, //ADDRESSES_ARB.wallet1,
+      owner.address, //ADDRESSES_ARB.charity,
+      owner.address, //ADDRESSES_ARB.giveaway,
+      owner.address, //ADDRESSES_ARB.giveaway,
+      owner.address, //ADDRESSES_ARB.bounties,
+      burner.address,
+      owner.address, //ADDRESSES_ARB.rewardsWallet,
+      community.address
+    ];
+    const initialFundProposalStrings: string[] = [
+      "Marketing",
+      "Product development",
+      "Operations",
+      "Charity",
+      "Egg hunt",
+      "Giveaways",
+      "Bounties",
+      "Burn",
+      "Reflections",
+      "Save to Next Week"
+    ];
+    const restrictedProposalSignatures: string[] = [
+      "upgradeTo(address)",
+      "upgradeToAndCall(address,bytes)",
+      "setMinter(address,bool)",
+      "setMaintenance(address,bool)",
+      "setSecurity(address,bool)",
+      "setUpgrader(address,bool)",
+      "setReceiveRewards(address,bool)",
+      "setHoldingLimitWhitelist(address,bool)",
+      "setSellLimitWhitelist(address,bool)",
+      "registerPair(address)",
+      "communityPause()"
+    ];
+    await community.init(darwin.address, fundAddress, initialFundProposalStrings, restrictedProposalSignatures);
     await darwin.approve(community.address, ethers.utils.parseEther("100000"));
 
     // SET addr1 seniorProposer

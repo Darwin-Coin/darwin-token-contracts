@@ -28,7 +28,6 @@ contract Darwin is IDarwin, ERC20Upgradeable, OwnableUpgradeable, AccessControlU
     uint256 public constant DEPLOYER_PERCENTAGE = 6000; // 60%
     uint256 public constant KIERAN_PERCENTAGE = 20; // 0.20%
     uint256 public constant WALLET1_PECENTAGE = 1000; // 10%
-    uint256 public constant WALLET2_PECENTAGE = 2980; // 29.80%
 
     uint256 public constant INITIAL_SUPPLY = 1e8 ether; // initial supply: 100m
     uint256 public constant MAX_SUPPLY = 1e9 ether; // max supply: 1b
@@ -76,7 +75,6 @@ contract Darwin is IDarwin, ERC20Upgradeable, OwnableUpgradeable, AccessControlU
         address _vester5,
         address _vester7,
         address _wallet1,
-        address _wallet2,
         address _kieran,
         address _charity,
         address _giveaway,
@@ -91,7 +89,6 @@ contract Darwin is IDarwin, ERC20Upgradeable, OwnableUpgradeable, AccessControlU
             _vester5,
             _vester7,
             _wallet1,
-            _wallet2,
             _kieran,
             _charity,
             _giveaway,
@@ -108,7 +105,6 @@ contract Darwin is IDarwin, ERC20Upgradeable, OwnableUpgradeable, AccessControlU
         address _vester5,
         address _vester7,
         address _wallet1,
-        address _wallet2,
         address _kieran,
         address _charity,
         address _giveaway,
@@ -130,7 +126,6 @@ contract Darwin is IDarwin, ERC20Upgradeable, OwnableUpgradeable, AccessControlU
         // exclude addresses from holding limit
         isExcludedFromHoldingLimit[_msgSender()] = true;
         isExcludedFromHoldingLimit[_wallet1] = true;
-        isExcludedFromHoldingLimit[_wallet2] = true;
         isExcludedFromHoldingLimit[_charity] = true;
         isExcludedFromHoldingLimit[_giveaway] = true;
         isExcludedFromHoldingLimit[_bounties] = true;
@@ -143,7 +138,6 @@ contract Darwin is IDarwin, ERC20Upgradeable, OwnableUpgradeable, AccessControlU
         // exclude addresses from sell limit
         isExcludedFromSellLimit[_msgSender()] = true;
         isExcludedFromSellLimit[_wallet1] = true;
-        isExcludedFromSellLimit[_wallet2] = true;
         isExcludedFromSellLimit[_charity] = true;
         isExcludedFromSellLimit[_giveaway] = true;
         isExcludedFromSellLimit[_bounties] = true;
@@ -160,7 +154,6 @@ contract Darwin is IDarwin, ERC20Upgradeable, OwnableUpgradeable, AccessControlU
         _setExcludedFromRewards(_bounties);
         _setExcludedFromRewards(_darwinCommunity);
         _setExcludedFromRewards(_wallet1);
-        _setExcludedFromRewards(_wallet2);
         _setExcludedFromRewards(_darwinDrop);
         _setExcludedFromRewards(rewardsWallet);
         _setExcludedFromRewards(_vester5);

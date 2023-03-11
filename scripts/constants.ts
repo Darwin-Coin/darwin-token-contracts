@@ -32,7 +32,6 @@ export const ADDRESSES_ARB = {
     vester: "",
     rewardsWallet: "0x3Cc90773ebB2714180b424815f390D937974109B",
     wallet1: "",
-    wallet2: "",
     kieran: "0xe4e672ED86b8f6782e889F125e977bcF54018232",
     charity: "",
     giveaway: "",
