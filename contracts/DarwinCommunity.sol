@@ -483,9 +483,9 @@ contract DarwinCommunity is IDarwinCommunity, AccessControl {
         receipt.darwinAmount = darwinAmount;
 
         if (inSupport) {
-            proposal.forVotes += 1;
+            proposal.forVotes += (darwinAmount / 1e18);
         } else {
-            proposal.againstVotes += 1;
+            proposal.againstVotes += (darwinAmount / 1e18);
         }
     }
 
