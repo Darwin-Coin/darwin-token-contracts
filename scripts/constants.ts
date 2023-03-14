@@ -24,16 +24,16 @@ export const ADDRESSES_ARB = {
     deployer: "0x63a0704e005776B153248A500Dfd950873AFB186",
     darwin: "",
     community: "",
-    drop: "",
+    drop: "0x0D683F642f5A5055DC31741957e05cccEdf469BA",
     presale: "",
     privateSales: [
         ""
     ],
     vester: "",
     rewardsWallet: "0x3Cc90773ebB2714180b424815f390D937974109B",
-    wallet1: "",
+    wallet1: "0x5Baa5b0eCB4d81DEbb15be26cc967E01a4c6b3e0",
     kieran: "0xe4e672ED86b8f6782e889F125e977bcF54018232",
-    charity: "",
-    giveaway: "",
-    bounties: "",
+    charity: "0x4066a812D1940CeB6bcB6749acd7Abe0Ca20DF42",
+    giveaway: "0x552F0100ae3A78ADd3D0f47F7590815b9538F4ef",
+    bounties: "0x16c0EE2590d29E61De097515522dD672f6342FE3",
 }

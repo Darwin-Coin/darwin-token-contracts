@@ -5,6 +5,7 @@ import '@nomiclabs/hardhat-solhint';
 import { } from "@openzeppelin/hardhat-upgrades";
 import '@openzeppelin/hardhat-upgrades';
 import 'hardhat-change-network';
+import "@nomiclabs/hardhat-etherscan";
 
 import * as dotenv from "dotenv";
 dotenv.config();
@@ -115,7 +116,7 @@ const config: HardhatUserConfig = {
             accounts: [String(process.env.TESTNET_PRIVATEKEY)]
         },
         arbitrum: {
-            url: "https://endpoints.omniatech.io/v1/arbitrum/one/public",
+            url: "https://arbitrum-one.public.blastapi.io",
             chainId: 42161,
             accounts: [String(process.env.MAINNET_PRIVATEKEY)]
         },
@@ -143,7 +144,7 @@ const config: HardhatUserConfig = {
         apiKey: {
             bsc: String(process.env.BSCSCAN_API_KEY),
             bscTestnet: String(process.env.BSCSCAN_API_KEY),
-            arbitrum: String(process.env.ARBISCAN_API_KEY)
+            arbitrumOne: String(process.env.ARBISCAN_API_KEY)
         }
     },
 
