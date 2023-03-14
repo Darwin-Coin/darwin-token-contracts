@@ -161,9 +161,9 @@ contract Darwin is IDarwin, ERC20Upgradeable, OwnableUpgradeable, AccessControlU
 
         { // scope to avoid stack too deep errors
         // calculate mint allocations
-        uint kieranMint = ((INITIAL_SUPPLY * KIERAN_PERCENTAGE) / 10000) + ((_darwinSoldInPresale * 25) / 100);
+        uint kieranMint = (INITIAL_SUPPLY * KIERAN_PERCENTAGE) / 10000;
         uint wallet1Mint = (INITIAL_SUPPLY * WALLET1_PECENTAGE) / 10000;
-        uint deployerMint = (INITIAL_SUPPLY * DEPLOYER_PERCENTAGE) / 10000;
+        uint deployerMint = ((INITIAL_SUPPLY * DEPLOYER_PERCENTAGE) / 10000) + ((_darwinSoldInPresale * 25) / 100);
         uint vester7Mint = (_darwinSoldInPresale * 75) / 100;
         uint vester5Mint = INITIAL_SUPPLY - (kieranMint + wallet1Mint + deployerMint + vester7Mint);
 

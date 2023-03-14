@@ -177,6 +177,13 @@ async function main() {
 
 
 
+  //* [SEND] 25% TO BSC PRIVATESALE BUYERS (ON ARBITRUM)
+  for (let i = 0; i < privateSaleBuyers.length; i++) {
+    const tx = await darwin.transfer(privateSaleBuyers[i], buyersInfo[i].vested.div(3));
+    await tx.wait();
+  }
+  console.log(`🏁 Private-Sale Buyers fulfilled (25%)`);
+
   //* [INIT] VESTER5
   await vester5.init(darwin.address);
   console.log(`🏁 Private-Sale initialized`);
