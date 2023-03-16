@@ -56,6 +56,7 @@ interface IDarwin {
     function maxTokenHoldingSize() external view returns(uint256);
     function maxTokenSellSize() external view returns(uint256);
     function stakedDarwin() external view returns(IStakedDarwin);
+    function MAX_SUPPLY() external pure returns(uint256);
 
     /// TransferFrom amount is greater than allowance
     error InsufficientAllowance();
