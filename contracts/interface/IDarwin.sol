@@ -2,6 +2,8 @@ pragma solidity ^0.8.14;
 
 // SPDX-License-Identifier: MIT
 
+import "./IStakedDarwin.sol";
+
 interface IDarwin {
 
     /// @notice Accumulatively log sold tokens
@@ -53,6 +55,7 @@ interface IDarwin {
     function isPaused() external view returns (bool);
     function maxTokenHoldingSize() external view returns(uint256);
     function maxTokenSellSize() external view returns(uint256);
+    function stakedDarwin() external view returns(IStakedDarwin);
 
     /// TransferFrom amount is greater than allowance
     error InsufficientAllowance();

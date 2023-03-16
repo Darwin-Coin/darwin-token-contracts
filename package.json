@@ -21,6 +21,8 @@
     "NFT"
   ],
   "devDependencies": {
+    "@nomicfoundation/hardhat-chai-matchers": "^1.0.6",
+    "@nomicfoundation/hardhat-network-helpers": "^1.0.8",
     "@nomicfoundation/hardhat-toolbox": "^1.0.2",
     "@nomiclabs/hardhat-ethers": "^2.0.5",
     "@nomiclabs/hardhat-solhint": "^2.0.1",
@@ -28,6 +30,10 @@
     "@openzeppelin/contracts-upgradeable": "^4.8.0",
     "@openzeppelin/hardhat-upgrades": "^1.14.0",
     "@tenderly/hardhat-tenderly": "^1.0.13",
+    "@typechain/ethers-v5": "^10.2.0",
+    "@typechain/hardhat": "^6.1.5",
+    "@types/chai": "^4.3.4",
+    "@types/mocha": "^9.1.1",
     "dotenv": "^10.0.0",
     "eslint": "^7.32.0",
     "eslint-config-prettier": "^8.4.0",
@@ -42,7 +48,9 @@
     "prettier": "^2.5.1",
     "prettier-plugin-solidity": "^1.0.0-beta.13",
     "solhint": "^3.3.7",
+    "solidity-coverage": "^0.7.22",
     "ts-node": "^10.9.1",
+    "typechain": "^8.1.1",
     "typescript": "^4.9.5"
   },
   "dependencies": {

@@ -3,63 +3,28 @@ pragma solidity ^0.8.14;
 // SPDX-License-Identifier: MIT
 
 import "./interface/IDarwinCommunity.sol";
+import "./interface/IStakedDarwin.sol";
 
 import "@openzeppelin/contracts/access/AccessControl.sol";
+import "@openzeppelin/contracts/security/ReentrancyGuard.sol";
 
 interface IDarwin {
     function bulkTransfer(address[] calldata recipients, uint256[] calldata amounts) external;
     function transferFrom(address from, address to, uint256 amount) external returns (bool);
     function balanceOf(address account) external view returns (uint256);
+    function stakedDarwin() external view returns(IStakedDarwin);
 }
 
-contract DarwinCommunity is IDarwinCommunity, AccessControl {
+contract DarwinCommunity is IDarwinCommunity, AccessControl, ReentrancyGuard {
 
     // roles
     bytes32 public constant OWNER = keccak256("OWNER_ROLE");
     bytes32 public constant ADMIN = keccak256("ADMIN_ROLE");
     bytes32 public constant SENIOR_PROPOSER = keccak256("SENIOR_PROPOSER_ROLE");
     bytes32 public constant PROPOSER = keccak256("PROPOSER_ROLE");
-
     bytes32[4] private roles = [PROPOSER,SENIOR_PROPOSER,ADMIN,OWNER];
 
-    enum ProposalState {
-        Pending,
-        Active,
-        Canceled,
-        Defeated,
-        Queued,
-        Expired,
-        Executed
-    }
-
-    /// @notice Ballot receipt record for a voter
-    struct Receipt {
-        bool hasVoted;
-        bool inSupport;
-        uint256 darwinAmount;
-    }
-
-    struct Proposal {
-        uint256 id;
-        address proposer;
-        address[] targets;
-        uint256[] values;
-        string[] signatures;
-        bytes[] calldatas;
-        uint256 darwinAmount;
-        uint256 startTime;
-        uint256 endTime;
-        uint256 forVotes;
-        uint256 againstVotes;
-        bool canceled;
-        bool executed;
-    }
-
-    struct CommunityFundCandidate {
-        uint256 id;
-        address valueAddress;
-        bool isActive;
-    }
+    uint public constant VOTE_LOCK_PERIOD = 365 days;
 
     modifier isProposalIdValid(uint256 _id) {
         require(_id > 0 && _id <= _lastProposalId, "DC::isProposalIdValid invalid id");
@@ -99,6 +64,8 @@ contract DarwinCommunity is IDarwinCommunity, AccessControl {
 
     mapping(address => uint256[]) private usersVotes;
 
+    mapping(uint => mapping(address => LockInfo)) internal _lockedStakedDarwin;
+
     uint256 public _lastCommunityFundCandidateId;
     uint256 public _lastProposalId;
 
@@ -115,6 +82,7 @@ contract DarwinCommunity is IDarwinCommunity, AccessControl {
     string[] private _initialFundProposalStrings;
 
     IDarwin public darwin;
+    IStakedDarwin public stakedDarwin;
 
     constructor(address _kieran) {
         _grantRole(OWNER, msg.sender);
@@ -127,6 +95,8 @@ contract DarwinCommunity is IDarwinCommunity, AccessControl {
         require(address(darwin) == address(0), "DC::init: already initialized");
 
         darwin = IDarwin(_darwin);
+        stakedDarwin = darwin.stakedDarwin();
+
         _initialFundProposalStrings = initialFundProposalStrings;
 
         proposalMaxOperations = 1;
@@ -167,6 +137,10 @@ contract DarwinCommunity is IDarwinCommunity, AccessControl {
 
     function setDarwinAddress(address _darwin) external onlyDarwinCommunity {
         darwin = IDarwin(_darwin);
+    }
+
+    function setStakedDarwinAddress(address _stakedDarwin) external onlyDarwinCommunity {
+        stakedDarwin = IStakedDarwin(_stakedDarwin);
     }
 
     function randomBoolean() private view returns (bool) {
@@ -408,9 +382,11 @@ contract DarwinCommunity is IDarwinCommunity, AccessControl {
         bool inSupport,
         uint256 darwinAmount
     ) external {
-        require(minDarwinTransferToAccess <= darwinAmount, "DC::castVote: not enough $DARWIN sent");
+        require(minDarwinTransferToAccess <= darwinAmount, "DC::castVote: not enough StakedDarwin sent");
+        require(stakedDarwin.transferFrom(msg.sender, address(this), darwinAmount), "DC::castVote: not enough StakedDarwin in wallet");
 
-        require(darwin.transferFrom(msg.sender, address(this), darwinAmount), "DC::castVote: not enough $DARWIN in wallet");
+        _lockedStakedDarwin[proposalId][msg.sender].darwinAmount = darwinAmount;
+        _lockedStakedDarwin[proposalId][msg.sender].lockEnd = block.timestamp + VOTE_LOCK_PERIOD;
 
         castVoteInternal(_msgSender(), proposalId, darwinAmount, inSupport);
         emit VoteCast(_msgSender(), proposalId, inSupport);
@@ -604,5 +580,43 @@ contract DarwinCommunity is IDarwinCommunity, AccessControl {
 
     function isProposalSignatureRestricted(string calldata signature) external view returns (bool) {
         return restrictedProposalActionSignature[uint256(keccak256(bytes(signature)))];
+    }
+
+
+    /////////////// LOCK ///////////////
+
+    /**
+     * @notice Function to unlock and withdraw StakedDarwin used to cast votes
+     */
+    function withdrawStakedDarwin() external nonReentrant {
+        uint total;
+        for (uint i = 0; i < _lastProposalId; i++) {
+            if (_lockedStakedDarwin[i][msg.sender].lockEnd <= block.timestamp) {
+                total += _lockedStakedDarwin[i][msg.sender].darwinAmount;
+                _lockedStakedDarwin[i][msg.sender].darwinAmount = 0;
+            }
+        }
+        if (total > 0) {
+            stakedDarwin.transfer(msg.sender, total);
+            emit Withdraw(msg.sender, total);
+        }
+    }
+
+    /**
+     * @notice Total amount of unlocked (so withdrawable) StakedDarwin
+     */
+    function freedStakedDarwin(address user) external view returns(uint total) {
+        for (uint i = 0; i < _lastProposalId; i++) {
+            if (_lockedStakedDarwin[i][user].lockEnd <= block.timestamp) {
+                total += _lockedStakedDarwin[i][user].darwinAmount;
+            }
+        }
+    }
+
+    /**
+     * @notice Locked StakedDarwins info
+     */
+    function lockedStakedDarwin(uint proposalId, address user) external view returns(LockInfo memory) {
+        return _lockedStakedDarwin[proposalId][user];
     }
 }

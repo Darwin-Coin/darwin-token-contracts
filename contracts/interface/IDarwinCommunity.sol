@@ -19,6 +19,50 @@ interface IDarwinCommunity {
         string other
     );
 
+        enum ProposalState {
+        Pending,
+        Active,
+        Canceled,
+        Defeated,
+        Queued,
+        Expired,
+        Executed
+    }
+
+    /// @notice Ballot receipt record for a voter
+    struct Receipt {
+        bool hasVoted;
+        bool inSupport;
+        uint256 darwinAmount;
+    }
+
+    struct Proposal {
+        uint256 id;
+        address proposer;
+        address[] targets;
+        uint256[] values;
+        string[] signatures;
+        bytes[] calldatas;
+        uint256 darwinAmount;
+        uint256 startTime;
+        uint256 endTime;
+        uint256 forVotes;
+        uint256 againstVotes;
+        bool canceled;
+        bool executed;
+    }
+
+    struct CommunityFundCandidate {
+        uint256 id;
+        address valueAddress;
+        bool isActive;
+    }
+
+    struct LockInfo {
+        uint darwinAmount;
+        uint lockEnd;
+    }
+
     /// @notice An event emitted when a vote has been cast on a proposal
     /// @param voter The address which casted a vote
     /// @param proposalId The proposal id which was voted on
@@ -28,8 +72,11 @@ interface IDarwinCommunity {
     /// @notice An event emitted when a proposal has been canceled
     event ProposalCanceled(uint256 indexed id);
 
-    /// @notice An event emitted when a proposal has been executed in the Timelock
+    /// @notice An event emitted when a proposal has been executed
     event ProposalExecuted(uint256 indexed id);
+
+    /// @notice An event emitted when a user withdraws the StakedDarwin they previously locked in to cast votes
+    event Withdraw(address indexed user, uint256 indexed darwinAmount);
 
     event ExecuteTransaction(
         uint256 indexed id,
@@ -43,5 +90,5 @@ interface IDarwinCommunity {
     event CommunityFundDistributed(uint256 fundWeek, uint256[] candidates, uint256[] tokens);
 
     function setDarwinAddress(address account) external;
-
+    function lockedStakedDarwin(uint proposalId, address user) external returns (LockInfo memory);
 }

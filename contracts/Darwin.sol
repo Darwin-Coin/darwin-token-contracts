@@ -5,10 +5,13 @@ pragma solidity 0.8.14;
 import "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/proxy/utils/UUPSUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/access/AccessControlUpgradeable.sol";
+import "@uniswap/v2-core/contracts/interfaces/IUniswapV2Factory.sol";
+
+import "./StakedDarwin.sol";
+import "./Openzeppelin/ERC20Upgradeable.sol";
+
 import "./interface/IDarwin.sol";
 import "./interface/IDarwinCommunity.sol";
-import "@uniswap/v2-core/contracts/interfaces/IUniswapV2Factory.sol";
-import "./Openzeppelin/ERC20Upgradeable.sol";
 
 contract Darwin is IDarwin, ERC20Upgradeable, OwnableUpgradeable, AccessControlUpgradeable, UUPSUpgradeable {
 
@@ -60,6 +63,8 @@ contract Darwin is IDarwin, ERC20Upgradeable, OwnableUpgradeable, AccessControlU
 
     // The DarwinSwap factory address
     IUniswapV2Factory public darwinSwapFactory;
+    // The StakedDarwin address
+    IStakedDarwin public stakedDarwin;
 
     modifier notPaused() {
         if(isPaused && !hasRole(COMMUNITY_ROLE, msg.sender)) {
@@ -112,6 +117,17 @@ contract Darwin is IDarwin, ERC20Upgradeable, OwnableUpgradeable, AccessControlU
         address _darwinDrop,
         uint _darwinSoldInPresale
     ) private onlyInitializing {
+        { // scope to avoid stack too deep errors
+        // Create StakedDarwin contract
+        bytes memory bytecode = type(StakedDarwin).creationCode;
+        bytes32 salt = keccak256(abi.encodePacked(address(this)));
+        address _stakedDarwin;
+        assembly {
+            _stakedDarwin := create2(0, add(bytecode, 32), mload(bytecode), salt)
+        }
+        stakedDarwin = IStakedDarwin(_stakedDarwin);
+        }
+
         rewardsWallet = 0x3Cc90773ebB2714180b424815f390D937974109B;
 
         // allow addresses to trade during the pre-launch pause
@@ -193,6 +209,15 @@ contract Darwin is IDarwin, ERC20Upgradeable, OwnableUpgradeable, AccessControlU
         require(address(darwinSwapFactory) == address(0), "DARWIN: DarwinSwap Factory address already set");
         darwinSwapFactory = IUniswapV2Factory(_darwinSwapFactory);
         _grantRole(FACTORY_ROLE, _darwinSwapFactory);
+    }
+
+    function setDarwinStaking(address _darwinStaking) external onlyRole(MAINTENANCE_ROLE) {
+        pauseWhitelist[_darwinStaking] = true;
+        isExcludedFromHoldingLimit[_darwinStaking] = true;
+        isExcludedFromSellLimit[_darwinStaking] = true;
+        _setExcludedFromRewards(_darwinStaking);
+        _grantRole(MINTER_ROLE, _darwinStaking);
+        stakedDarwin.setDarwinStaking(_darwinStaking);
     }
 
     function registerDarwinSwapPair(address _pair) external onlyRole(FACTORY_ROLE) {
