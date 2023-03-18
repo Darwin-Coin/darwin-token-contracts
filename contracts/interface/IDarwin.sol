@@ -2,7 +2,7 @@ pragma solidity ^0.8.14;
 
 // SPDX-License-Identifier: MIT
 
-import "./IStakedDarwin.sol";
+import {IStakedDarwin} from "./IStakedDarwin.sol";
 
 interface IDarwin {
 
@@ -27,9 +27,6 @@ interface IDarwin {
     function setSecurity(address _addr, bool _hasRole) external; // RESTRICTED
     function setUpgrader(address _account, bool _hasRole) external; // RESTRICTED
     function setReceiveRewards(address account, bool shouldReceive) external; // RESTRICTED
-    function setHoldingLimitWhitelist(address account, bool whitelisted) external; // RESTRICTED
-    function setSellLimitWhitelist(address account, bool whitelisted) external; // RESTRICTED
-    function registerPair(address pairAddress) external; // RESTRICTED
     function communityPause() external; // RESTRICTED
     function communityUnPause() external;
 
@@ -50,11 +47,7 @@ interface IDarwin {
     function mint(address account, uint256 amount) external;
 
     // VIEW
-    function isExcludedFromHoldingLimit(address account) external view returns (bool);
-    function isExcludedFromSellLimit(address account) external view returns (bool);
     function isPaused() external view returns (bool);
-    function maxTokenHoldingSize() external view returns(uint256);
-    function maxTokenSellSize() external view returns(uint256);
     function stakedDarwin() external view returns(IStakedDarwin);
     function MAX_SUPPLY() external pure returns(uint256);
 

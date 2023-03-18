@@ -2,20 +2,20 @@ pragma solidity 0.8.14;
 
 // SPDX-License-Identifier: MIT
 
-import "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
-import "@openzeppelin/contracts-upgradeable/proxy/utils/UUPSUpgradeable.sol";
-import "@openzeppelin/contracts-upgradeable/access/AccessControlUpgradeable.sol";
-import "@uniswap/v2-core/contracts/interfaces/IUniswapV2Factory.sol";
+import {OwnableUpgradeable} from "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
+import {UUPSUpgradeable} from "@openzeppelin/contracts-upgradeable/proxy/utils/UUPSUpgradeable.sol";
+import {AccessControlUpgradeable} from "@openzeppelin/contracts-upgradeable/access/AccessControlUpgradeable.sol";
+import {IUniswapV2Factory} from "@uniswap/v2-core/contracts/interfaces/IUniswapV2Factory.sol";
 
-import "./StakedDarwin.sol";
-import "./Openzeppelin/ERC20Upgradeable.sol";
+import {StakedDarwin} from "./StakedDarwin.sol";
+import {ERC20Upgradeable} from "./Openzeppelin/ERC20Upgradeable.sol";
 
-import "./interface/IDarwin.sol";
-import "./interface/IDarwinCommunity.sol";
+import {IDarwin, IStakedDarwin} from "./interface/IDarwin.sol";
+import {IDarwinCommunity} from "./interface/IDarwinCommunity.sol";
 
 contract Darwin is IDarwin, ERC20Upgradeable, OwnableUpgradeable, AccessControlUpgradeable, UUPSUpgradeable {
 
-    // roles
+    // Roles
     bytes32 public constant COMMUNITY_ROLE = keccak256("COMMUNITY_ROLE");
     bytes32 public constant UPGRADER_ROLE = keccak256("UPGRADER_ROLE");
     bytes32 public constant MINTER_ROLE = keccak256("MINTER_ROLE");
@@ -23,57 +23,46 @@ contract Darwin is IDarwin, ERC20Upgradeable, OwnableUpgradeable, AccessControlU
     bytes32 public constant SECURITY_ROLE = keccak256("SECURITY_ROLE");
     bytes32 public constant FACTORY_ROLE = keccak256("FACTORY_ROLE");
 
-    // constants
+    // Constants
     uint256 private constant _MULTIPLIER = 2**160;
-    uint256 private constant _PERCENTAGE_MULTIPLIER = 100;
-    uint256 private constant _PERCENTAGE_100 = 100 * _PERCENTAGE_MULTIPLIER;
-
     uint256 public constant DEPLOYER_PERCENTAGE = 6000; // 60%
     uint256 public constant KIERAN_PERCENTAGE = 20; // 0.20%
     uint256 public constant WALLET1_PECENTAGE = 1000; // 10%
-
     uint256 public constant INITIAL_SUPPLY = 1e8 ether; // initial supply: 100m
     uint256 public constant MAX_SUPPLY = 1e9 ether; // max supply: 1b
-    uint256 public constant MAX_TOKEN_SALE_LIMIT_DURATION = 5 hours;
 
-    // limit exclusions
-    mapping(address => bool) public isExcludedFromSellLimit;
-    mapping(address => bool) public isExcludedFromHoldingLimit;
-
-    // Logs
-    /// @notice track sold tokens over maxTokenSaleLimitDuration
-    mapping(address => TokenSellLog) private _tokenSellLog;
-
-    // reward values
+    // Reflections
     uint256 public culmulativeRewardPerToken;
+    address[] public excludedFromRewards;
     mapping(address => uint256) private _lastCulmulativeRewards;
     mapping(address => bool) private _isExcludedFromRewards;
-    address[] public excludedFromRewards;
+
+    // Pausing
+    bool public isPaused;
+    bool public isLive;
+    mapping(address => bool) private _pauseWhitelist;
 
     // The rewards wallet
     address public rewardsWallet;
-
-    // How much DARWIN has been burnt
-    uint256 public totalBurnt;
-
-    // pausing
-    bool public isPaused;
-    bool public isLive;
-    mapping(address => bool) private pauseWhitelist;
-
     // The DarwinSwap factory address
     IUniswapV2Factory public darwinSwapFactory;
     // The StakedDarwin address
     IStakedDarwin public stakedDarwin;
+    // The DarwinMasterChef address
+    address public masterChef;
+    // The DarwinStaking address
+    address public darwinStaking;
+    // How much DARWIN has been burnt
+    uint256 public totalBurnt;
 
     modifier notPaused() {
         if(isPaused && !hasRole(COMMUNITY_ROLE, msg.sender)) {
-            if(isLive || pauseWhitelist[msg.sender] == false) revert Paused();
+            if(isLive || _pauseWhitelist[msg.sender] == false) revert Paused();
         }
         _;
     }
 
-    //////////////////////// Initializers /////////////////////////////////
+    //////////////////////// INITIALIZER /////////////////////////////////
 
     function initialize(
         address _darwinCommunity,
@@ -131,37 +120,13 @@ contract Darwin is IDarwin, ERC20Upgradeable, OwnableUpgradeable, AccessControlU
         rewardsWallet = 0x3Cc90773ebB2714180b424815f390D937974109B;
 
         // allow addresses to trade during the pre-launch pause
-        pauseWhitelist[_msgSender()] = true;
-        pauseWhitelist[_wallet1] = true;
-        pauseWhitelist[_kieran] = true;
-        pauseWhitelist[_darwinDrop] = true;
-        pauseWhitelist[_darwinCommunity] = true;
-        pauseWhitelist[_vester5] = true;
-        pauseWhitelist[_vester7] = true;
-
-        // exclude addresses from holding limit
-        isExcludedFromHoldingLimit[_msgSender()] = true;
-        isExcludedFromHoldingLimit[_wallet1] = true;
-        isExcludedFromHoldingLimit[_charity] = true;
-        isExcludedFromHoldingLimit[_giveaway] = true;
-        isExcludedFromHoldingLimit[_bounties] = true;
-        isExcludedFromHoldingLimit[_darwinCommunity] = true;
-        isExcludedFromHoldingLimit[_darwinDrop] = true;
-        isExcludedFromHoldingLimit[rewardsWallet] = true;
-        isExcludedFromHoldingLimit[_vester5] = true;
-        isExcludedFromHoldingLimit[_vester7] = true;
-
-        // exclude addresses from sell limit
-        isExcludedFromSellLimit[_msgSender()] = true;
-        isExcludedFromSellLimit[_wallet1] = true;
-        isExcludedFromSellLimit[_charity] = true;
-        isExcludedFromSellLimit[_giveaway] = true;
-        isExcludedFromSellLimit[_bounties] = true;
-        isExcludedFromSellLimit[_darwinCommunity] = true;
-        isExcludedFromSellLimit[_darwinDrop] = true;
-        isExcludedFromSellLimit[rewardsWallet] = true;
-        isExcludedFromSellLimit[_vester5] = true;
-        isExcludedFromSellLimit[_vester7] = true;
+        _pauseWhitelist[_msgSender()] = true;
+        _pauseWhitelist[_wallet1] = true;
+        _pauseWhitelist[_kieran] = true;
+        _pauseWhitelist[_darwinDrop] = true;
+        _pauseWhitelist[_darwinCommunity] = true;
+        _pauseWhitelist[_vester5] = true;
+        _pauseWhitelist[_vester7] = true;
 
         // exclude addresses from receiving rewards
         _setExcludedFromRewards(_msgSender());
@@ -212,16 +177,22 @@ contract Darwin is IDarwin, ERC20Upgradeable, OwnableUpgradeable, AccessControlU
     }
 
     function setDarwinStaking(address _darwinStaking) external onlyRole(MAINTENANCE_ROLE) {
-        pauseWhitelist[_darwinStaking] = true;
-        isExcludedFromHoldingLimit[_darwinStaking] = true;
-        isExcludedFromSellLimit[_darwinStaking] = true;
+        require(darwinStaking == address(0), "DARWIN: DarwinStaking address already set");
+        darwinStaking = _darwinStaking;
         _setExcludedFromRewards(_darwinStaking);
         _grantRole(MINTER_ROLE, _darwinStaking);
         stakedDarwin.setDarwinStaking(_darwinStaking);
     }
 
+    function setMasterChef(address _masterChef) external onlyRole(MAINTENANCE_ROLE) {
+        require(masterChef == address(0), "DARWIN: DarwinMasterChef address already set");
+        masterChef = _masterChef;
+        _setExcludedFromRewards(_masterChef);
+        _grantRole(MINTER_ROLE, _masterChef);
+    }
+
     function registerDarwinSwapPair(address _pair) external onlyRole(FACTORY_ROLE) {
-        _registerPair(_pair);
+        _setExcludedFromRewards(_pair);
     }
 
     ////////////////////// MAINTENANCE FUNCTIONS ///////////////////////////////////
@@ -232,15 +203,13 @@ contract Darwin is IDarwin, ERC20Upgradeable, OwnableUpgradeable, AccessControlU
     }
 
     function setPauseWhitelist(address _addr, bool value) external onlyRole(MAINTENANCE_ROLE) {
-        pauseWhitelist[_addr] = value;
+        _pauseWhitelist[_addr] = value;
     }
 
     function setPresaleAddress(address _addr) external onlyRole(MAINTENANCE_ROLE) {
         require(!isLive, "DARWIN: Darwin Protocol is already live");
         _setExcludedFromRewards(_addr);
-        isExcludedFromHoldingLimit[_addr] = true;
-        isExcludedFromSellLimit[_addr] = true;
-        pauseWhitelist[_addr] = true;
+        _pauseWhitelist[_addr] = true;
     }
 
     ////////////////////// SECURITY FUNCTIONS ///////////////////////////////////
@@ -260,7 +229,7 @@ contract Darwin is IDarwin, ERC20Upgradeable, OwnableUpgradeable, AccessControlU
     ////////////////////// REWARDS FUNCTIONS /////////////////////////////////////
 
     function _getRewardsOwed(uint _cumulativeRewardsPerToken, uint _lastCumulativeRewards, uint _balance) internal pure returns(uint) {
-        return ((_cumulativeRewardsPerToken - _lastCumulativeRewards) * _balance) /_MULTIPLIER;
+        return ((_cumulativeRewardsPerToken - _lastCumulativeRewards) * _balance) / _MULTIPLIER;
     }
 
     function _distributeRewardToUser(uint _culmulativeRewardsPerToken, uint _accountsLastCulmulativeRewards, uint _balance, address _account) internal returns(uint newBalance) {
@@ -282,7 +251,7 @@ contract Darwin is IDarwin, ERC20Upgradeable, OwnableUpgradeable, AccessControlU
     }
 
     function _distributeRewards(uint256 amount) internal {
-        culmulativeRewardPerToken += (amount *_MULTIPLIER) / (totalSupply() - _getExcludedBalances());
+        culmulativeRewardPerToken += (amount * _MULTIPLIER) / (totalSupply() - _getExcludedBalances());
     }
 
     function _getExcludedBalances() internal view returns(uint excludedBalances) {
@@ -318,12 +287,6 @@ contract Darwin is IDarwin, ERC20Upgradeable, OwnableUpgradeable, AccessControlU
         _lastCulmulativeRewards[account] = culmulativeRewardPerToken;
     }
 
-    function _registerPair(address pairAddress) internal {
-        isExcludedFromSellLimit[pairAddress] = true;
-        isExcludedFromHoldingLimit[pairAddress] = true;
-        _setExcludedFromRewards(pairAddress);
-    }
-
     function _updateBalance(address account) internal {
         if(_isExcludedFromRewards[account]) return;
         uint _culmulativeRewardPerToken = culmulativeRewardPerToken;
@@ -331,37 +294,6 @@ contract Darwin is IDarwin, ERC20Upgradeable, OwnableUpgradeable, AccessControlU
         if(_culmulativeRewardPerToken > _lastCulmulativeReward) {
             _distributeRewardToUser(_culmulativeRewardPerToken, _lastCulmulativeReward, ERC20Upgradeable.balanceOf(account), account);
         }
-    }
-
-    ////////////////////// LIMITS FUNCTIONS /////////////////////////////////////
-
-    function maxTokenHoldingSize() public view returns(uint256) {
-        return totalSupply() / 50; // 2% of the supply
-    }
-
-    function _enforceHoldingLimit(address account) private view {
-        if(isExcludedFromHoldingLimit[account]) return;
-        if (ERC20Upgradeable.balanceOf(account) > maxTokenHoldingSize()) {
-            revert HoldingLimitExceeded();
-        }
-    }
-
-    function maxTokenSellSize() public view returns(uint256) {
-        return totalSupply() / 1000; // .1% of the supply
-    }
-
-    /// @notice inforce token sale limit over sale limit duration
-    function _enforceSellLimit(address account, uint256 amount) private {
-        if(isExcludedFromSellLimit[account] || account == address(0)) return;
-        TokenSellLog storage log = _tokenSellLog[account];
-        uint216 newAmount = uint216(amount);
-        uint40 currentTime = uint40(block.timestamp);
-        uint40 timeSinceLastSell = currentTime - log.lastSale;
-        if(timeSinceLastSell < MAX_TOKEN_SALE_LIMIT_DURATION) {
-            newAmount += uint216(((MAX_TOKEN_SALE_LIMIT_DURATION - timeSinceLastSell) * log.amount) / MAX_TOKEN_SALE_LIMIT_DURATION);
-        }
-        if(newAmount > maxTokenSellSize()) revert SellLimitExceeded();
-        (log.amount, log.lastSale) = (newAmount, currentTime);
     }
 
     /////////////////////// TRANSFER FUNCTIONS //////////////////////////////////////
@@ -373,10 +305,9 @@ contract Darwin is IDarwin, ERC20Upgradeable, OwnableUpgradeable, AccessControlU
         }
     }
 
-    function _beforeTokenTransfer(address from, address to, uint256 amount) internal override notPaused {
+    function _beforeTokenTransfer(address from, address to) internal override notPaused {
         _updateBalance(from);
         _updateBalance(to);
-        _enforceSellLimit(from, amount);
     }
 
     function _afterTokenTransfer(
@@ -385,7 +316,6 @@ contract Darwin is IDarwin, ERC20Upgradeable, OwnableUpgradeable, AccessControlU
         uint256 amount
     ) internal override {
         super._afterTokenTransfer(from, to, amount);
-        _enforceHoldingLimit(to);
         if(to == rewardsWallet) {
             _distributeRewards(amount);
         }
@@ -453,14 +383,6 @@ contract Darwin is IDarwin, ERC20Upgradeable, OwnableUpgradeable, AccessControlU
         }
     }
 
-    function setHoldingLimitWhitelist(address account, bool whitelisted) external onlyRole(COMMUNITY_ROLE) {
-        isExcludedFromHoldingLimit[account] = whitelisted;
-    }
-
-    function setSellLimitWhitelist(address account, bool whitelisted) external onlyRole(COMMUNITY_ROLE) {
-        isExcludedFromSellLimit[account] = whitelisted;
-    }
-
     function communityPause() external onlyRole(COMMUNITY_ROLE) {
         if(!isPaused) {
             isPaused = true;
@@ -471,10 +393,6 @@ contract Darwin is IDarwin, ERC20Upgradeable, OwnableUpgradeable, AccessControlU
         if(isPaused) {
             isPaused = false;
         }
-    }
-
-    function registerPair(address pairAddress) external onlyRole(COMMUNITY_ROLE) {
-        _registerPair(pairAddress);
     }
 
     function _authorizeUpgrade(address newImplementation) internal override onlyRole(UPGRADER_ROLE){}

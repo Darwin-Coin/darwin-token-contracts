@@ -168,9 +168,6 @@ async function main() {
     "setSecurity(address,bool)",
     "setUpgrader(address,bool)",
     "setReceiveRewards(address,bool)",
-    "setHoldingLimitWhitelist(address,bool)",
-    "setSellLimitWhitelist(address,bool)",
-    "registerPair(address)",
     "communityPause()"
   ];
 

@@ -11,7 +11,11 @@
     "modifier-name-mixedcase": "warn",
     "private-vars-leading-underscore": "warn",
     "func-order": "warn",
-    "ordering": "warn",
-    "not-rely-on-time": "none"
+    "ordering": "off",
+    "not-rely-on-time": "off",
+    "no-inline-assembly": "off",
+    "reason-string": "off",
+    "no-empty-blocks": "off",
+    "func-name-mixedcase": "off"
   }
 }
