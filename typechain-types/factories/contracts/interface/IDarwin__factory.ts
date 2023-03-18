@@ -104,6 +104,19 @@ const _abi = [
     type: "event",
   },
   {
+    inputs: [],
+    name: "MAX_SUPPLY",
+    outputs: [
+      {
+        internalType: "uint256",
+        name: "",
+        type: "uint256",
+      },
+    ],
+    stateMutability: "pure",
+    type: "function",
+  },
+  {
     inputs: [
       {
         internalType: "address[]",
@@ -163,44 +176,6 @@ const _abi = [
     type: "function",
   },
   {
-    inputs: [
-      {
-        internalType: "address",
-        name: "account",
-        type: "address",
-      },
-    ],
-    name: "isExcludedFromHoldingLimit",
-    outputs: [
-      {
-        internalType: "bool",
-        name: "",
-        type: "bool",
-      },
-    ],
-    stateMutability: "view",
-    type: "function",
-  },
-  {
-    inputs: [
-      {
-        internalType: "address",
-        name: "account",
-        type: "address",
-      },
-    ],
-    name: "isExcludedFromSellLimit",
-    outputs: [
-      {
-        internalType: "bool",
-        name: "",
-        type: "bool",
-      },
-    ],
-    stateMutability: "view",
-    type: "function",
-  },
-  {
     inputs: [],
     name: "isPaused",
     outputs: [
@@ -208,32 +183,6 @@ const _abi = [
         internalType: "bool",
         name: "",
         type: "bool",
-      },
-    ],
-    stateMutability: "view",
-    type: "function",
-  },
-  {
-    inputs: [],
-    name: "maxTokenHoldingSize",
-    outputs: [
-      {
-        internalType: "uint256",
-        name: "",
-        type: "uint256",
-      },
-    ],
-    stateMutability: "view",
-    type: "function",
-  },
-  {
-    inputs: [],
-    name: "maxTokenSellSize",
-    outputs: [
-      {
-        internalType: "uint256",
-        name: "",
-        type: "uint256",
       },
     ],
     stateMutability: "view",
@@ -274,42 +223,11 @@ const _abi = [
     inputs: [
       {
         internalType: "address",
-        name: "pairAddress",
-        type: "address",
-      },
-    ],
-    name: "registerPair",
-    outputs: [],
-    stateMutability: "nonpayable",
-    type: "function",
-  },
-  {
-    inputs: [
-      {
-        internalType: "address",
         name: "_darwinSwapFactory",
         type: "address",
       },
     ],
     name: "setDarwinSwapFactory",
-    outputs: [],
-    stateMutability: "nonpayable",
-    type: "function",
-  },
-  {
-    inputs: [
-      {
-        internalType: "address",
-        name: "account",
-        type: "address",
-      },
-      {
-        internalType: "bool",
-        name: "whitelisted",
-        type: "bool",
-      },
-    ],
-    name: "setHoldingLimitWhitelist",
     outputs: [],
     stateMutability: "nonpayable",
     type: "function",
@@ -420,24 +338,6 @@ const _abi = [
       },
     ],
     name: "setSecurity",
-    outputs: [],
-    stateMutability: "nonpayable",
-    type: "function",
-  },
-  {
-    inputs: [
-      {
-        internalType: "address",
-        name: "account",
-        type: "address",
-      },
-      {
-        internalType: "bool",
-        name: "whitelisted",
-        type: "bool",
-      },
-    ],
-    name: "setSellLimitWhitelist",
     outputs: [],
     stateMutability: "nonpayable",
     type: "function",

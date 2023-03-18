@@ -38,7 +38,6 @@ export interface DarwinInterface extends utils.Interface {
     "KIERAN_PERCENTAGE()": FunctionFragment;
     "MAINTENANCE_ROLE()": FunctionFragment;
     "MAX_SUPPLY()": FunctionFragment;
-    "MAX_TOKEN_SALE_LIMIT_DURATION()": FunctionFragment;
     "MINTER_ROLE()": FunctionFragment;
     "SECURITY_ROLE()": FunctionFragment;
     "UPGRADER_ROLE()": FunctionFragment;
@@ -51,6 +50,7 @@ export interface DarwinInterface extends utils.Interface {
     "communityPause()": FunctionFragment;
     "communityUnPause()": FunctionFragment;
     "culmulativeRewardPerToken()": FunctionFragment;
+    "darwinStaking()": FunctionFragment;
     "darwinSwapFactory()": FunctionFragment;
     "decimals()": FunctionFragment;
     "decreaseAllowance(address,uint256)": FunctionFragment;
@@ -63,33 +63,28 @@ export interface DarwinInterface extends utils.Interface {
     "hasRole(bytes32,address)": FunctionFragment;
     "increaseAllowance(address,uint256)": FunctionFragment;
     "initialize(address,address,address,address,address,address,address,address,address,uint256)": FunctionFragment;
-    "isExcludedFromHoldingLimit(address)": FunctionFragment;
-    "isExcludedFromSellLimit(address)": FunctionFragment;
     "isLive()": FunctionFragment;
     "isPaused()": FunctionFragment;
-    "maxTokenHoldingSize()": FunctionFragment;
-    "maxTokenSellSize()": FunctionFragment;
+    "masterChef()": FunctionFragment;
     "mint(address,uint256)": FunctionFragment;
     "name()": FunctionFragment;
     "owner()": FunctionFragment;
     "proxiableUUID()": FunctionFragment;
     "registerDarwinSwapPair(address)": FunctionFragment;
-    "registerPair(address)": FunctionFragment;
     "renounceOwnership()": FunctionFragment;
     "renounceRole(bytes32,address)": FunctionFragment;
     "revokeRole(bytes32,address)": FunctionFragment;
     "rewardsWallet()": FunctionFragment;
     "setDarwinStaking(address)": FunctionFragment;
     "setDarwinSwapFactory(address)": FunctionFragment;
-    "setHoldingLimitWhitelist(address,bool)": FunctionFragment;
     "setLive()": FunctionFragment;
     "setMaintenance(address,bool)": FunctionFragment;
+    "setMasterChef(address)": FunctionFragment;
     "setMinter(address,bool)": FunctionFragment;
     "setPauseWhitelist(address,bool)": FunctionFragment;
     "setPresaleAddress(address)": FunctionFragment;
     "setReceiveRewards(address,bool)": FunctionFragment;
     "setSecurity(address,bool)": FunctionFragment;
-    "setSellLimitWhitelist(address,bool)": FunctionFragment;
     "setUpgrader(address,bool)": FunctionFragment;
     "stakedDarwin()": FunctionFragment;
     "supportsInterface(bytes4)": FunctionFragment;
@@ -113,7 +108,6 @@ export interface DarwinInterface extends utils.Interface {
       | "KIERAN_PERCENTAGE"
       | "MAINTENANCE_ROLE"
       | "MAX_SUPPLY"
-      | "MAX_TOKEN_SALE_LIMIT_DURATION"
       | "MINTER_ROLE"
       | "SECURITY_ROLE"
       | "UPGRADER_ROLE"
@@ -126,6 +120,7 @@ export interface DarwinInterface extends utils.Interface {
       | "communityPause"
       | "communityUnPause"
       | "culmulativeRewardPerToken"
+      | "darwinStaking"
       | "darwinSwapFactory"
       | "decimals"
       | "decreaseAllowance"
@@ -138,33 +133,28 @@ export interface DarwinInterface extends utils.Interface {
       | "hasRole"
       | "increaseAllowance"
       | "initialize"
-      | "isExcludedFromHoldingLimit"
-      | "isExcludedFromSellLimit"
       | "isLive"
       | "isPaused"
-      | "maxTokenHoldingSize"
-      | "maxTokenSellSize"
+      | "masterChef"
       | "mint"
       | "name"
       | "owner"
       | "proxiableUUID"
       | "registerDarwinSwapPair"
-      | "registerPair"
       | "renounceOwnership"
       | "renounceRole"
       | "revokeRole"
       | "rewardsWallet"
       | "setDarwinStaking"
       | "setDarwinSwapFactory"
-      | "setHoldingLimitWhitelist"
       | "setLive"
       | "setMaintenance"
+      | "setMasterChef"
       | "setMinter"
       | "setPauseWhitelist"
       | "setPresaleAddress"
       | "setReceiveRewards"
       | "setSecurity"
-      | "setSellLimitWhitelist"
       | "setUpgrader"
       | "stakedDarwin"
       | "supportsInterface"
@@ -208,10 +198,6 @@ export interface DarwinInterface extends utils.Interface {
   ): string;
   encodeFunctionData(
     functionFragment: "MAX_SUPPLY",
-    values?: undefined
-  ): string;
-  encodeFunctionData(
-    functionFragment: "MAX_TOKEN_SALE_LIMIT_DURATION",
     values?: undefined
   ): string;
   encodeFunctionData(
@@ -260,6 +246,10 @@ export interface DarwinInterface extends utils.Interface {
   ): string;
   encodeFunctionData(
     functionFragment: "culmulativeRewardPerToken",
+    values?: undefined
+  ): string;
+  encodeFunctionData(
+    functionFragment: "darwinStaking",
     values?: undefined
   ): string;
   encodeFunctionData(
@@ -318,22 +308,10 @@ export interface DarwinInterface extends utils.Interface {
       PromiseOrValue<BigNumberish>
     ]
   ): string;
-  encodeFunctionData(
-    functionFragment: "isExcludedFromHoldingLimit",
-    values: [PromiseOrValue<string>]
-  ): string;
-  encodeFunctionData(
-    functionFragment: "isExcludedFromSellLimit",
-    values: [PromiseOrValue<string>]
-  ): string;
   encodeFunctionData(functionFragment: "isLive", values?: undefined): string;
   encodeFunctionData(functionFragment: "isPaused", values?: undefined): string;
   encodeFunctionData(
-    functionFragment: "maxTokenHoldingSize",
-    values?: undefined
-  ): string;
-  encodeFunctionData(
-    functionFragment: "maxTokenSellSize",
+    functionFragment: "masterChef",
     values?: undefined
   ): string;
   encodeFunctionData(
@@ -348,10 +326,6 @@ export interface DarwinInterface extends utils.Interface {
   ): string;
   encodeFunctionData(
     functionFragment: "registerDarwinSwapPair",
-    values: [PromiseOrValue<string>]
-  ): string;
-  encodeFunctionData(
-    functionFragment: "registerPair",
     values: [PromiseOrValue<string>]
   ): string;
   encodeFunctionData(
@@ -378,14 +352,14 @@ export interface DarwinInterface extends utils.Interface {
     functionFragment: "setDarwinSwapFactory",
     values: [PromiseOrValue<string>]
   ): string;
-  encodeFunctionData(
-    functionFragment: "setHoldingLimitWhitelist",
-    values: [PromiseOrValue<string>, PromiseOrValue<boolean>]
-  ): string;
   encodeFunctionData(functionFragment: "setLive", values?: undefined): string;
   encodeFunctionData(
     functionFragment: "setMaintenance",
     values: [PromiseOrValue<string>, PromiseOrValue<boolean>]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "setMasterChef",
+    values: [PromiseOrValue<string>]
   ): string;
   encodeFunctionData(
     functionFragment: "setMinter",
@@ -405,10 +379,6 @@ export interface DarwinInterface extends utils.Interface {
   ): string;
   encodeFunctionData(
     functionFragment: "setSecurity",
-    values: [PromiseOrValue<string>, PromiseOrValue<boolean>]
-  ): string;
-  encodeFunctionData(
-    functionFragment: "setSellLimitWhitelist",
     values: [PromiseOrValue<string>, PromiseOrValue<boolean>]
   ): string;
   encodeFunctionData(
@@ -487,10 +457,6 @@ export interface DarwinInterface extends utils.Interface {
   ): Result;
   decodeFunctionResult(functionFragment: "MAX_SUPPLY", data: BytesLike): Result;
   decodeFunctionResult(
-    functionFragment: "MAX_TOKEN_SALE_LIMIT_DURATION",
-    data: BytesLike
-  ): Result;
-  decodeFunctionResult(
     functionFragment: "MINTER_ROLE",
     data: BytesLike
   ): Result;
@@ -524,6 +490,10 @@ export interface DarwinInterface extends utils.Interface {
   ): Result;
   decodeFunctionResult(
     functionFragment: "culmulativeRewardPerToken",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
+    functionFragment: "darwinStaking",
     data: BytesLike
   ): Result;
   decodeFunctionResult(
@@ -562,24 +532,9 @@ export interface DarwinInterface extends utils.Interface {
     data: BytesLike
   ): Result;
   decodeFunctionResult(functionFragment: "initialize", data: BytesLike): Result;
-  decodeFunctionResult(
-    functionFragment: "isExcludedFromHoldingLimit",
-    data: BytesLike
-  ): Result;
-  decodeFunctionResult(
-    functionFragment: "isExcludedFromSellLimit",
-    data: BytesLike
-  ): Result;
   decodeFunctionResult(functionFragment: "isLive", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "isPaused", data: BytesLike): Result;
-  decodeFunctionResult(
-    functionFragment: "maxTokenHoldingSize",
-    data: BytesLike
-  ): Result;
-  decodeFunctionResult(
-    functionFragment: "maxTokenSellSize",
-    data: BytesLike
-  ): Result;
+  decodeFunctionResult(functionFragment: "masterChef", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "mint", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "name", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "owner", data: BytesLike): Result;
@@ -589,10 +544,6 @@ export interface DarwinInterface extends utils.Interface {
   ): Result;
   decodeFunctionResult(
     functionFragment: "registerDarwinSwapPair",
-    data: BytesLike
-  ): Result;
-  decodeFunctionResult(
-    functionFragment: "registerPair",
     data: BytesLike
   ): Result;
   decodeFunctionResult(
@@ -616,13 +567,13 @@ export interface DarwinInterface extends utils.Interface {
     functionFragment: "setDarwinSwapFactory",
     data: BytesLike
   ): Result;
-  decodeFunctionResult(
-    functionFragment: "setHoldingLimitWhitelist",
-    data: BytesLike
-  ): Result;
   decodeFunctionResult(functionFragment: "setLive", data: BytesLike): Result;
   decodeFunctionResult(
     functionFragment: "setMaintenance",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
+    functionFragment: "setMasterChef",
     data: BytesLike
   ): Result;
   decodeFunctionResult(functionFragment: "setMinter", data: BytesLike): Result;
@@ -640,10 +591,6 @@ export interface DarwinInterface extends utils.Interface {
   ): Result;
   decodeFunctionResult(
     functionFragment: "setSecurity",
-    data: BytesLike
-  ): Result;
-  decodeFunctionResult(
-    functionFragment: "setSellLimitWhitelist",
     data: BytesLike
   ): Result;
   decodeFunctionResult(
@@ -883,10 +830,6 @@ export interface Darwin extends BaseContract {
 
     MAX_SUPPLY(overrides?: CallOverrides): Promise<[BigNumber]>;
 
-    MAX_TOKEN_SALE_LIMIT_DURATION(
-      overrides?: CallOverrides
-    ): Promise<[BigNumber]>;
-
     MINTER_ROLE(overrides?: CallOverrides): Promise<[string]>;
 
     SECURITY_ROLE(overrides?: CallOverrides): Promise<[string]>;
@@ -932,6 +875,8 @@ export interface Darwin extends BaseContract {
     ): Promise<ContractTransaction>;
 
     culmulativeRewardPerToken(overrides?: CallOverrides): Promise<[BigNumber]>;
+
+    darwinStaking(overrides?: CallOverrides): Promise<[string]>;
 
     darwinSwapFactory(overrides?: CallOverrides): Promise<[string]>;
 
@@ -998,23 +943,11 @@ export interface Darwin extends BaseContract {
       overrides?: Overrides & { from?: PromiseOrValue<string> }
     ): Promise<ContractTransaction>;
 
-    isExcludedFromHoldingLimit(
-      arg0: PromiseOrValue<string>,
-      overrides?: CallOverrides
-    ): Promise<[boolean]>;
-
-    isExcludedFromSellLimit(
-      arg0: PromiseOrValue<string>,
-      overrides?: CallOverrides
-    ): Promise<[boolean]>;
-
     isLive(overrides?: CallOverrides): Promise<[boolean]>;
 
     isPaused(overrides?: CallOverrides): Promise<[boolean]>;
 
-    maxTokenHoldingSize(overrides?: CallOverrides): Promise<[BigNumber]>;
-
-    maxTokenSellSize(overrides?: CallOverrides): Promise<[BigNumber]>;
+    masterChef(overrides?: CallOverrides): Promise<[string]>;
 
     mint(
       account: PromiseOrValue<string>,
@@ -1030,11 +963,6 @@ export interface Darwin extends BaseContract {
 
     registerDarwinSwapPair(
       _pair: PromiseOrValue<string>,
-      overrides?: Overrides & { from?: PromiseOrValue<string> }
-    ): Promise<ContractTransaction>;
-
-    registerPair(
-      pairAddress: PromiseOrValue<string>,
       overrides?: Overrides & { from?: PromiseOrValue<string> }
     ): Promise<ContractTransaction>;
 
@@ -1066,12 +994,6 @@ export interface Darwin extends BaseContract {
       overrides?: Overrides & { from?: PromiseOrValue<string> }
     ): Promise<ContractTransaction>;
 
-    setHoldingLimitWhitelist(
-      account: PromiseOrValue<string>,
-      whitelisted: PromiseOrValue<boolean>,
-      overrides?: Overrides & { from?: PromiseOrValue<string> }
-    ): Promise<ContractTransaction>;
-
     setLive(
       overrides?: Overrides & { from?: PromiseOrValue<string> }
     ): Promise<ContractTransaction>;
@@ -1079,6 +1001,11 @@ export interface Darwin extends BaseContract {
     setMaintenance(
       _account: PromiseOrValue<string>,
       _hasRole: PromiseOrValue<boolean>,
+      overrides?: Overrides & { from?: PromiseOrValue<string> }
+    ): Promise<ContractTransaction>;
+
+    setMasterChef(
+      _masterChef: PromiseOrValue<string>,
       overrides?: Overrides & { from?: PromiseOrValue<string> }
     ): Promise<ContractTransaction>;
 
@@ -1108,12 +1035,6 @@ export interface Darwin extends BaseContract {
     setSecurity(
       _account: PromiseOrValue<string>,
       _hasRole: PromiseOrValue<boolean>,
-      overrides?: Overrides & { from?: PromiseOrValue<string> }
-    ): Promise<ContractTransaction>;
-
-    setSellLimitWhitelist(
-      account: PromiseOrValue<string>,
-      whitelisted: PromiseOrValue<boolean>,
       overrides?: Overrides & { from?: PromiseOrValue<string> }
     ): Promise<ContractTransaction>;
 
@@ -1182,8 +1103,6 @@ export interface Darwin extends BaseContract {
 
   MAX_SUPPLY(overrides?: CallOverrides): Promise<BigNumber>;
 
-  MAX_TOKEN_SALE_LIMIT_DURATION(overrides?: CallOverrides): Promise<BigNumber>;
-
   MINTER_ROLE(overrides?: CallOverrides): Promise<string>;
 
   SECURITY_ROLE(overrides?: CallOverrides): Promise<string>;
@@ -1229,6 +1148,8 @@ export interface Darwin extends BaseContract {
   ): Promise<ContractTransaction>;
 
   culmulativeRewardPerToken(overrides?: CallOverrides): Promise<BigNumber>;
+
+  darwinStaking(overrides?: CallOverrides): Promise<string>;
 
   darwinSwapFactory(overrides?: CallOverrides): Promise<string>;
 
@@ -1295,23 +1216,11 @@ export interface Darwin extends BaseContract {
     overrides?: Overrides & { from?: PromiseOrValue<string> }
   ): Promise<ContractTransaction>;
 
-  isExcludedFromHoldingLimit(
-    arg0: PromiseOrValue<string>,
-    overrides?: CallOverrides
-  ): Promise<boolean>;
-
-  isExcludedFromSellLimit(
-    arg0: PromiseOrValue<string>,
-    overrides?: CallOverrides
-  ): Promise<boolean>;
-
   isLive(overrides?: CallOverrides): Promise<boolean>;
 
   isPaused(overrides?: CallOverrides): Promise<boolean>;
 
-  maxTokenHoldingSize(overrides?: CallOverrides): Promise<BigNumber>;
-
-  maxTokenSellSize(overrides?: CallOverrides): Promise<BigNumber>;
+  masterChef(overrides?: CallOverrides): Promise<string>;
 
   mint(
     account: PromiseOrValue<string>,
@@ -1327,11 +1236,6 @@ export interface Darwin extends BaseContract {
 
   registerDarwinSwapPair(
     _pair: PromiseOrValue<string>,
-    overrides?: Overrides & { from?: PromiseOrValue<string> }
-  ): Promise<ContractTransaction>;
-
-  registerPair(
-    pairAddress: PromiseOrValue<string>,
     overrides?: Overrides & { from?: PromiseOrValue<string> }
   ): Promise<ContractTransaction>;
 
@@ -1363,12 +1267,6 @@ export interface Darwin extends BaseContract {
     overrides?: Overrides & { from?: PromiseOrValue<string> }
   ): Promise<ContractTransaction>;
 
-  setHoldingLimitWhitelist(
-    account: PromiseOrValue<string>,
-    whitelisted: PromiseOrValue<boolean>,
-    overrides?: Overrides & { from?: PromiseOrValue<string> }
-  ): Promise<ContractTransaction>;
-
   setLive(
     overrides?: Overrides & { from?: PromiseOrValue<string> }
   ): Promise<ContractTransaction>;
@@ -1376,6 +1274,11 @@ export interface Darwin extends BaseContract {
   setMaintenance(
     _account: PromiseOrValue<string>,
     _hasRole: PromiseOrValue<boolean>,
+    overrides?: Overrides & { from?: PromiseOrValue<string> }
+  ): Promise<ContractTransaction>;
+
+  setMasterChef(
+    _masterChef: PromiseOrValue<string>,
     overrides?: Overrides & { from?: PromiseOrValue<string> }
   ): Promise<ContractTransaction>;
 
@@ -1405,12 +1308,6 @@ export interface Darwin extends BaseContract {
   setSecurity(
     _account: PromiseOrValue<string>,
     _hasRole: PromiseOrValue<boolean>,
-    overrides?: Overrides & { from?: PromiseOrValue<string> }
-  ): Promise<ContractTransaction>;
-
-  setSellLimitWhitelist(
-    account: PromiseOrValue<string>,
-    whitelisted: PromiseOrValue<boolean>,
     overrides?: Overrides & { from?: PromiseOrValue<string> }
   ): Promise<ContractTransaction>;
 
@@ -1479,10 +1376,6 @@ export interface Darwin extends BaseContract {
 
     MAX_SUPPLY(overrides?: CallOverrides): Promise<BigNumber>;
 
-    MAX_TOKEN_SALE_LIMIT_DURATION(
-      overrides?: CallOverrides
-    ): Promise<BigNumber>;
-
     MINTER_ROLE(overrides?: CallOverrides): Promise<string>;
 
     SECURITY_ROLE(overrides?: CallOverrides): Promise<string>;
@@ -1524,6 +1417,8 @@ export interface Darwin extends BaseContract {
     communityUnPause(overrides?: CallOverrides): Promise<void>;
 
     culmulativeRewardPerToken(overrides?: CallOverrides): Promise<BigNumber>;
+
+    darwinStaking(overrides?: CallOverrides): Promise<string>;
 
     darwinSwapFactory(overrides?: CallOverrides): Promise<string>;
 
@@ -1586,23 +1481,11 @@ export interface Darwin extends BaseContract {
       overrides?: CallOverrides
     ): Promise<void>;
 
-    isExcludedFromHoldingLimit(
-      arg0: PromiseOrValue<string>,
-      overrides?: CallOverrides
-    ): Promise<boolean>;
-
-    isExcludedFromSellLimit(
-      arg0: PromiseOrValue<string>,
-      overrides?: CallOverrides
-    ): Promise<boolean>;
-
     isLive(overrides?: CallOverrides): Promise<boolean>;
 
     isPaused(overrides?: CallOverrides): Promise<boolean>;
 
-    maxTokenHoldingSize(overrides?: CallOverrides): Promise<BigNumber>;
-
-    maxTokenSellSize(overrides?: CallOverrides): Promise<BigNumber>;
+    masterChef(overrides?: CallOverrides): Promise<string>;
 
     mint(
       account: PromiseOrValue<string>,
@@ -1618,11 +1501,6 @@ export interface Darwin extends BaseContract {
 
     registerDarwinSwapPair(
       _pair: PromiseOrValue<string>,
-      overrides?: CallOverrides
-    ): Promise<void>;
-
-    registerPair(
-      pairAddress: PromiseOrValue<string>,
       overrides?: CallOverrides
     ): Promise<void>;
 
@@ -1652,17 +1530,16 @@ export interface Darwin extends BaseContract {
       overrides?: CallOverrides
     ): Promise<void>;
 
-    setHoldingLimitWhitelist(
-      account: PromiseOrValue<string>,
-      whitelisted: PromiseOrValue<boolean>,
-      overrides?: CallOverrides
-    ): Promise<void>;
-
     setLive(overrides?: CallOverrides): Promise<void>;
 
     setMaintenance(
       _account: PromiseOrValue<string>,
       _hasRole: PromiseOrValue<boolean>,
+      overrides?: CallOverrides
+    ): Promise<void>;
+
+    setMasterChef(
+      _masterChef: PromiseOrValue<string>,
       overrides?: CallOverrides
     ): Promise<void>;
 
@@ -1692,12 +1569,6 @@ export interface Darwin extends BaseContract {
     setSecurity(
       _account: PromiseOrValue<string>,
       _hasRole: PromiseOrValue<boolean>,
-      overrides?: CallOverrides
-    ): Promise<void>;
-
-    setSellLimitWhitelist(
-      account: PromiseOrValue<string>,
-      whitelisted: PromiseOrValue<boolean>,
       overrides?: CallOverrides
     ): Promise<void>;
 
@@ -1877,10 +1748,6 @@ export interface Darwin extends BaseContract {
 
     MAX_SUPPLY(overrides?: CallOverrides): Promise<BigNumber>;
 
-    MAX_TOKEN_SALE_LIMIT_DURATION(
-      overrides?: CallOverrides
-    ): Promise<BigNumber>;
-
     MINTER_ROLE(overrides?: CallOverrides): Promise<BigNumber>;
 
     SECURITY_ROLE(overrides?: CallOverrides): Promise<BigNumber>;
@@ -1926,6 +1793,8 @@ export interface Darwin extends BaseContract {
     ): Promise<BigNumber>;
 
     culmulativeRewardPerToken(overrides?: CallOverrides): Promise<BigNumber>;
+
+    darwinStaking(overrides?: CallOverrides): Promise<BigNumber>;
 
     darwinSwapFactory(overrides?: CallOverrides): Promise<BigNumber>;
 
@@ -1992,23 +1861,11 @@ export interface Darwin extends BaseContract {
       overrides?: Overrides & { from?: PromiseOrValue<string> }
     ): Promise<BigNumber>;
 
-    isExcludedFromHoldingLimit(
-      arg0: PromiseOrValue<string>,
-      overrides?: CallOverrides
-    ): Promise<BigNumber>;
-
-    isExcludedFromSellLimit(
-      arg0: PromiseOrValue<string>,
-      overrides?: CallOverrides
-    ): Promise<BigNumber>;
-
     isLive(overrides?: CallOverrides): Promise<BigNumber>;
 
     isPaused(overrides?: CallOverrides): Promise<BigNumber>;
 
-    maxTokenHoldingSize(overrides?: CallOverrides): Promise<BigNumber>;
-
-    maxTokenSellSize(overrides?: CallOverrides): Promise<BigNumber>;
+    masterChef(overrides?: CallOverrides): Promise<BigNumber>;
 
     mint(
       account: PromiseOrValue<string>,
@@ -2024,11 +1881,6 @@ export interface Darwin extends BaseContract {
 
     registerDarwinSwapPair(
       _pair: PromiseOrValue<string>,
-      overrides?: Overrides & { from?: PromiseOrValue<string> }
-    ): Promise<BigNumber>;
-
-    registerPair(
-      pairAddress: PromiseOrValue<string>,
       overrides?: Overrides & { from?: PromiseOrValue<string> }
     ): Promise<BigNumber>;
 
@@ -2060,12 +1912,6 @@ export interface Darwin extends BaseContract {
       overrides?: Overrides & { from?: PromiseOrValue<string> }
     ): Promise<BigNumber>;
 
-    setHoldingLimitWhitelist(
-      account: PromiseOrValue<string>,
-      whitelisted: PromiseOrValue<boolean>,
-      overrides?: Overrides & { from?: PromiseOrValue<string> }
-    ): Promise<BigNumber>;
-
     setLive(
       overrides?: Overrides & { from?: PromiseOrValue<string> }
     ): Promise<BigNumber>;
@@ -2073,6 +1919,11 @@ export interface Darwin extends BaseContract {
     setMaintenance(
       _account: PromiseOrValue<string>,
       _hasRole: PromiseOrValue<boolean>,
+      overrides?: Overrides & { from?: PromiseOrValue<string> }
+    ): Promise<BigNumber>;
+
+    setMasterChef(
+      _masterChef: PromiseOrValue<string>,
       overrides?: Overrides & { from?: PromiseOrValue<string> }
     ): Promise<BigNumber>;
 
@@ -2102,12 +1953,6 @@ export interface Darwin extends BaseContract {
     setSecurity(
       _account: PromiseOrValue<string>,
       _hasRole: PromiseOrValue<boolean>,
-      overrides?: Overrides & { from?: PromiseOrValue<string> }
-    ): Promise<BigNumber>;
-
-    setSellLimitWhitelist(
-      account: PromiseOrValue<string>,
-      whitelisted: PromiseOrValue<boolean>,
       overrides?: Overrides & { from?: PromiseOrValue<string> }
     ): Promise<BigNumber>;
 
@@ -2181,10 +2026,6 @@ export interface Darwin extends BaseContract {
 
     MAX_SUPPLY(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
-    MAX_TOKEN_SALE_LIMIT_DURATION(
-      overrides?: CallOverrides
-    ): Promise<PopulatedTransaction>;
-
     MINTER_ROLE(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
     SECURITY_ROLE(overrides?: CallOverrides): Promise<PopulatedTransaction>;
@@ -2232,6 +2073,8 @@ export interface Darwin extends BaseContract {
     culmulativeRewardPerToken(
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
+
+    darwinStaking(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
     darwinSwapFactory(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
@@ -2298,25 +2141,11 @@ export interface Darwin extends BaseContract {
       overrides?: Overrides & { from?: PromiseOrValue<string> }
     ): Promise<PopulatedTransaction>;
 
-    isExcludedFromHoldingLimit(
-      arg0: PromiseOrValue<string>,
-      overrides?: CallOverrides
-    ): Promise<PopulatedTransaction>;
-
-    isExcludedFromSellLimit(
-      arg0: PromiseOrValue<string>,
-      overrides?: CallOverrides
-    ): Promise<PopulatedTransaction>;
-
     isLive(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
     isPaused(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
-    maxTokenHoldingSize(
-      overrides?: CallOverrides
-    ): Promise<PopulatedTransaction>;
-
-    maxTokenSellSize(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+    masterChef(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
     mint(
       account: PromiseOrValue<string>,
@@ -2332,11 +2161,6 @@ export interface Darwin extends BaseContract {
 
     registerDarwinSwapPair(
       _pair: PromiseOrValue<string>,
-      overrides?: Overrides & { from?: PromiseOrValue<string> }
-    ): Promise<PopulatedTransaction>;
-
-    registerPair(
-      pairAddress: PromiseOrValue<string>,
       overrides?: Overrides & { from?: PromiseOrValue<string> }
     ): Promise<PopulatedTransaction>;
 
@@ -2368,12 +2192,6 @@ export interface Darwin extends BaseContract {
       overrides?: Overrides & { from?: PromiseOrValue<string> }
     ): Promise<PopulatedTransaction>;
 
-    setHoldingLimitWhitelist(
-      account: PromiseOrValue<string>,
-      whitelisted: PromiseOrValue<boolean>,
-      overrides?: Overrides & { from?: PromiseOrValue<string> }
-    ): Promise<PopulatedTransaction>;
-
     setLive(
       overrides?: Overrides & { from?: PromiseOrValue<string> }
     ): Promise<PopulatedTransaction>;
@@ -2381,6 +2199,11 @@ export interface Darwin extends BaseContract {
     setMaintenance(
       _account: PromiseOrValue<string>,
       _hasRole: PromiseOrValue<boolean>,
+      overrides?: Overrides & { from?: PromiseOrValue<string> }
+    ): Promise<PopulatedTransaction>;
+
+    setMasterChef(
+      _masterChef: PromiseOrValue<string>,
       overrides?: Overrides & { from?: PromiseOrValue<string> }
     ): Promise<PopulatedTransaction>;
 
@@ -2410,12 +2233,6 @@ export interface Darwin extends BaseContract {
     setSecurity(
       _account: PromiseOrValue<string>,
       _hasRole: PromiseOrValue<boolean>,
-      overrides?: Overrides & { from?: PromiseOrValue<string> }
-    ): Promise<PopulatedTransaction>;
-
-    setSellLimitWhitelist(
-      account: PromiseOrValue<string>,
-      whitelisted: PromiseOrValue<boolean>,
       overrides?: Overrides & { from?: PromiseOrValue<string> }
     ): Promise<PopulatedTransaction>;
 
