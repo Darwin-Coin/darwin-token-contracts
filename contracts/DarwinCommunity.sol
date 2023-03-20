@@ -2,11 +2,11 @@ pragma solidity ^0.8.14;
 
 // SPDX-License-Identifier: MIT
 
-import "./interface/IDarwinCommunity.sol";
-import "./interface/IStakedDarwin.sol";
+import {IDarwinCommunity} from "./interface/IDarwinCommunity.sol";
+import {IStakedDarwin} from "./interface/IStakedDarwin.sol";
 
-import "@openzeppelin/contracts/access/AccessControl.sol";
-import "@openzeppelin/contracts/security/ReentrancyGuard.sol";
+import {AccessControl} from "@openzeppelin/contracts/access/AccessControl.sol";
+import {ReentrancyGuard} from "@openzeppelin/contracts/security/ReentrancyGuard.sol";
 
 interface IDarwin {
     function bulkTransfer(address[] calldata recipients, uint256[] calldata amounts) external;
@@ -22,64 +22,39 @@ contract DarwinCommunity is IDarwinCommunity, AccessControl, ReentrancyGuard {
     bytes32 public constant ADMIN = keccak256("ADMIN_ROLE");
     bytes32 public constant SENIOR_PROPOSER = keccak256("SENIOR_PROPOSER_ROLE");
     bytes32 public constant PROPOSER = keccak256("PROPOSER_ROLE");
-    bytes32[4] private roles = [PROPOSER,SENIOR_PROPOSER,ADMIN,OWNER];
+    bytes32[4] private _roles = [PROPOSER,SENIOR_PROPOSER,ADMIN,OWNER];
+
+    /// @notice 1. Mapping to ensure execute() is called by 2 admins before actually executing the proposal
+    mapping(uint256 => mapping(address => bool)) private _calledExecute;
+    /// @notice 2. Mapping to ensure execute() is called by 2 admins before actually executing the proposal
+    mapping(uint256 => uint256) private _calls;
+    /// @notice Community Fund Candidates
+    mapping(uint256 => CommunityFundCandidate) private _communityFundCandidates;
+    /// @notice Active Community Fund Candidates
+    uint256[] private _activeCommunityFundCandidateIds;
+    /// @notice Vote Receipts
+    mapping(uint256 => mapping(address => Receipt)) private _voteReceipts;
+    /// @notice The official record of all proposals ever proposed
+    mapping(uint256 => Proposal) private _proposals;
+    /// @notice Restricted proposal actions, only owner can create proposals with these signature
+    mapping(uint256 => bool) private _restrictedProposalActionSignature;
+    /// @notice Only for backend purposes
+    string[] private _initialFundProposalStrings;
+    /// @notice Amount of StakedDarwin locked in a proposal by a user
+    mapping(uint => mapping(address => LockInfo)) private _lockedStakedDarwin;
 
     uint public constant VOTE_LOCK_PERIOD = 365 days;
+    uint public constant CALLS_TO_EXECUTE = 2;
 
-    modifier isProposalIdValid(uint256 _id) {
-        require(_id > 0 && _id <= _lastProposalId, "DC::isProposalIdValid invalid id");
-        _;
-    }
-
-    modifier onlyDarwinCommunity() {
-        require(_msgSender() == address(this), "DC::onlyDarwinCommunity: only DarwinCommunity can access");
-        _;
-    }
-
-    // overrides AccessControl's hasRole to allow more important roles to act like they also have less important roles' permissions
-    function hasRole(bytes32 _role, address _addr) public view override returns(bool) {
-        bool passed = false;
-        for (uint i = 0; i < roles.length; i++) {
-            if (!passed && _role == roles[i]) {
-                passed = true;
-            }
-            if (passed && super.hasRole(roles[i], _addr)) {
-                return true;
-            }
-        }
-        return false;
-    }
-
-    mapping(uint256 => CommunityFundCandidate) private communityFundCandidates;
-    uint256[] private activeCommunityFundCandidateIds;
-
-    /// @notice week => address => % distribution()
-    mapping(uint256 => mapping(address => Receipt)) private voteReceipts;
-
-    /// @notice The official record of all proposals ever proposed
-    mapping(uint256 => Proposal) private proposals;
-
-    /// @notice Restricted proposal actions, only owner can create proposals with these signature
-    mapping(uint256 => bool) private restrictedProposalActionSignature;
-
-    mapping(address => uint256[]) private usersVotes;
-
-    mapping(uint => mapping(address => LockInfo)) internal _lockedStakedDarwin;
-
-    uint256 public _lastCommunityFundCandidateId;
-    uint256 public _lastProposalId;
-
+    uint256 public lastCommunityFundCandidateId;
+    uint256 public lastProposalId;
     uint256 public minDarwinTransferToAccess;
-
     uint256 public proposalMinVotesCountForAction;
     uint256 public proposalMaxOperations;
     uint256 public minVotingDelay;
     uint256 public minVotingPeriod;
     uint256 public maxVotingPeriod;
     uint256 public gracePeriod;
-
-    // This is only for backend purpose
-    string[] private _initialFundProposalStrings;
 
     IDarwin public darwin;
     IStakedDarwin public stakedDarwin;
@@ -88,6 +63,30 @@ contract DarwinCommunity is IDarwinCommunity, AccessControl, ReentrancyGuard {
         _grantRole(OWNER, msg.sender);
         _grantRole(OWNER, _kieran); // Team Lead
         _grantRole(OWNER, 0x745309f30deB0a8271F5f521925222F5E1280641); // Tech Lead
+    }
+
+    modifier isProposalIdValid(uint256 _id) {
+        require(_id > 0 && _id <= lastProposalId, "DC::isProposalIdValid invalid id");
+        _;
+    }
+
+    modifier onlyDarwinCommunity() {
+        require(_msgSender() == address(this), "DC::onlyDarwinCommunity: only DarwinCommunity can access");
+        _;
+    }
+
+    /// @notice Overrides AccessControl's hasRole to allow more important roles to act like they also have less important roles' permissions
+    function hasRole(bytes32 _role, address _addr) public view override returns(bool) {
+        bool passed = false;
+        for (uint i = 0; i < _roles.length; i++) {
+            if (!passed && _role == _roles[i]) {
+                passed = true;
+            }
+            if (passed && super.hasRole(_roles[i], _addr)) {
+                return true;
+            }
+        }
+        return false;
     }
 
     function init(address _darwin, address[] memory fundAddress, string[] memory initialFundProposalStrings, string[] memory restrictedProposalSignatures) external onlyRole(OWNER) {
@@ -110,20 +109,20 @@ contract DarwinCommunity is IDarwinCommunity, AccessControl, ReentrancyGuard {
 
         for (uint256 i = 0; i < restrictedProposalSignatures.length; i++) {
             uint256 signature = uint256(keccak256(bytes(restrictedProposalSignatures[i])));
-            restrictedProposalActionSignature[signature] = true;
+            _restrictedProposalActionSignature[signature] = true;
         }
 
         for (uint256 i = 0; i < _initialFundProposalStrings.length; i++) {
-            uint256 id = _lastCommunityFundCandidateId + 1;
+            uint256 id = lastCommunityFundCandidateId + 1;
 
-            communityFundCandidates[id] = CommunityFundCandidate({
+            _communityFundCandidates[id] = CommunityFundCandidate({
                 id: id,
                 valueAddress: fundAddress[i],
                 isActive: true
             });
 
-            activeCommunityFundCandidateIds.push(id);
-            _lastCommunityFundCandidateId = id;
+            _activeCommunityFundCandidateIds.push(id);
+            lastCommunityFundCandidateId = id;
         }
     }
 
@@ -131,7 +130,7 @@ contract DarwinCommunity is IDarwinCommunity, AccessControl, ReentrancyGuard {
     function emitInitialFundsEvents() external onlyRole(OWNER) {
         for (uint256 i = 0; i < _initialFundProposalStrings.length; i++) {
             uint id = i + 1;
-            emit NewFundCandidate(id, communityFundCandidates[id].valueAddress, _initialFundProposalStrings[i]);
+            emit NewFundCandidate(id, _communityFundCandidates[id].valueAddress, _initialFundProposalStrings[i]);
         }
     }
 
@@ -143,21 +142,21 @@ contract DarwinCommunity is IDarwinCommunity, AccessControl, ReentrancyGuard {
         stakedDarwin = IStakedDarwin(_stakedDarwin);
     }
 
-    function randomBoolean() private view returns (bool) {
+    function _randomBoolean() private view returns (bool) {
         return uint256(keccak256(abi.encodePacked(block.difficulty, block.timestamp))) % 2 > 0;
     }
 
     function deactivateFundCandidate(uint256 _id) external onlyDarwinCommunity {
-        require(communityFundCandidates[_id].isActive, "DC::deactivateFundCandidate: not active");
+        require(_communityFundCandidates[_id].isActive, "DC::deactivateFundCandidate: not active");
 
-        communityFundCandidates[_id].isActive = false;
+        _communityFundCandidates[_id].isActive = false;
 
-        for (uint256 i = 0; i < activeCommunityFundCandidateIds.length; i++) {
-            if (activeCommunityFundCandidateIds[i] == _id) {
-                activeCommunityFundCandidateIds[i] = activeCommunityFundCandidateIds[
-                    activeCommunityFundCandidateIds.length - 1
+        for (uint256 i = 0; i < _activeCommunityFundCandidateIds.length; i++) {
+            if (_activeCommunityFundCandidateIds[i] == _id) {
+                _activeCommunityFundCandidateIds[i] = _activeCommunityFundCandidateIds[
+                    _activeCommunityFundCandidateIds.length - 1
                 ];
-                activeCommunityFundCandidateIds.pop();
+                _activeCommunityFundCandidateIds.pop();
                 break;
             }
         }
@@ -166,17 +165,17 @@ contract DarwinCommunity is IDarwinCommunity, AccessControl, ReentrancyGuard {
     }
 
     function newFundCandidate(address valueAddress, string calldata proposal) public onlyDarwinCommunity {
-        uint256 id = _lastCommunityFundCandidateId + 1;
+        uint256 id = lastCommunityFundCandidateId + 1;
 
-        communityFundCandidates[id] = CommunityFundCandidate({ id: id, valueAddress: valueAddress, isActive: true });
+        _communityFundCandidates[id] = CommunityFundCandidate({ id: id, valueAddress: valueAddress, isActive: true });
 
-        activeCommunityFundCandidateIds.push(id);
-        _lastCommunityFundCandidateId = id;
+        _activeCommunityFundCandidateIds.push(id);
+        lastCommunityFundCandidateId = id;
 
         emit NewFundCandidate(id, valueAddress, proposal);
     }
 
-    function getCommunityTokens(
+    function _getCommunityTokens(
         uint256[] memory candidates,
         uint256[] memory votes,
         uint256 totalVoteCount,
@@ -199,7 +198,7 @@ contract DarwinCommunity is IDarwinCommunity, AccessControl, ReentrancyGuard {
         uint256 _totalVoteCount = 0;
 
         for (uint256 i = 0; i < candidates.length; ) {
-            allTokenRecepients[i] = communityFundCandidates[candidates[i]].valueAddress;
+            allTokenRecepients[i] = _communityFundCandidates[candidates[i]].valueAddress;
             allTokenDistribution[i] = (tokensToDistribute * votes[i]) / totalVoteCount;
 
             if (
@@ -261,7 +260,7 @@ contract DarwinCommunity is IDarwinCommunity, AccessControl, ReentrancyGuard {
             uint256[] memory allTokenDistribution,
             address[] memory recipientsToTransfer,
             uint256[] memory tokenAmountToTransfer
-        ) = getCommunityTokens(candidates, votes, totalVoteCount, tokensToDistribute);
+        ) = _getCommunityTokens(candidates, votes, totalVoteCount, tokensToDistribute);
 
         darwin.bulkTransfer(recipientsToTransfer, tokenAmountToTransfer);
 
@@ -299,12 +298,12 @@ contract DarwinCommunity is IDarwinCommunity, AccessControl, ReentrancyGuard {
 
         uint256 startTime = block.timestamp + minVotingDelay;
 
-        uint256 proposalId = _lastProposalId + 1;
+        uint256 proposalId = lastProposalId + 1;
 
         for (uint256 i = 0; i < signatures.length; i++) {
             uint256 signature = uint256(keccak256(bytes(signatures[i])));
 
-            if (restrictedProposalActionSignature[signature]) {
+            if (_restrictedProposalActionSignature[signature]) {
                 require(hasRole(SENIOR_PROPOSER, msg.sender), "DC::propose: proposal signature restricted");
             }
         }
@@ -325,8 +324,8 @@ contract DarwinCommunity is IDarwinCommunity, AccessControl, ReentrancyGuard {
             executed: false
         });
 
-        _lastProposalId = proposalId;
-        proposals[newProposal.id] = newProposal;
+        lastProposalId = proposalId;
+        _proposals[newProposal.id] = newProposal;
 
         emit ProposalCreated(newProposal.id, msg.sender, startTime, endTime, title, description, other);
         return newProposal.id;
@@ -338,7 +337,7 @@ contract DarwinCommunity is IDarwinCommunity, AccessControl, ReentrancyGuard {
      * @return Proposal state
      */
     function state(uint256 proposalId) public view isProposalIdValid(proposalId) returns (ProposalState) {
-        Proposal storage proposal = proposals[proposalId];
+        Proposal storage proposal = _proposals[proposalId];
         if (proposal.canceled) {
             return ProposalState.Canceled;
         } else if (block.timestamp <= proposal.startTime) {
@@ -363,7 +362,7 @@ contract DarwinCommunity is IDarwinCommunity, AccessControl, ReentrancyGuard {
     function cancel(uint256 proposalId) external isProposalIdValid(proposalId) {
         require(state(proposalId) != ProposalState.Executed, "DC::cancel: cannot cancel executed proposal");
 
-        Proposal storage proposal = proposals[proposalId];
+        Proposal storage proposal = _proposals[proposalId];
 
         require(_msgSender() == proposal.proposer || hasRole(ADMIN, _msgSender()), "DC::cancel: cannot cancel proposal");
 
@@ -388,7 +387,7 @@ contract DarwinCommunity is IDarwinCommunity, AccessControl, ReentrancyGuard {
         _lockedStakedDarwin[proposalId][msg.sender].darwinAmount = darwinAmount;
         _lockedStakedDarwin[proposalId][msg.sender].lockEnd = block.timestamp + VOTE_LOCK_PERIOD;
 
-        castVoteInternal(_msgSender(), proposalId, darwinAmount, inSupport);
+        _castVoteInternal(_msgSender(), proposalId, darwinAmount, inSupport);
         emit VoteCast(_msgSender(), proposalId, inSupport);
     }
 
@@ -398,7 +397,7 @@ contract DarwinCommunity is IDarwinCommunity, AccessControl, ReentrancyGuard {
      * @param proposalId The id of the proposal to vote on
      * @param inSupport The support value for the vote. 0=against, 1=for, 2=abstain
      */
-    function castVoteInternal(
+    function _castVoteInternal(
         address voter,
         uint256 proposalId,
         uint256 darwinAmount,
@@ -406,12 +405,10 @@ contract DarwinCommunity is IDarwinCommunity, AccessControl, ReentrancyGuard {
     ) private {
         require(state(proposalId) == ProposalState.Active, "DC::castVoteInternal: voting is closed");
 
-        Receipt storage receipt = voteReceipts[proposalId][voter];
-        Proposal storage proposal = proposals[proposalId];
+        Receipt storage receipt = _voteReceipts[proposalId][voter];
+        Proposal storage proposal = _proposals[proposalId];
 
         require(receipt.hasVoted == false, "DC::castVoteInternal: voter already voted");
-
-        usersVotes[voter].push(proposalId);
 
         receipt.hasVoted = true;
         receipt.inSupport = inSupport;
@@ -427,9 +424,20 @@ contract DarwinCommunity is IDarwinCommunity, AccessControl, ReentrancyGuard {
     /**
      * @notice Executes a queued proposal if eta has passed
      * @param proposalId The id of the proposal to execute
+     * NOTE: to execute a proposal, 2 different ADMINs have to call this. If it is called for the first time, it will just bump the counter by 1 and return without executing.
      */
     function execute(uint256 proposalId) external payable onlyRole(ADMIN) {
-        Proposal storage proposal = proposals[proposalId];
+
+        { // ensuring execute() is called by 2 admins before actually executing the proposal
+            require(!_calledExecute[proposalId][msg.sender], "DC::execute: caller already voted for execution");
+            _calledExecute[proposalId][msg.sender] = true;
+            _calls[proposalId]++;
+            if (_calls[proposalId] < CALLS_TO_EXECUTE) {
+                return;
+            }
+        }
+
+        Proposal storage proposal = _proposals[proposalId];
 
         require(
             state(proposalId) == ProposalState.Queued,
@@ -445,10 +453,10 @@ contract DarwinCommunity is IDarwinCommunity, AccessControl, ReentrancyGuard {
 
         if (
             proposal.forVotes != proposal.againstVotes ||
-            (proposal.forVotes == proposal.againstVotes && randomBoolean())
+            (proposal.forVotes == proposal.againstVotes && _randomBoolean())
         ) {
             for (uint256 i = 0; i < proposal.targets.length; i++) {
-                executeTransaction(
+                _executeTransaction(
                     proposal.id,
                     proposal.targets[i],
                     proposal.values[i],
@@ -461,7 +469,7 @@ contract DarwinCommunity is IDarwinCommunity, AccessControl, ReentrancyGuard {
         emit ProposalExecuted(proposalId);
     }
 
-    function executeTransaction(
+    function _executeTransaction(
         uint256 id,
         address target,
         uint256 value,
@@ -480,12 +488,12 @@ contract DarwinCommunity is IDarwinCommunity, AccessControl, ReentrancyGuard {
 
         (bool success, bytes memory returndata) = target.call{ value: value }(callData);
 
-        require(success, extractRevertReason(returndata));
+        require(success, _extractRevertReason(returndata));
 
         emit ExecuteTransaction(id, txHash, target, value, signature, data);
     }
 
-    function extractRevertReason(bytes memory revertData) internal pure returns (string memory reason) {
+    function _extractRevertReason(bytes memory revertData) internal pure returns (string memory reason) {
         uint256 length = revertData.length;
         if (length < 68) return "";
         uint256 t;
@@ -558,28 +566,28 @@ contract DarwinCommunity is IDarwinCommunity, AccessControl, ReentrancyGuard {
 
     function getActiveFundCandidates() external view returns (CommunityFundCandidate[] memory) {
         CommunityFundCandidate[] memory candidates = new CommunityFundCandidate[](
-            activeCommunityFundCandidateIds.length
+            _activeCommunityFundCandidateIds.length
         );
-        for (uint256 i = 0; i < activeCommunityFundCandidateIds.length; i++) {
-            candidates[i] = communityFundCandidates[activeCommunityFundCandidateIds[i]];
+        for (uint256 i = 0; i < _activeCommunityFundCandidateIds.length; i++) {
+            candidates[i] = _communityFundCandidates[_activeCommunityFundCandidateIds[i]];
         }
         return candidates;
     }
 
     function getActiveFundDandidateIds() external view returns (uint256[] memory) {
-        return activeCommunityFundCandidateIds;
+        return _activeCommunityFundCandidateIds;
     }
 
     function getProposal(uint256 id) external view isProposalIdValid(id) returns (Proposal memory) {
-        return proposals[id];
+        return _proposals[id];
     }
 
     function getVoteReceipt(uint256 id) external view isProposalIdValid(id) returns (DarwinCommunity.Receipt memory) {
-        return voteReceipts[id][_msgSender()];
+        return _voteReceipts[id][_msgSender()];
     }
 
     function isProposalSignatureRestricted(string calldata signature) external view returns (bool) {
-        return restrictedProposalActionSignature[uint256(keccak256(bytes(signature)))];
+        return _restrictedProposalActionSignature[uint256(keccak256(bytes(signature)))];
     }
 
 
@@ -590,7 +598,7 @@ contract DarwinCommunity is IDarwinCommunity, AccessControl, ReentrancyGuard {
      */
     function withdrawStakedDarwin() external nonReentrant {
         uint total;
-        for (uint i = 0; i < _lastProposalId; i++) {
+        for (uint i = 0; i < lastProposalId; i++) {
             if (_lockedStakedDarwin[i][msg.sender].lockEnd <= block.timestamp) {
                 total += _lockedStakedDarwin[i][msg.sender].darwinAmount;
                 _lockedStakedDarwin[i][msg.sender].darwinAmount = 0;
@@ -606,7 +614,7 @@ contract DarwinCommunity is IDarwinCommunity, AccessControl, ReentrancyGuard {
      * @notice Total amount of unlocked (so withdrawable) StakedDarwin
      */
     function freedStakedDarwin(address user) external view returns(uint total) {
-        for (uint i = 0; i < _lastProposalId; i++) {
+        for (uint i = 0; i < lastProposalId; i++) {
             if (_lockedStakedDarwin[i][user].lockEnd <= block.timestamp) {
                 total += _lockedStakedDarwin[i][user].darwinAmount;
             }

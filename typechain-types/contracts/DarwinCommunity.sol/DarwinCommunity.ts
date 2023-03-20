@@ -113,13 +113,12 @@ export declare namespace IDarwinCommunity {
 export interface DarwinCommunityInterface extends utils.Interface {
   functions: {
     "ADMIN()": FunctionFragment;
+    "CALLS_TO_EXECUTE()": FunctionFragment;
     "DEFAULT_ADMIN_ROLE()": FunctionFragment;
     "OWNER()": FunctionFragment;
     "PROPOSER()": FunctionFragment;
     "SENIOR_PROPOSER()": FunctionFragment;
     "VOTE_LOCK_PERIOD()": FunctionFragment;
-    "_lastCommunityFundCandidateId()": FunctionFragment;
-    "_lastProposalId()": FunctionFragment;
     "cancel(uint256)": FunctionFragment;
     "castVote(uint256,bool,uint256)": FunctionFragment;
     "darwin()": FunctionFragment;
@@ -138,6 +137,8 @@ export interface DarwinCommunityInterface extends utils.Interface {
     "hasRole(bytes32,address)": FunctionFragment;
     "init(address,address[],string[],string[])": FunctionFragment;
     "isProposalSignatureRestricted(string)": FunctionFragment;
+    "lastCommunityFundCandidateId()": FunctionFragment;
+    "lastProposalId()": FunctionFragment;
     "lockedStakedDarwin(uint256,address)": FunctionFragment;
     "maxVotingPeriod()": FunctionFragment;
     "minDarwinTransferToAccess()": FunctionFragment;
@@ -170,13 +171,12 @@ export interface DarwinCommunityInterface extends utils.Interface {
   getFunction(
     nameOrSignatureOrTopic:
       | "ADMIN"
+      | "CALLS_TO_EXECUTE"
       | "DEFAULT_ADMIN_ROLE"
       | "OWNER"
       | "PROPOSER"
       | "SENIOR_PROPOSER"
       | "VOTE_LOCK_PERIOD"
-      | "_lastCommunityFundCandidateId"
-      | "_lastProposalId"
       | "cancel"
       | "castVote"
       | "darwin"
@@ -195,6 +195,8 @@ export interface DarwinCommunityInterface extends utils.Interface {
       | "hasRole"
       | "init"
       | "isProposalSignatureRestricted"
+      | "lastCommunityFundCandidateId"
+      | "lastProposalId"
       | "lockedStakedDarwin"
       | "maxVotingPeriod"
       | "minDarwinTransferToAccess"
@@ -226,6 +228,10 @@ export interface DarwinCommunityInterface extends utils.Interface {
 
   encodeFunctionData(functionFragment: "ADMIN", values?: undefined): string;
   encodeFunctionData(
+    functionFragment: "CALLS_TO_EXECUTE",
+    values?: undefined
+  ): string;
+  encodeFunctionData(
     functionFragment: "DEFAULT_ADMIN_ROLE",
     values?: undefined
   ): string;
@@ -237,14 +243,6 @@ export interface DarwinCommunityInterface extends utils.Interface {
   ): string;
   encodeFunctionData(
     functionFragment: "VOTE_LOCK_PERIOD",
-    values?: undefined
-  ): string;
-  encodeFunctionData(
-    functionFragment: "_lastCommunityFundCandidateId",
-    values?: undefined
-  ): string;
-  encodeFunctionData(
-    functionFragment: "_lastProposalId",
     values?: undefined
   ): string;
   encodeFunctionData(
@@ -330,6 +328,14 @@ export interface DarwinCommunityInterface extends utils.Interface {
   encodeFunctionData(
     functionFragment: "isProposalSignatureRestricted",
     values: [PromiseOrValue<string>]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "lastCommunityFundCandidateId",
+    values?: undefined
+  ): string;
+  encodeFunctionData(
+    functionFragment: "lastProposalId",
+    values?: undefined
   ): string;
   encodeFunctionData(
     functionFragment: "lockedStakedDarwin",
@@ -451,6 +457,10 @@ export interface DarwinCommunityInterface extends utils.Interface {
 
   decodeFunctionResult(functionFragment: "ADMIN", data: BytesLike): Result;
   decodeFunctionResult(
+    functionFragment: "CALLS_TO_EXECUTE",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
     functionFragment: "DEFAULT_ADMIN_ROLE",
     data: BytesLike
   ): Result;
@@ -462,14 +472,6 @@ export interface DarwinCommunityInterface extends utils.Interface {
   ): Result;
   decodeFunctionResult(
     functionFragment: "VOTE_LOCK_PERIOD",
-    data: BytesLike
-  ): Result;
-  decodeFunctionResult(
-    functionFragment: "_lastCommunityFundCandidateId",
-    data: BytesLike
-  ): Result;
-  decodeFunctionResult(
-    functionFragment: "_lastProposalId",
     data: BytesLike
   ): Result;
   decodeFunctionResult(functionFragment: "cancel", data: BytesLike): Result;
@@ -521,6 +523,14 @@ export interface DarwinCommunityInterface extends utils.Interface {
   decodeFunctionResult(functionFragment: "init", data: BytesLike): Result;
   decodeFunctionResult(
     functionFragment: "isProposalSignatureRestricted",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
+    functionFragment: "lastCommunityFundCandidateId",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
+    functionFragment: "lastProposalId",
     data: BytesLike
   ): Result;
   decodeFunctionResult(
@@ -852,6 +862,8 @@ export interface DarwinCommunity extends BaseContract {
   functions: {
     ADMIN(overrides?: CallOverrides): Promise<[string]>;
 
+    CALLS_TO_EXECUTE(overrides?: CallOverrides): Promise<[BigNumber]>;
+
     DEFAULT_ADMIN_ROLE(overrides?: CallOverrides): Promise<[string]>;
 
     OWNER(overrides?: CallOverrides): Promise<[string]>;
@@ -861,12 +873,6 @@ export interface DarwinCommunity extends BaseContract {
     SENIOR_PROPOSER(overrides?: CallOverrides): Promise<[string]>;
 
     VOTE_LOCK_PERIOD(overrides?: CallOverrides): Promise<[BigNumber]>;
-
-    _lastCommunityFundCandidateId(
-      overrides?: CallOverrides
-    ): Promise<[BigNumber]>;
-
-    _lastProposalId(overrides?: CallOverrides): Promise<[BigNumber]>;
 
     cancel(
       proposalId: PromiseOrValue<BigNumberish>,
@@ -959,6 +965,12 @@ export interface DarwinCommunity extends BaseContract {
       signature: PromiseOrValue<string>,
       overrides?: CallOverrides
     ): Promise<[boolean]>;
+
+    lastCommunityFundCandidateId(
+      overrides?: CallOverrides
+    ): Promise<[BigNumber]>;
+
+    lastProposalId(overrides?: CallOverrides): Promise<[BigNumber]>;
 
     lockedStakedDarwin(
       proposalId: PromiseOrValue<BigNumberish>,
@@ -1093,6 +1105,8 @@ export interface DarwinCommunity extends BaseContract {
 
   ADMIN(overrides?: CallOverrides): Promise<string>;
 
+  CALLS_TO_EXECUTE(overrides?: CallOverrides): Promise<BigNumber>;
+
   DEFAULT_ADMIN_ROLE(overrides?: CallOverrides): Promise<string>;
 
   OWNER(overrides?: CallOverrides): Promise<string>;
@@ -1102,10 +1116,6 @@ export interface DarwinCommunity extends BaseContract {
   SENIOR_PROPOSER(overrides?: CallOverrides): Promise<string>;
 
   VOTE_LOCK_PERIOD(overrides?: CallOverrides): Promise<BigNumber>;
-
-  _lastCommunityFundCandidateId(overrides?: CallOverrides): Promise<BigNumber>;
-
-  _lastProposalId(overrides?: CallOverrides): Promise<BigNumber>;
 
   cancel(
     proposalId: PromiseOrValue<BigNumberish>,
@@ -1196,6 +1206,10 @@ export interface DarwinCommunity extends BaseContract {
     signature: PromiseOrValue<string>,
     overrides?: CallOverrides
   ): Promise<boolean>;
+
+  lastCommunityFundCandidateId(overrides?: CallOverrides): Promise<BigNumber>;
+
+  lastProposalId(overrides?: CallOverrides): Promise<BigNumber>;
 
   lockedStakedDarwin(
     proposalId: PromiseOrValue<BigNumberish>,
@@ -1328,6 +1342,8 @@ export interface DarwinCommunity extends BaseContract {
   callStatic: {
     ADMIN(overrides?: CallOverrides): Promise<string>;
 
+    CALLS_TO_EXECUTE(overrides?: CallOverrides): Promise<BigNumber>;
+
     DEFAULT_ADMIN_ROLE(overrides?: CallOverrides): Promise<string>;
 
     OWNER(overrides?: CallOverrides): Promise<string>;
@@ -1337,12 +1353,6 @@ export interface DarwinCommunity extends BaseContract {
     SENIOR_PROPOSER(overrides?: CallOverrides): Promise<string>;
 
     VOTE_LOCK_PERIOD(overrides?: CallOverrides): Promise<BigNumber>;
-
-    _lastCommunityFundCandidateId(
-      overrides?: CallOverrides
-    ): Promise<BigNumber>;
-
-    _lastProposalId(overrides?: CallOverrides): Promise<BigNumber>;
 
     cancel(
       proposalId: PromiseOrValue<BigNumberish>,
@@ -1431,6 +1441,10 @@ export interface DarwinCommunity extends BaseContract {
       signature: PromiseOrValue<string>,
       overrides?: CallOverrides
     ): Promise<boolean>;
+
+    lastCommunityFundCandidateId(overrides?: CallOverrides): Promise<BigNumber>;
+
+    lastProposalId(overrides?: CallOverrides): Promise<BigNumber>;
 
     lockedStakedDarwin(
       proposalId: PromiseOrValue<BigNumberish>,
@@ -1712,6 +1726,8 @@ export interface DarwinCommunity extends BaseContract {
   estimateGas: {
     ADMIN(overrides?: CallOverrides): Promise<BigNumber>;
 
+    CALLS_TO_EXECUTE(overrides?: CallOverrides): Promise<BigNumber>;
+
     DEFAULT_ADMIN_ROLE(overrides?: CallOverrides): Promise<BigNumber>;
 
     OWNER(overrides?: CallOverrides): Promise<BigNumber>;
@@ -1721,12 +1737,6 @@ export interface DarwinCommunity extends BaseContract {
     SENIOR_PROPOSER(overrides?: CallOverrides): Promise<BigNumber>;
 
     VOTE_LOCK_PERIOD(overrides?: CallOverrides): Promise<BigNumber>;
-
-    _lastCommunityFundCandidateId(
-      overrides?: CallOverrides
-    ): Promise<BigNumber>;
-
-    _lastProposalId(overrides?: CallOverrides): Promise<BigNumber>;
 
     cancel(
       proposalId: PromiseOrValue<BigNumberish>,
@@ -1815,6 +1825,10 @@ export interface DarwinCommunity extends BaseContract {
       signature: PromiseOrValue<string>,
       overrides?: CallOverrides
     ): Promise<BigNumber>;
+
+    lastCommunityFundCandidateId(overrides?: CallOverrides): Promise<BigNumber>;
+
+    lastProposalId(overrides?: CallOverrides): Promise<BigNumber>;
 
     lockedStakedDarwin(
       proposalId: PromiseOrValue<BigNumberish>,
@@ -1950,6 +1964,8 @@ export interface DarwinCommunity extends BaseContract {
   populateTransaction: {
     ADMIN(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
+    CALLS_TO_EXECUTE(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+
     DEFAULT_ADMIN_ROLE(
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
@@ -1961,12 +1977,6 @@ export interface DarwinCommunity extends BaseContract {
     SENIOR_PROPOSER(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
     VOTE_LOCK_PERIOD(overrides?: CallOverrides): Promise<PopulatedTransaction>;
-
-    _lastCommunityFundCandidateId(
-      overrides?: CallOverrides
-    ): Promise<PopulatedTransaction>;
-
-    _lastProposalId(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
     cancel(
       proposalId: PromiseOrValue<BigNumberish>,
@@ -2059,6 +2069,12 @@ export interface DarwinCommunity extends BaseContract {
       signature: PromiseOrValue<string>,
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
+
+    lastCommunityFundCandidateId(
+      overrides?: CallOverrides
+    ): Promise<PopulatedTransaction>;
+
+    lastProposalId(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
     lockedStakedDarwin(
       proposalId: PromiseOrValue<BigNumberish>,
