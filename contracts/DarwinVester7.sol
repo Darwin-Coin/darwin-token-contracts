@@ -11,11 +11,11 @@ import {IDarwin} from "./interface/IDarwin.sol";
 /// @title Darwin Vester (MIGRATED FROM BSC)
 contract DarwinVester7 is IDarwinVester, ReentrancyGuard, Ownable {
 
-    /// @notice Percentage of monthly interest (0.583%)
-    uint256 public constant INTEREST = 583;
+    /// @notice Percentage of monthly interest (0.625%, 7.5% in a year)
+    uint256 public constant INTEREST = 625;
     /// @notice Number of months thru which interest is active
     uint256 public constant MONTHS = 12;
-    /// @notice Time thru which interest is active (in seconds)
+    /// @notice Above in seconds
     uint256 public constant VESTING_TIME = MONTHS * (30 days);
 
     mapping(address => UserInfo) public userInfo;

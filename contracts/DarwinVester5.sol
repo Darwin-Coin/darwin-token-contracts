@@ -11,7 +11,7 @@ import {IDarwin} from "./interface/IDarwin.sol";
 /// @title Darwin Vester
 contract DarwinVester5 is IDarwinVester, ReentrancyGuard, Ownable {
 
-    /// @notice Percentage of monthly interest (0.416%)
+    /// @notice Percentage of monthly interest (0.416%, 5% in a year)
     uint256 public constant INTEREST = 416;
     /// @notice Number of months thru which vested darwin will be fully withdrawable
     uint256 public constant MONTHS = 12;
