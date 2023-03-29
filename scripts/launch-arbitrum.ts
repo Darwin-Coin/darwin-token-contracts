@@ -164,7 +164,7 @@ async function main() {
   //? [VERIFY] STAKING
   await hardhat.run("verify:verify", {
     address: staking.address,
-    constructorArguments: [darwin.address, stakedDarwin.address]
+    constructorArguments: [darwin.address, stakedDarwin.address, evotures.address]
   });
 
   //* [INIT] DARWIN WITH STAKING
