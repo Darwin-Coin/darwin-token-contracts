@@ -81,6 +81,22 @@ declare module "hardhat/types/runtime" {
       signerOrOptions?: ethers.Signer | FactoryOptions
     ): Promise<Contracts.IERC20__factory>;
     getContractFactory(
+      name: "ERC721",
+      signerOrOptions?: ethers.Signer | FactoryOptions
+    ): Promise<Contracts.ERC721__factory>;
+    getContractFactory(
+      name: "IERC721Metadata",
+      signerOrOptions?: ethers.Signer | FactoryOptions
+    ): Promise<Contracts.IERC721Metadata__factory>;
+    getContractFactory(
+      name: "IERC721",
+      signerOrOptions?: ethers.Signer | FactoryOptions
+    ): Promise<Contracts.IERC721__factory>;
+    getContractFactory(
+      name: "IERC721Receiver",
+      signerOrOptions?: ethers.Signer | FactoryOptions
+    ): Promise<Contracts.IERC721Receiver__factory>;
+    getContractFactory(
       name: "ERC165",
       signerOrOptions?: ethers.Signer | FactoryOptions
     ): Promise<Contracts.ERC165__factory>;
@@ -117,6 +133,10 @@ declare module "hardhat/types/runtime" {
       signerOrOptions?: ethers.Signer | FactoryOptions
     ): Promise<Contracts.DarwinPrivateSale__factory>;
     getContractFactory(
+      name: "DarwinStaking",
+      signerOrOptions?: ethers.Signer | FactoryOptions
+    ): Promise<Contracts.DarwinStaking__factory>;
+    getContractFactory(
       name: "DarwinVester5",
       signerOrOptions?: ethers.Signer | FactoryOptions
     ): Promise<Contracts.DarwinVester5__factory>;
@@ -124,6 +144,10 @@ declare module "hardhat/types/runtime" {
       name: "DarwinVester7",
       signerOrOptions?: ethers.Signer | FactoryOptions
     ): Promise<Contracts.DarwinVester7__factory>;
+    getContractFactory(
+      name: "EvoturesNFT",
+      signerOrOptions?: ethers.Signer | FactoryOptions
+    ): Promise<Contracts.EvoturesNFT__factory>;
     getContractFactory(
       name: "IDarwin",
       signerOrOptions?: ethers.Signer | FactoryOptions
@@ -137,13 +161,33 @@ declare module "hardhat/types/runtime" {
       signerOrOptions?: ethers.Signer | FactoryOptions
     ): Promise<Contracts.IDarwinPresale__factory>;
     getContractFactory(
+      name: "IDarwinStaking",
+      signerOrOptions?: ethers.Signer | FactoryOptions
+    ): Promise<Contracts.IDarwinStaking__factory>;
+    getContractFactory(
       name: "IDarwinVester",
       signerOrOptions?: ethers.Signer | FactoryOptions
     ): Promise<Contracts.IDarwinVester__factory>;
     getContractFactory(
+      name: "IERC20",
+      signerOrOptions?: ethers.Signer | FactoryOptions
+    ): Promise<Contracts.IERC20__factory>;
+    getContractFactory(
+      name: "IEvoturesNFT",
+      signerOrOptions?: ethers.Signer | FactoryOptions
+    ): Promise<Contracts.IEvoturesNFT__factory>;
+    getContractFactory(
+      name: "ILootboxTicket",
+      signerOrOptions?: ethers.Signer | FactoryOptions
+    ): Promise<Contracts.ILootboxTicket__factory>;
+    getContractFactory(
       name: "IStakedDarwin",
       signerOrOptions?: ethers.Signer | FactoryOptions
     ): Promise<Contracts.IStakedDarwin__factory>;
+    getContractFactory(
+      name: "LootboxTicket",
+      signerOrOptions?: ethers.Signer | FactoryOptions
+    ): Promise<Contracts.LootboxTicket__factory>;
     getContractFactory(
       name: "ERC20Upgradeable",
       signerOrOptions?: ethers.Signer | FactoryOptions
@@ -239,6 +283,26 @@ declare module "hardhat/types/runtime" {
       signer?: ethers.Signer
     ): Promise<Contracts.IERC20>;
     getContractAt(
+      name: "ERC721",
+      address: string,
+      signer?: ethers.Signer
+    ): Promise<Contracts.ERC721>;
+    getContractAt(
+      name: "IERC721Metadata",
+      address: string,
+      signer?: ethers.Signer
+    ): Promise<Contracts.IERC721Metadata>;
+    getContractAt(
+      name: "IERC721",
+      address: string,
+      signer?: ethers.Signer
+    ): Promise<Contracts.IERC721>;
+    getContractAt(
+      name: "IERC721Receiver",
+      address: string,
+      signer?: ethers.Signer
+    ): Promise<Contracts.IERC721Receiver>;
+    getContractAt(
       name: "ERC165",
       address: string,
       signer?: ethers.Signer
@@ -284,6 +348,11 @@ declare module "hardhat/types/runtime" {
       signer?: ethers.Signer
     ): Promise<Contracts.DarwinPrivateSale>;
     getContractAt(
+      name: "DarwinStaking",
+      address: string,
+      signer?: ethers.Signer
+    ): Promise<Contracts.DarwinStaking>;
+    getContractAt(
       name: "DarwinVester5",
       address: string,
       signer?: ethers.Signer
@@ -293,6 +362,11 @@ declare module "hardhat/types/runtime" {
       address: string,
       signer?: ethers.Signer
     ): Promise<Contracts.DarwinVester7>;
+    getContractAt(
+      name: "EvoturesNFT",
+      address: string,
+      signer?: ethers.Signer
+    ): Promise<Contracts.EvoturesNFT>;
     getContractAt(
       name: "IDarwin",
       address: string,
@@ -309,15 +383,40 @@ declare module "hardhat/types/runtime" {
       signer?: ethers.Signer
     ): Promise<Contracts.IDarwinPresale>;
     getContractAt(
+      name: "IDarwinStaking",
+      address: string,
+      signer?: ethers.Signer
+    ): Promise<Contracts.IDarwinStaking>;
+    getContractAt(
       name: "IDarwinVester",
       address: string,
       signer?: ethers.Signer
     ): Promise<Contracts.IDarwinVester>;
     getContractAt(
+      name: "IERC20",
+      address: string,
+      signer?: ethers.Signer
+    ): Promise<Contracts.IERC20>;
+    getContractAt(
+      name: "IEvoturesNFT",
+      address: string,
+      signer?: ethers.Signer
+    ): Promise<Contracts.IEvoturesNFT>;
+    getContractAt(
+      name: "ILootboxTicket",
+      address: string,
+      signer?: ethers.Signer
+    ): Promise<Contracts.ILootboxTicket>;
+    getContractAt(
       name: "IStakedDarwin",
       address: string,
       signer?: ethers.Signer
     ): Promise<Contracts.IStakedDarwin>;
+    getContractAt(
+      name: "LootboxTicket",
+      address: string,
+      signer?: ethers.Signer
+    ): Promise<Contracts.LootboxTicket>;
     getContractAt(
       name: "ERC20Upgradeable",
       address: string,

@@ -7,7 +7,7 @@ import { BigNumber } from "ethers";
 import * as hardhat from "hardhat";
 import { ethers, upgrades } from "hardhat";
 import { DarwinBurner, DarwinCommunity } from "../typechain-types";
-import { Darwin, DarwinPrivateSale, DarwinVester5, DarwinVester7 } from "../typechain-types/contracts";
+import { Darwin, DarwinPrivateSale, DarwinStaking, DarwinVester5, DarwinVester7, EvoturesNFT, LootboxTicket, StakedDarwin } from "../typechain-types/contracts";
 import { ADDRESSES, ADDRESSES_ARB } from "./constants";
 
 
@@ -49,7 +49,35 @@ async function main() {
   const darwinVester5Factory = await ethers.getContractFactory("DarwinVester5");
   const darwinCommunityFactory = await ethers.getContractFactory("DarwinCommunity");
   const darwinFactory = await ethers.getContractFactory("Darwin");
+  const stakedDarwinFactory = await ethers.getContractFactory("StakedDarwin");
   const darwinBurnerFactory = await ethers.getContractFactory("DarwinBurner");
+  const stakingFactory = await ethers.getContractFactory("DarwinStaking");
+  const evoturesFactory = await ethers.getContractFactory("EvoturesNFT");
+  const ticketFactory = await ethers.getContractFactory("LootboxTicket");
+
+
+  //! [DEPLOY] EVOTURES
+  const evotures = await evoturesFactory.deploy() as EvoturesNFT;
+  await evotures.deployed();
+  console.log(`🔨 Deployed Evotures NFT at: ${evotures.address}`);
+
+  //? [VERIFY] EVOTURES
+  await hardhat.run("verify:verify", {
+    address: evotures.address,
+    constructorArguments: []
+  });
+
+
+  //! [ATTACH] TICKET
+  const ticket = ticketFactory.attach(await evotures.ticketsContract()) as LootboxTicket;
+  await ticket.deployed();
+  console.log(`🔨 Deployed Lootbox Ticket at: ${ticket.address}`);
+
+  //? [VERIFY] TICKET
+  await hardhat.run("verify:verify", {
+    address: ticket.address,
+    constructorArguments: []
+  });
 
 
   //! [DEPLOY] VESTER5
@@ -110,11 +138,39 @@ async function main() {
   await darwin.deployed();
   console.log(`🔨 Deployed Darwin Protocol at: ${darwin.address}`);
 
+  //! [ATTACH] STAKED DARWIN
+  const stakedDarwin = stakedDarwinFactory.attach(await darwin.stakedDarwin()) as StakedDarwin;
+  await stakedDarwin.deployed();
+  console.log(`🔨 Deployed Staked Darwin at: ${stakedDarwin.address}`);
+
   //? [VERIFY] DARWIN PROTOCOL
   await hardhat.run("verify:verify", {
     address: darwin.address,
     constructorArguments: []
   });
+
+  //? [VERIFY] STAKED DARWIN
+  await hardhat.run("verify:verify", {
+    address: stakedDarwin.address,
+    constructorArguments: []
+  });
+
+
+  //! [DEPLOY] STAKING
+  const staking = await stakingFactory.deploy(darwin.address, stakedDarwin.address, evotures.address) as DarwinStaking;
+  await staking.deployed();
+  console.log(`🔨 Deployed Darwin Staking at: ${staking.address}`);
+
+  //? [VERIFY] STAKING
+  await hardhat.run("verify:verify", {
+    address: staking.address,
+    constructorArguments: [darwin.address, stakedDarwin.address]
+  });
+
+  //* [INIT] DARWIN WITH STAKING
+  const setStaking = await darwin.setDarwinStaking(staking.address);
+  await setStaking.wait();
+  console.log(`🏁 Staking address set for Darwin and Staked Darwin`);
 
 
   //! [DEPLOY] DARWIN BURNER
