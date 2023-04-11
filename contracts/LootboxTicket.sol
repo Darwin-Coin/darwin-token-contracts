@@ -33,14 +33,13 @@ contract LootboxTicket is ERC721("Evotures Lootbox Tickets","EVOTICK"), ILootbox
     }
 
     function mint(address _to, Rarity _rarity) external {
-        require(msg.sender == dev, "EvoturesNFT: CALLER_IS_NOT_DEV");
+        require(msg.sender == dev, "LootboxTicket: CALLER_IS_NOT_DEV");
         _safeMint(_to, lastTicketId);
         rarity[lastTicketId] = _rarity;
         lastTicketId++;
     }
 
     function openLootBox(uint _ticketId) external {
-        safeTransferFrom(msg.sender, evoturesContract, _ticketId);
         uint ticketChances;
         if (rarity[_ticketId] == Rarity.COMMON) {
             ticketChances = _COMMON_CHANCES;
@@ -54,5 +53,13 @@ contract LootboxTicket is ERC721("Evotures Lootbox Tickets","EVOTICK"), ILootbox
             ticketChances = _ANCIENT_CHANCES;
         }
         IEvoturesNFT(evoturesContract).mint(msg.sender, ticketChances);
+        _safeBurn(_ticketId);
+    }
+
+    function _safeBurn(uint _ticketId) internal {
+        require(_isApprovedOrOwner(_msgSender(), _ticketId), "LootboxTicket: CALLER_NOT_TICKET_OWNER");
+        delete rarity[_ticketId];
+
+        _burn(_ticketId);
     }
 }

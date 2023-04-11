@@ -200,16 +200,22 @@ contract Darwin is IDarwin, ERC20Upgradeable, OwnableUpgradeable, AccessControlU
     function setLive() external onlyRole(MAINTENANCE_ROLE) {
         isPaused = false;
         isLive = true;
+
+        emit SetLive(block.timestamp);
     }
 
     function setPauseWhitelist(address _addr, bool value) external onlyRole(MAINTENANCE_ROLE) {
         _pauseWhitelist[_addr] = value;
+
+        emit SetPauseWhitelist(_addr, value);
     }
 
     function setPresaleAddress(address _addr) external onlyRole(MAINTENANCE_ROLE) {
         require(!isLive, "DARWIN: Darwin Protocol is already live");
         _setExcludedFromRewards(_addr);
         _pauseWhitelist[_addr] = true;
+
+        emit SetPresaleAddress(_addr);
     }
 
     ////////////////////// SECURITY FUNCTIONS ///////////////////////////////////
@@ -218,12 +224,16 @@ contract Darwin is IDarwin, ERC20Upgradeable, OwnableUpgradeable, AccessControlU
         if(!isPaused && !isLive) {
             isPaused = true;
         }
+
+        emit SetPaused(block.timestamp);
     }
 
     function emergencyUnPause() external onlyRole(SECURITY_ROLE) {
         if(isPaused && !isLive) {
             isPaused = false;
         }
+
+        emit SetUnpaused(block.timestamp);
     }
 
     ////////////////////// REWARDS FUNCTIONS /////////////////////////////////////
@@ -387,12 +397,16 @@ contract Darwin is IDarwin, ERC20Upgradeable, OwnableUpgradeable, AccessControlU
         if(!isPaused) {
             isPaused = true;
         }
+
+        emit SetPaused(block.timestamp);
     }
 
     function communityUnPause() external onlyRole(COMMUNITY_ROLE) {
         if(isPaused) {
             isPaused = false;
         }
+
+        emit SetUnpaused(block.timestamp);
     }
 
     function _authorizeUpgrade(address newImplementation) internal override onlyRole(UPGRADER_ROLE){}

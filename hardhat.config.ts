@@ -111,7 +111,7 @@ const config: HardhatUserConfig = {
         },
 
         arbitrumGoerli: {
-            url: "https://endpoints.omniatech.io/v1/arbitrum/goerli/public",
+            url: "https://arbitrum-goerli.public.blastapi.io",
             chainId: 421613,
             accounts: [String(process.env.TESTNET_PRIVATEKEY)]
         },
@@ -144,7 +144,8 @@ const config: HardhatUserConfig = {
         apiKey: {
             bsc: String(process.env.BSCSCAN_API_KEY),
             bscTestnet: String(process.env.BSCSCAN_API_KEY),
-            arbitrumOne: String(process.env.ARBISCAN_API_KEY)
+            arbitrumOne: String(process.env.ARBISCAN_API_KEY),
+            arbitrumGoerli: String(process.env.ARBISCAN_API_KEY)
         }
     },
 

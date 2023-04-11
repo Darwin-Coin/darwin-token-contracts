@@ -135,11 +135,8 @@ contract DarwinCommunity is IDarwinCommunity, AccessControl, ReentrancyGuard {
     }
 
     function setDarwinAddress(address _darwin) external onlyDarwinCommunity {
+        require(_darwin != address(0), "DC:setDarwinAddress:: zero address");
         darwin = IDarwin(_darwin);
-    }
-
-    function setStakedDarwinAddress(address _stakedDarwin) external onlyDarwinCommunity {
-        stakedDarwin = IStakedDarwin(_stakedDarwin);
     }
 
     function _randomBoolean() private view returns (bool) {
@@ -165,6 +162,8 @@ contract DarwinCommunity is IDarwinCommunity, AccessControl, ReentrancyGuard {
     }
 
     function newFundCandidate(address valueAddress, string calldata proposal) public onlyDarwinCommunity {
+        require(valueAddress != address(0), "DC:newFundCandidate:: zero address");
+
         uint256 id = lastCommunityFundCandidateId + 1;
 
         _communityFundCandidates[id] = CommunityFundCandidate({ id: id, valueAddress: valueAddress, isActive: true });

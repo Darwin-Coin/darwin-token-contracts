@@ -219,10 +219,20 @@ export interface IDarwinInterface extends utils.Interface {
   events: {
     "ExcludedFromReflection(address,bool)": EventFragment;
     "ExcludedFromSellLimit(address,bool)": EventFragment;
+    "SetLive(uint256)": EventFragment;
+    "SetPauseWhitelist(address,bool)": EventFragment;
+    "SetPaused(uint256)": EventFragment;
+    "SetPresaleAddress(address)": EventFragment;
+    "SetUnpaused(uint256)": EventFragment;
   };
 
   getEvent(nameOrSignatureOrTopic: "ExcludedFromReflection"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "ExcludedFromSellLimit"): EventFragment;
+  getEvent(nameOrSignatureOrTopic: "SetLive"): EventFragment;
+  getEvent(nameOrSignatureOrTopic: "SetPauseWhitelist"): EventFragment;
+  getEvent(nameOrSignatureOrTopic: "SetPaused"): EventFragment;
+  getEvent(nameOrSignatureOrTopic: "SetPresaleAddress"): EventFragment;
+  getEvent(nameOrSignatureOrTopic: "SetUnpaused"): EventFragment;
 }
 
 export interface ExcludedFromReflectionEventObject {
@@ -248,6 +258,50 @@ export type ExcludedFromSellLimitEvent = TypedEvent<
 
 export type ExcludedFromSellLimitEventFilter =
   TypedEventFilter<ExcludedFromSellLimitEvent>;
+
+export interface SetLiveEventObject {
+  timestamp: BigNumber;
+}
+export type SetLiveEvent = TypedEvent<[BigNumber], SetLiveEventObject>;
+
+export type SetLiveEventFilter = TypedEventFilter<SetLiveEvent>;
+
+export interface SetPauseWhitelistEventObject {
+  account: string;
+  isWhitelisted: boolean;
+}
+export type SetPauseWhitelistEvent = TypedEvent<
+  [string, boolean],
+  SetPauseWhitelistEventObject
+>;
+
+export type SetPauseWhitelistEventFilter =
+  TypedEventFilter<SetPauseWhitelistEvent>;
+
+export interface SetPausedEventObject {
+  timestamp: BigNumber;
+}
+export type SetPausedEvent = TypedEvent<[BigNumber], SetPausedEventObject>;
+
+export type SetPausedEventFilter = TypedEventFilter<SetPausedEvent>;
+
+export interface SetPresaleAddressEventObject {
+  account: string;
+}
+export type SetPresaleAddressEvent = TypedEvent<
+  [string],
+  SetPresaleAddressEventObject
+>;
+
+export type SetPresaleAddressEventFilter =
+  TypedEventFilter<SetPresaleAddressEvent>;
+
+export interface SetUnpausedEventObject {
+  timestamp: BigNumber;
+}
+export type SetUnpausedEvent = TypedEvent<[BigNumber], SetUnpausedEventObject>;
+
+export type SetUnpausedEventFilter = TypedEventFilter<SetUnpausedEvent>;
 
 export interface IDarwin extends BaseContract {
   connect(signerOrProvider: Signer | Provider | string): this;
@@ -569,6 +623,27 @@ export interface IDarwin extends BaseContract {
       account?: null,
       isExcluded?: null
     ): ExcludedFromSellLimitEventFilter;
+
+    "SetLive(uint256)"(timestamp?: null): SetLiveEventFilter;
+    SetLive(timestamp?: null): SetLiveEventFilter;
+
+    "SetPauseWhitelist(address,bool)"(
+      account?: null,
+      isWhitelisted?: null
+    ): SetPauseWhitelistEventFilter;
+    SetPauseWhitelist(
+      account?: null,
+      isWhitelisted?: null
+    ): SetPauseWhitelistEventFilter;
+
+    "SetPaused(uint256)"(timestamp?: null): SetPausedEventFilter;
+    SetPaused(timestamp?: null): SetPausedEventFilter;
+
+    "SetPresaleAddress(address)"(account?: null): SetPresaleAddressEventFilter;
+    SetPresaleAddress(account?: null): SetPresaleAddressEventFilter;
+
+    "SetUnpaused(uint256)"(timestamp?: null): SetUnpausedEventFilter;
+    SetUnpaused(timestamp?: null): SetUnpausedEventFilter;
   };
 
   estimateGas: {

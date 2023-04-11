@@ -3,14 +3,13 @@ pragma solidity ^0.8.14;
 // SPDX-License-Identifier: MIT
 
 import "@openzeppelin/contracts/token/ERC721/ERC721.sol";
-import "@openzeppelin/contracts/token/ERC721/IERC721Receiver.sol";
 
 import {LootboxTicket} from "./LootboxTicket.sol";
 
 import {IEvoturesNFT} from "./interface/IEvoturesNFT.sol";
 import {ILootboxTicket} from "./interface/ILootboxTicket.sol";
 
-contract EvoturesNFT is ERC721("Evotures NFTs","EVOTURES"), IEvoturesNFT, IERC721Receiver {
+contract EvoturesNFT is ERC721("Evotures NFTs","EVOTURES"), IEvoturesNFT {
     using Address for address;
     using Strings for uint256;
 
@@ -21,7 +20,7 @@ contract EvoturesNFT is ERC721("Evotures NFTs","EVOTURES"), IEvoturesNFT, IERC72
     mapping(uint256 => Stats) private _stats;
 
     constructor() {
-        // Create LiquidityBundles contract
+        // Create LootboxTicket contract
         bytes memory bytecode = type(LootboxTicket).creationCode;
         bytes32 salt = keccak256(abi.encodePacked(address(this)));
         address _ticketsContract;
@@ -48,12 +47,12 @@ contract EvoturesNFT is ERC721("Evotures NFTs","EVOTURES"), IEvoturesNFT, IERC72
 
     // TODO: SET BASE URI
     function _baseURI() internal pure override returns (string memory) {
-        return "ipfs://TODO/";
+        return "ipfs://QmXNRXbSeJVJTGFRa69u9A1wz1H17pkB8S4EXvVQtuRfTE/";
     }
 
     // TODO: SET CONTARCT URI
     function contractURI() public pure returns (string memory) {
-        return "ipfs://TODO/0.json";
+        return "https://darwinprotocol.io/evotures.json";
     }
 
     function _pseudoRand(uint _chances, uint _seed) private view returns(uint256) {
@@ -145,15 +144,6 @@ contract EvoturesNFT is ERC721("Evotures NFTs","EVOTURES"), IEvoturesNFT, IERC72
         } else {
             s.alignment = Alignment.DIVINE;
         }
-    }
-
-    function onERC721Received(
-        address,
-        address,
-        uint256,
-        bytes calldata
-    ) external returns (bytes4) {
-        return IERC721Receiver.onERC721Received.selector;
     }
 
     function stats(uint _tokenId) external view returns(Stats memory) {

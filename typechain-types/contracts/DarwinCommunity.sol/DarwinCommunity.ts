@@ -161,7 +161,6 @@ export interface DarwinCommunityInterface extends utils.Interface {
     "setProposalMinVotesCountForAction(uint256)": FunctionFragment;
     "setProposer(address,bool)": FunctionFragment;
     "setSeniorProposer(address,bool)": FunctionFragment;
-    "setStakedDarwinAddress(address)": FunctionFragment;
     "stakedDarwin()": FunctionFragment;
     "state(uint256)": FunctionFragment;
     "supportsInterface(bytes4)": FunctionFragment;
@@ -219,7 +218,6 @@ export interface DarwinCommunityInterface extends utils.Interface {
       | "setProposalMinVotesCountForAction"
       | "setProposer"
       | "setSeniorProposer"
-      | "setStakedDarwinAddress"
       | "stakedDarwin"
       | "state"
       | "supportsInterface"
@@ -435,10 +433,6 @@ export interface DarwinCommunityInterface extends utils.Interface {
     values: [PromiseOrValue<string>, PromiseOrValue<boolean>]
   ): string;
   encodeFunctionData(
-    functionFragment: "setStakedDarwinAddress",
-    values: [PromiseOrValue<string>]
-  ): string;
-  encodeFunctionData(
     functionFragment: "stakedDarwin",
     values?: undefined
   ): string;
@@ -607,10 +601,6 @@ export interface DarwinCommunityInterface extends utils.Interface {
   ): Result;
   decodeFunctionResult(
     functionFragment: "setSeniorProposer",
-    data: BytesLike
-  ): Result;
-  decodeFunctionResult(
-    functionFragment: "setStakedDarwinAddress",
     data: BytesLike
   ): Result;
   decodeFunctionResult(
@@ -1081,11 +1071,6 @@ export interface DarwinCommunity extends BaseContract {
       overrides?: Overrides & { from?: PromiseOrValue<string> }
     ): Promise<ContractTransaction>;
 
-    setStakedDarwinAddress(
-      _stakedDarwin: PromiseOrValue<string>,
-      overrides?: Overrides & { from?: PromiseOrValue<string> }
-    ): Promise<ContractTransaction>;
-
     stakedDarwin(overrides?: CallOverrides): Promise<[string]>;
 
     state(
@@ -1318,11 +1303,6 @@ export interface DarwinCommunity extends BaseContract {
     overrides?: Overrides & { from?: PromiseOrValue<string> }
   ): Promise<ContractTransaction>;
 
-  setStakedDarwinAddress(
-    _stakedDarwin: PromiseOrValue<string>,
-    overrides?: Overrides & { from?: PromiseOrValue<string> }
-  ): Promise<ContractTransaction>;
-
   stakedDarwin(overrides?: CallOverrides): Promise<string>;
 
   state(
@@ -1552,11 +1532,6 @@ export interface DarwinCommunity extends BaseContract {
     setSeniorProposer(
       _account: PromiseOrValue<string>,
       _hasRole: PromiseOrValue<boolean>,
-      overrides?: CallOverrides
-    ): Promise<void>;
-
-    setStakedDarwinAddress(
-      _stakedDarwin: PromiseOrValue<string>,
       overrides?: CallOverrides
     ): Promise<void>;
 
@@ -1939,11 +1914,6 @@ export interface DarwinCommunity extends BaseContract {
       overrides?: Overrides & { from?: PromiseOrValue<string> }
     ): Promise<BigNumber>;
 
-    setStakedDarwinAddress(
-      _stakedDarwin: PromiseOrValue<string>,
-      overrides?: Overrides & { from?: PromiseOrValue<string> }
-    ): Promise<BigNumber>;
-
     stakedDarwin(overrides?: CallOverrides): Promise<BigNumber>;
 
     state(
@@ -2186,11 +2156,6 @@ export interface DarwinCommunity extends BaseContract {
     setSeniorProposer(
       _account: PromiseOrValue<string>,
       _hasRole: PromiseOrValue<boolean>,
-      overrides?: Overrides & { from?: PromiseOrValue<string> }
-    ): Promise<PopulatedTransaction>;
-
-    setStakedDarwinAddress(
-      _stakedDarwin: PromiseOrValue<string>,
       overrides?: Overrides & { from?: PromiseOrValue<string> }
     ): Promise<PopulatedTransaction>;
 

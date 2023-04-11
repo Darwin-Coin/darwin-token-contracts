@@ -637,6 +637,11 @@ export interface DarwinInterface extends utils.Interface {
     "RoleAdminChanged(bytes32,bytes32,bytes32)": EventFragment;
     "RoleGranted(bytes32,address,address)": EventFragment;
     "RoleRevoked(bytes32,address,address)": EventFragment;
+    "SetLive(uint256)": EventFragment;
+    "SetPauseWhitelist(address,bool)": EventFragment;
+    "SetPaused(uint256)": EventFragment;
+    "SetPresaleAddress(address)": EventFragment;
+    "SetUnpaused(uint256)": EventFragment;
     "Transfer(address,address,uint256)": EventFragment;
     "Upgraded(address)": EventFragment;
   };
@@ -651,6 +656,11 @@ export interface DarwinInterface extends utils.Interface {
   getEvent(nameOrSignatureOrTopic: "RoleAdminChanged"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "RoleGranted"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "RoleRevoked"): EventFragment;
+  getEvent(nameOrSignatureOrTopic: "SetLive"): EventFragment;
+  getEvent(nameOrSignatureOrTopic: "SetPauseWhitelist"): EventFragment;
+  getEvent(nameOrSignatureOrTopic: "SetPaused"): EventFragment;
+  getEvent(nameOrSignatureOrTopic: "SetPresaleAddress"): EventFragment;
+  getEvent(nameOrSignatureOrTopic: "SetUnpaused"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "Transfer"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "Upgraded"): EventFragment;
 }
@@ -767,6 +777,50 @@ export type RoleRevokedEvent = TypedEvent<
 >;
 
 export type RoleRevokedEventFilter = TypedEventFilter<RoleRevokedEvent>;
+
+export interface SetLiveEventObject {
+  timestamp: BigNumber;
+}
+export type SetLiveEvent = TypedEvent<[BigNumber], SetLiveEventObject>;
+
+export type SetLiveEventFilter = TypedEventFilter<SetLiveEvent>;
+
+export interface SetPauseWhitelistEventObject {
+  account: string;
+  isWhitelisted: boolean;
+}
+export type SetPauseWhitelistEvent = TypedEvent<
+  [string, boolean],
+  SetPauseWhitelistEventObject
+>;
+
+export type SetPauseWhitelistEventFilter =
+  TypedEventFilter<SetPauseWhitelistEvent>;
+
+export interface SetPausedEventObject {
+  timestamp: BigNumber;
+}
+export type SetPausedEvent = TypedEvent<[BigNumber], SetPausedEventObject>;
+
+export type SetPausedEventFilter = TypedEventFilter<SetPausedEvent>;
+
+export interface SetPresaleAddressEventObject {
+  account: string;
+}
+export type SetPresaleAddressEvent = TypedEvent<
+  [string],
+  SetPresaleAddressEventObject
+>;
+
+export type SetPresaleAddressEventFilter =
+  TypedEventFilter<SetPresaleAddressEvent>;
+
+export interface SetUnpausedEventObject {
+  timestamp: BigNumber;
+}
+export type SetUnpausedEvent = TypedEvent<[BigNumber], SetUnpausedEventObject>;
+
+export type SetUnpausedEventFilter = TypedEventFilter<SetUnpausedEvent>;
 
 export interface TransferEventObject {
   from: string;
@@ -1711,6 +1765,27 @@ export interface Darwin extends BaseContract {
       account?: PromiseOrValue<string> | null,
       sender?: PromiseOrValue<string> | null
     ): RoleRevokedEventFilter;
+
+    "SetLive(uint256)"(timestamp?: null): SetLiveEventFilter;
+    SetLive(timestamp?: null): SetLiveEventFilter;
+
+    "SetPauseWhitelist(address,bool)"(
+      account?: null,
+      isWhitelisted?: null
+    ): SetPauseWhitelistEventFilter;
+    SetPauseWhitelist(
+      account?: null,
+      isWhitelisted?: null
+    ): SetPauseWhitelistEventFilter;
+
+    "SetPaused(uint256)"(timestamp?: null): SetPausedEventFilter;
+    SetPaused(timestamp?: null): SetPausedEventFilter;
+
+    "SetPresaleAddress(address)"(account?: null): SetPresaleAddressEventFilter;
+    SetPresaleAddress(account?: null): SetPresaleAddressEventFilter;
+
+    "SetUnpaused(uint256)"(timestamp?: null): SetUnpausedEventFilter;
+    SetUnpaused(timestamp?: null): SetUnpausedEventFilter;
 
     "Transfer(address,address,uint256)"(
       from?: PromiseOrValue<string> | null,

@@ -14,6 +14,11 @@ interface IDarwin {
 
     event ExcludedFromReflection(address account, bool isExcluded);
     event ExcludedFromSellLimit(address account, bool isExcluded);
+    event SetLive(uint timestamp);
+    event SetPaused(uint timestamp);
+    event SetUnpaused(uint timestamp);
+    event SetPauseWhitelist(address account, bool isWhitelisted);
+    event SetPresaleAddress(address account);
 
     // PUBLIC
     function distributeRewards(uint256 amount) external;
