@@ -43,8 +43,8 @@ export const ADDRESSES_ARB_GOERLI = {
     darwin: "",
     community: "",
     drop: "",
-    evotures: "0x03a16C47Fa284E13E3Ea628dCB5C7CD7d6F085d6",
-    tickets: "0xf3cfCfE1E935084061fDE0Bd8916E9bb6DDEA512",
+    evotures: "0xF0dEBDc03420d947bC6f53659c424413adC74fDb",
+    tickets: "0xFBBE61b464a8eAF1C8BeE435Af695cB947669f9a",
     presale: "",
     privateSales: [
         ""

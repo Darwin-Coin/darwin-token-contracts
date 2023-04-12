@@ -46,12 +46,12 @@ async function main() {
   const stats = await evotures.stats(evotureId);
   console.log(`🔨 Minted Evoture #${evotureId}`);
   console.log({
-    no: stats.no,
-    hp: stats.hp,
-    attack: stats.attack,
-    defense: stats.defense,
-    speed: stats.speed,
-    special: stats.special,
+    no: stats.no.toNumber(),
+    hp: stats.hp.toNumber(),
+    attack: stats.attack.toNumber(),
+    defense: stats.defense.toNumber(),
+    speed: stats.speed.toNumber(),
+    special: stats.special.toNumber(),
     alignment: stats.alignment,
     rarity: stats.rarity,
     multiplier: stats.multiplier
