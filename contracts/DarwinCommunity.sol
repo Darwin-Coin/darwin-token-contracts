@@ -4,6 +4,7 @@ pragma solidity ^0.8.14;
 
 import {IDarwinCommunity} from "./interface/IDarwinCommunity.sol";
 import {IStakedDarwin} from "./interface/IStakedDarwin.sol";
+import {IDarwinStaking} from "./interface/IDarwinStaking.sol";
 
 import {AccessControl} from "@openzeppelin/contracts/access/AccessControl.sol";
 import {ReentrancyGuard} from "@openzeppelin/contracts/security/ReentrancyGuard.sol";
@@ -40,8 +41,6 @@ contract DarwinCommunity is IDarwinCommunity, AccessControl, ReentrancyGuard {
     mapping(uint256 => bool) private _restrictedProposalActionSignature;
     /// @notice Only for backend purposes
     string[] private _initialFundProposalStrings;
-    /// @notice Amount of StakedDarwin locked in a proposal by a user
-    mapping(uint => mapping(address => LockInfo)) private _lockedStakedDarwin;
 
     uint public constant VOTE_LOCK_PERIOD = 365 days;
     uint public constant CALLS_TO_EXECUTE = 2;
@@ -58,6 +57,7 @@ contract DarwinCommunity is IDarwinCommunity, AccessControl, ReentrancyGuard {
 
     IDarwin public darwin;
     IStakedDarwin public stakedDarwin;
+    IDarwinStaking public staking;
 
     constructor(address _kieran) {
         _grantRole(OWNER, msg.sender);
@@ -95,6 +95,7 @@ contract DarwinCommunity is IDarwinCommunity, AccessControl, ReentrancyGuard {
 
         darwin = IDarwin(_darwin);
         stakedDarwin = darwin.stakedDarwin();
+        staking = IDarwinStaking(stakedDarwin.darwinStaking());
 
         _initialFundProposalStrings = initialFundProposalStrings;
 
@@ -377,16 +378,13 @@ contract DarwinCommunity is IDarwinCommunity, AccessControl, ReentrancyGuard {
      */
     function castVote(
         uint256 proposalId,
-        bool inSupport,
-        uint256 darwinAmount
+        bool inSupport
     ) external {
-        require(minDarwinTransferToAccess <= darwinAmount, "DC::castVote: not enough StakedDarwin sent");
-        require(stakedDarwin.transferFrom(msg.sender, address(this), darwinAmount), "DC::castVote: not enough StakedDarwin in wallet");
+        uint sBalance = stakedDarwin.balanceOf(msg.sender);
+        require(minDarwinTransferToAccess <= sBalance, "DC::castVote: not enough StakedDarwin to vote");
+        require(staking.getUserInfo(msg.sender).lockEnd >= _proposals[proposalId].endTime, "DC::castVote: the staking locking period ends before the proposal end time");
 
-        _lockedStakedDarwin[proposalId][msg.sender].darwinAmount = darwinAmount;
-        _lockedStakedDarwin[proposalId][msg.sender].lockEnd = block.timestamp + VOTE_LOCK_PERIOD;
-
-        _castVoteInternal(_msgSender(), proposalId, darwinAmount, inSupport);
+        _castVoteInternal(_msgSender(), proposalId, sBalance, inSupport);
         emit VoteCast(_msgSender(), proposalId, inSupport);
     }
 
@@ -587,43 +585,5 @@ contract DarwinCommunity is IDarwinCommunity, AccessControl, ReentrancyGuard {
 
     function isProposalSignatureRestricted(string calldata signature) external view returns (bool) {
         return _restrictedProposalActionSignature[uint256(keccak256(bytes(signature)))];
-    }
-
-
-    /////////////// LOCK ///////////////
-
-    /**
-     * @notice Function to unlock and withdraw StakedDarwin used to cast votes
-     */
-    function withdrawStakedDarwin() external nonReentrant {
-        uint total;
-        for (uint i = 0; i < lastProposalId; i++) {
-            if (_lockedStakedDarwin[i][msg.sender].lockEnd <= block.timestamp) {
-                total += _lockedStakedDarwin[i][msg.sender].darwinAmount;
-                _lockedStakedDarwin[i][msg.sender].darwinAmount = 0;
-            }
-        }
-        if (total > 0) {
-            stakedDarwin.transfer(msg.sender, total);
-            emit Withdraw(msg.sender, total);
-        }
-    }
-
-    /**
-     * @notice Total amount of unlocked (so withdrawable) StakedDarwin
-     */
-    function freedStakedDarwin(address user) external view returns(uint total) {
-        for (uint i = 0; i < lastProposalId; i++) {
-            if (_lockedStakedDarwin[i][user].lockEnd <= block.timestamp) {
-                total += _lockedStakedDarwin[i][user].darwinAmount;
-            }
-        }
-    }
-
-    /**
-     * @notice Locked StakedDarwins info
-     */
-    function lockedStakedDarwin(uint proposalId, address user) external view returns(LockInfo memory) {
-        return _lockedStakedDarwin[proposalId][user];
     }
 }

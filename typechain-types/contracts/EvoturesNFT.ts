@@ -27,60 +27,25 @@ import type {
   PromiseOrValue,
 } from "../common";
 
-export declare namespace IEvoturesNFT {
-  export type StatsStruct = {
-    no: PromiseOrValue<BigNumberish>;
-    hp: PromiseOrValue<BigNumberish>;
-    attack: PromiseOrValue<BigNumberish>;
-    defense: PromiseOrValue<BigNumberish>;
-    speed: PromiseOrValue<BigNumberish>;
-    special: PromiseOrValue<BigNumberish>;
-    alignment: PromiseOrValue<BigNumberish>;
-    rarity: PromiseOrValue<BigNumberish>;
-    multiplier: PromiseOrValue<BigNumberish>;
-  };
-
-  export type StatsStructOutput = [
-    BigNumber,
-    BigNumber,
-    BigNumber,
-    BigNumber,
-    BigNumber,
-    BigNumber,
-    number,
-    number,
-    number
-  ] & {
-    no: BigNumber;
-    hp: BigNumber;
-    attack: BigNumber;
-    defense: BigNumber;
-    speed: BigNumber;
-    special: BigNumber;
-    alignment: number;
-    rarity: number;
-    multiplier: number;
-  };
-}
-
 export interface EvoturesNFTInterface extends utils.Interface {
   functions: {
     "approve(address,uint256)": FunctionFragment;
     "balanceOf(address)": FunctionFragment;
     "contractURI()": FunctionFragment;
+    "dev()": FunctionFragment;
     "getApproved(uint256)": FunctionFragment;
     "isApprovedForAll(address,address)": FunctionFragment;
     "lastTokenId()": FunctionFragment;
     "mint(address,uint256)": FunctionFragment;
+    "mintAll()": FunctionFragment;
+    "multipliers(uint256)": FunctionFragment;
     "name()": FunctionFragment;
     "ownerOf(uint256)": FunctionFragment;
     "safeTransferFrom(address,address,uint256)": FunctionFragment;
     "safeTransferFrom(address,address,uint256,bytes)": FunctionFragment;
     "setApprovalForAll(address,bool)": FunctionFragment;
-    "stats(uint256)": FunctionFragment;
     "supportsInterface(bytes4)": FunctionFragment;
     "symbol()": FunctionFragment;
-    "ticketsContract()": FunctionFragment;
     "tokenURI(uint256)": FunctionFragment;
     "transferFrom(address,address,uint256)": FunctionFragment;
   };
@@ -90,19 +55,20 @@ export interface EvoturesNFTInterface extends utils.Interface {
       | "approve"
       | "balanceOf"
       | "contractURI"
+      | "dev"
       | "getApproved"
       | "isApprovedForAll"
       | "lastTokenId"
       | "mint"
+      | "mintAll"
+      | "multipliers"
       | "name"
       | "ownerOf"
       | "safeTransferFrom(address,address,uint256)"
       | "safeTransferFrom(address,address,uint256,bytes)"
       | "setApprovalForAll"
-      | "stats"
       | "supportsInterface"
       | "symbol"
-      | "ticketsContract"
       | "tokenURI"
       | "transferFrom"
   ): FunctionFragment;
@@ -119,6 +85,7 @@ export interface EvoturesNFTInterface extends utils.Interface {
     functionFragment: "contractURI",
     values?: undefined
   ): string;
+  encodeFunctionData(functionFragment: "dev", values?: undefined): string;
   encodeFunctionData(
     functionFragment: "getApproved",
     values: [PromiseOrValue<BigNumberish>]
@@ -134,6 +101,11 @@ export interface EvoturesNFTInterface extends utils.Interface {
   encodeFunctionData(
     functionFragment: "mint",
     values: [PromiseOrValue<string>, PromiseOrValue<BigNumberish>]
+  ): string;
+  encodeFunctionData(functionFragment: "mintAll", values?: undefined): string;
+  encodeFunctionData(
+    functionFragment: "multipliers",
+    values: [PromiseOrValue<BigNumberish>]
   ): string;
   encodeFunctionData(functionFragment: "name", values?: undefined): string;
   encodeFunctionData(
@@ -162,18 +134,10 @@ export interface EvoturesNFTInterface extends utils.Interface {
     values: [PromiseOrValue<string>, PromiseOrValue<boolean>]
   ): string;
   encodeFunctionData(
-    functionFragment: "stats",
-    values: [PromiseOrValue<BigNumberish>]
-  ): string;
-  encodeFunctionData(
     functionFragment: "supportsInterface",
     values: [PromiseOrValue<BytesLike>]
   ): string;
   encodeFunctionData(functionFragment: "symbol", values?: undefined): string;
-  encodeFunctionData(
-    functionFragment: "ticketsContract",
-    values?: undefined
-  ): string;
   encodeFunctionData(
     functionFragment: "tokenURI",
     values: [PromiseOrValue<BigNumberish>]
@@ -193,6 +157,7 @@ export interface EvoturesNFTInterface extends utils.Interface {
     functionFragment: "contractURI",
     data: BytesLike
   ): Result;
+  decodeFunctionResult(functionFragment: "dev", data: BytesLike): Result;
   decodeFunctionResult(
     functionFragment: "getApproved",
     data: BytesLike
@@ -206,6 +171,11 @@ export interface EvoturesNFTInterface extends utils.Interface {
     data: BytesLike
   ): Result;
   decodeFunctionResult(functionFragment: "mint", data: BytesLike): Result;
+  decodeFunctionResult(functionFragment: "mintAll", data: BytesLike): Result;
+  decodeFunctionResult(
+    functionFragment: "multipliers",
+    data: BytesLike
+  ): Result;
   decodeFunctionResult(functionFragment: "name", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "ownerOf", data: BytesLike): Result;
   decodeFunctionResult(
@@ -220,16 +190,11 @@ export interface EvoturesNFTInterface extends utils.Interface {
     functionFragment: "setApprovalForAll",
     data: BytesLike
   ): Result;
-  decodeFunctionResult(functionFragment: "stats", data: BytesLike): Result;
   decodeFunctionResult(
     functionFragment: "supportsInterface",
     data: BytesLike
   ): Result;
   decodeFunctionResult(functionFragment: "symbol", data: BytesLike): Result;
-  decodeFunctionResult(
-    functionFragment: "ticketsContract",
-    data: BytesLike
-  ): Result;
   decodeFunctionResult(functionFragment: "tokenURI", data: BytesLike): Result;
   decodeFunctionResult(
     functionFragment: "transferFrom",
@@ -323,6 +288,8 @@ export interface EvoturesNFT extends BaseContract {
 
     contractURI(overrides?: CallOverrides): Promise<[string]>;
 
+    dev(overrides?: CallOverrides): Promise<[string]>;
+
     getApproved(
       tokenId: PromiseOrValue<BigNumberish>,
       overrides?: CallOverrides
@@ -338,9 +305,18 @@ export interface EvoturesNFT extends BaseContract {
 
     mint(
       _to: PromiseOrValue<string>,
-      _ticketChances: PromiseOrValue<BigNumberish>,
+      _multiplier: PromiseOrValue<BigNumberish>,
       overrides?: Overrides & { from?: PromiseOrValue<string> }
     ): Promise<ContractTransaction>;
+
+    mintAll(
+      overrides?: Overrides & { from?: PromiseOrValue<string> }
+    ): Promise<ContractTransaction>;
+
+    multipliers(
+      arg0: PromiseOrValue<BigNumberish>,
+      overrides?: CallOverrides
+    ): Promise<[BigNumber]>;
 
     name(overrides?: CallOverrides): Promise<[string]>;
 
@@ -370,19 +346,12 @@ export interface EvoturesNFT extends BaseContract {
       overrides?: Overrides & { from?: PromiseOrValue<string> }
     ): Promise<ContractTransaction>;
 
-    stats(
-      _tokenId: PromiseOrValue<BigNumberish>,
-      overrides?: CallOverrides
-    ): Promise<[IEvoturesNFT.StatsStructOutput]>;
-
     supportsInterface(
       interfaceId: PromiseOrValue<BytesLike>,
       overrides?: CallOverrides
     ): Promise<[boolean]>;
 
     symbol(overrides?: CallOverrides): Promise<[string]>;
-
-    ticketsContract(overrides?: CallOverrides): Promise<[string]>;
 
     tokenURI(
       tokenId: PromiseOrValue<BigNumberish>,
@@ -410,6 +379,8 @@ export interface EvoturesNFT extends BaseContract {
 
   contractURI(overrides?: CallOverrides): Promise<string>;
 
+  dev(overrides?: CallOverrides): Promise<string>;
+
   getApproved(
     tokenId: PromiseOrValue<BigNumberish>,
     overrides?: CallOverrides
@@ -425,9 +396,18 @@ export interface EvoturesNFT extends BaseContract {
 
   mint(
     _to: PromiseOrValue<string>,
-    _ticketChances: PromiseOrValue<BigNumberish>,
+    _multiplier: PromiseOrValue<BigNumberish>,
     overrides?: Overrides & { from?: PromiseOrValue<string> }
   ): Promise<ContractTransaction>;
+
+  mintAll(
+    overrides?: Overrides & { from?: PromiseOrValue<string> }
+  ): Promise<ContractTransaction>;
+
+  multipliers(
+    arg0: PromiseOrValue<BigNumberish>,
+    overrides?: CallOverrides
+  ): Promise<BigNumber>;
 
   name(overrides?: CallOverrides): Promise<string>;
 
@@ -457,19 +437,12 @@ export interface EvoturesNFT extends BaseContract {
     overrides?: Overrides & { from?: PromiseOrValue<string> }
   ): Promise<ContractTransaction>;
 
-  stats(
-    _tokenId: PromiseOrValue<BigNumberish>,
-    overrides?: CallOverrides
-  ): Promise<IEvoturesNFT.StatsStructOutput>;
-
   supportsInterface(
     interfaceId: PromiseOrValue<BytesLike>,
     overrides?: CallOverrides
   ): Promise<boolean>;
 
   symbol(overrides?: CallOverrides): Promise<string>;
-
-  ticketsContract(overrides?: CallOverrides): Promise<string>;
 
   tokenURI(
     tokenId: PromiseOrValue<BigNumberish>,
@@ -497,6 +470,8 @@ export interface EvoturesNFT extends BaseContract {
 
     contractURI(overrides?: CallOverrides): Promise<string>;
 
+    dev(overrides?: CallOverrides): Promise<string>;
+
     getApproved(
       tokenId: PromiseOrValue<BigNumberish>,
       overrides?: CallOverrides
@@ -512,9 +487,16 @@ export interface EvoturesNFT extends BaseContract {
 
     mint(
       _to: PromiseOrValue<string>,
-      _ticketChances: PromiseOrValue<BigNumberish>,
+      _multiplier: PromiseOrValue<BigNumberish>,
       overrides?: CallOverrides
     ): Promise<void>;
+
+    mintAll(overrides?: CallOverrides): Promise<void>;
+
+    multipliers(
+      arg0: PromiseOrValue<BigNumberish>,
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
 
     name(overrides?: CallOverrides): Promise<string>;
 
@@ -544,19 +526,12 @@ export interface EvoturesNFT extends BaseContract {
       overrides?: CallOverrides
     ): Promise<void>;
 
-    stats(
-      _tokenId: PromiseOrValue<BigNumberish>,
-      overrides?: CallOverrides
-    ): Promise<IEvoturesNFT.StatsStructOutput>;
-
     supportsInterface(
       interfaceId: PromiseOrValue<BytesLike>,
       overrides?: CallOverrides
     ): Promise<boolean>;
 
     symbol(overrides?: CallOverrides): Promise<string>;
-
-    ticketsContract(overrides?: CallOverrides): Promise<string>;
 
     tokenURI(
       tokenId: PromiseOrValue<BigNumberish>,
@@ -620,6 +595,8 @@ export interface EvoturesNFT extends BaseContract {
 
     contractURI(overrides?: CallOverrides): Promise<BigNumber>;
 
+    dev(overrides?: CallOverrides): Promise<BigNumber>;
+
     getApproved(
       tokenId: PromiseOrValue<BigNumberish>,
       overrides?: CallOverrides
@@ -635,8 +612,17 @@ export interface EvoturesNFT extends BaseContract {
 
     mint(
       _to: PromiseOrValue<string>,
-      _ticketChances: PromiseOrValue<BigNumberish>,
+      _multiplier: PromiseOrValue<BigNumberish>,
       overrides?: Overrides & { from?: PromiseOrValue<string> }
+    ): Promise<BigNumber>;
+
+    mintAll(
+      overrides?: Overrides & { from?: PromiseOrValue<string> }
+    ): Promise<BigNumber>;
+
+    multipliers(
+      arg0: PromiseOrValue<BigNumberish>,
+      overrides?: CallOverrides
     ): Promise<BigNumber>;
 
     name(overrides?: CallOverrides): Promise<BigNumber>;
@@ -667,19 +653,12 @@ export interface EvoturesNFT extends BaseContract {
       overrides?: Overrides & { from?: PromiseOrValue<string> }
     ): Promise<BigNumber>;
 
-    stats(
-      _tokenId: PromiseOrValue<BigNumberish>,
-      overrides?: CallOverrides
-    ): Promise<BigNumber>;
-
     supportsInterface(
       interfaceId: PromiseOrValue<BytesLike>,
       overrides?: CallOverrides
     ): Promise<BigNumber>;
 
     symbol(overrides?: CallOverrides): Promise<BigNumber>;
-
-    ticketsContract(overrides?: CallOverrides): Promise<BigNumber>;
 
     tokenURI(
       tokenId: PromiseOrValue<BigNumberish>,
@@ -708,6 +687,8 @@ export interface EvoturesNFT extends BaseContract {
 
     contractURI(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
+    dev(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+
     getApproved(
       tokenId: PromiseOrValue<BigNumberish>,
       overrides?: CallOverrides
@@ -723,8 +704,17 @@ export interface EvoturesNFT extends BaseContract {
 
     mint(
       _to: PromiseOrValue<string>,
-      _ticketChances: PromiseOrValue<BigNumberish>,
+      _multiplier: PromiseOrValue<BigNumberish>,
       overrides?: Overrides & { from?: PromiseOrValue<string> }
+    ): Promise<PopulatedTransaction>;
+
+    mintAll(
+      overrides?: Overrides & { from?: PromiseOrValue<string> }
+    ): Promise<PopulatedTransaction>;
+
+    multipliers(
+      arg0: PromiseOrValue<BigNumberish>,
+      overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 
     name(overrides?: CallOverrides): Promise<PopulatedTransaction>;
@@ -755,19 +745,12 @@ export interface EvoturesNFT extends BaseContract {
       overrides?: Overrides & { from?: PromiseOrValue<string> }
     ): Promise<PopulatedTransaction>;
 
-    stats(
-      _tokenId: PromiseOrValue<BigNumberish>,
-      overrides?: CallOverrides
-    ): Promise<PopulatedTransaction>;
-
     supportsInterface(
       interfaceId: PromiseOrValue<BytesLike>,
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 
     symbol(overrides?: CallOverrides): Promise<PopulatedTransaction>;
-
-    ticketsContract(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
     tokenURI(
       tokenId: PromiseOrValue<BigNumberish>,

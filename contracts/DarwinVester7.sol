@@ -5,11 +5,19 @@ import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/security/ReentrancyGuard.sol";
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 
+import "@openzeppelin/contracts/token/ERC721/ERC721.sol";
+import "@openzeppelin/contracts/token/ERC721/IERC721Receiver.sol";
+
 import {IDarwinVester} from "./interface/IDarwinVester.sol";
 import {IDarwin} from "./interface/IDarwin.sol";
+import "./interface/IMultiplierNFT.sol";
 
 /// @title Darwin Vester (MIGRATED FROM BSC)
-contract DarwinVester7 is IDarwinVester, ReentrancyGuard, Ownable {
+contract DarwinVester7 is IDarwinVester, ReentrancyGuard, Ownable, IERC721Receiver {
+    // Address of the contract of the 300 initially minted Evotures
+    IMultiplierNFT public evotures;
+    // Address of the contract of the randomly minted Evotures
+    IMultiplierNFT public multiplier;
 
     /// @notice Percentage of monthly interest (0.625%, 7.5% in a year)
     uint256 public constant INTEREST = 625;
@@ -33,13 +41,15 @@ contract DarwinVester7 is IDarwinVester, ReentrancyGuard, Ownable {
         _;
     }
 
-    // Constructor takes these args due to migration from BSC
-    constructor(address[] memory _users, UserInfo[] memory _userInfo) {
+    // Constructor takes these args due to migration from BSC, plus evotures address
+    constructor(address[] memory _users, UserInfo[] memory _userInfo, address _evotures, address _multiplier) {
         require(_users.length == _userInfo.length, "Vester7: Invalid _userInfo");
         for (uint i = 0; i < _users.length; i++) {
             userInfo[_users[i]] = _userInfo[i];
         }
         deployer = msg.sender;
+        evotures = IMultiplierNFT(_evotures);
+        multiplier = IMultiplierNFT(_multiplier);
     }
 
     function init(address _darwin) external {
@@ -49,34 +59,60 @@ contract DarwinVester7 is IDarwinVester, ReentrancyGuard, Ownable {
         _isInitialized = true;
     }
 
-    // Withdraws darwin from contract and also claims any minted darwin. If _amount == 0, does not withdraw but just claim.
     function withdraw(uint _amount) external isInitialized nonReentrant {
-        _withdraw(msg.sender, _amount);
-    }
-
-    function _withdraw(address _user, uint _amount) internal {
-        _claim(_user);
+        _claim();
         if (_amount > 0) {
-            uint withdrawable = withdrawableDarwin(_user);
+            uint withdrawable = withdrawableDarwin(msg.sender);
             if (_amount > withdrawable) {
                 revert AmountExceedsWithdrawable();
             }
-            userInfo[_user].vested -= _amount;
-            userInfo[_user].withdrawn += _amount;
-            if (!darwin.transfer(_user, _amount)) {
+            userInfo[msg.sender].vested -= _amount;
+            userInfo[msg.sender].withdrawn += _amount;
+            if (!darwin.transfer(msg.sender, _amount)) {
                 revert TransferFailed();
             }
-            emit Withdraw(_user, _amount);
+            emit Withdraw(msg.sender, _amount);
         }
     }
 
-    function _claim(address _user) internal {
+    function _claim() internal {
         uint claimAmount = claimableDarwin(msg.sender);
         if (claimAmount > 0) {
-            userInfo[_user].claimed += claimAmount;
-            IDarwin(address(darwin)).mint(_user, claimAmount);
-            emit Claim(_user, claimAmount);
+            userInfo[msg.sender].claimed += claimAmount;
+            IDarwin(address(darwin)).mint(msg.sender, claimAmount);
+            emit Claim(msg.sender, claimAmount);
         }
+    }
+
+    function stakeEvoture(uint _tokenId, bool _lootBox) external nonReentrant {
+        require(userInfo[msg.sender].boost == 0, "Vester7: EVOTURE_ALREADY_STAKED");
+
+        _claim();
+
+        IMultiplierNFT nft = evotures;
+        if (_lootBox) {
+            nft = multiplier;
+        }
+        IERC721(address(nft)).safeTransferFrom(msg.sender, address(this), _tokenId);
+        userInfo[msg.sender].boost = nft.multipliers(_tokenId);
+        userInfo[msg.sender].tokenId = _tokenId;
+
+        emit StakeEvoture(msg.sender, _tokenId, userInfo[msg.sender].boost);
+    }
+
+    function withdrawEvoture() external nonReentrant {
+        require(userInfo[msg.sender].boost > 0, "Vester7: NO_EVOTURE_TO_WITHDRAW");
+
+        _claim();
+
+        IMultiplierNFT nft = evotures;
+        if (IERC721(address(nft)).ownerOf(userInfo[msg.sender].tokenId) != address(this)) {
+            nft = multiplier;
+        }
+        IERC721(address(nft)).safeTransferFrom(address(this), msg.sender, userInfo[msg.sender].tokenId);
+        userInfo[msg.sender].boost = 0;
+
+        emit WithdrawEvoture(msg.sender, userInfo[msg.sender].tokenId);
     }
 
     function withdrawableDarwin(address _user) public view returns(uint256 withdrawable) {
@@ -102,11 +138,25 @@ contract DarwinVester7 is IDarwinVester, ReentrancyGuard, Ownable {
             return 0;
         }
         uint claimed = userInfo[_user].claimed;
+        uint boost = userInfo[_user].boost;
         uint start = userInfo[_user].vestTimestamp;
         uint passedMonthsFromStart = (block.timestamp - start) / (30 days);
         if (passedMonthsFromStart > MONTHS) {
             passedMonthsFromStart = MONTHS;
         }
         claimable = (((vested * INTEREST) / 100000) * passedMonthsFromStart) - claimed;
+
+        if (boost > 0) {
+            claimable += ((claimable * boost) / 100);
+        }
+    }
+
+    function onERC721Received(
+        address,
+        address,
+        uint256,
+        bytes calldata
+    ) external returns (bytes4) {
+        return IERC721Receiver.onERC721Received.selector;
     }
 }

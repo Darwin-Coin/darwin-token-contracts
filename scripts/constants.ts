@@ -25,6 +25,8 @@ export const ADDRESSES_ARB = {
     darwin: "",
     community: "",
     drop: "0x0D683F642f5A5055DC31741957e05cccEdf469BA",
+    evotures: "0xCEa708CBCeEc08800b91C885639F25537710d860",
+    tickets: "0xF8F5D4B9B8c29468Fb606FE31C61152A3dF863F8",
     presale: "",
     privateSales: [
         ""

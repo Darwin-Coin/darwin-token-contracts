@@ -6,7 +6,7 @@ interface IDarwinStaking {
         uint lastClaimTimestamp;
         uint lockEnd;
         uint boost; // (1, 5, 10, 25, 50)
-        uint evotureTokenId;
+        uint tokenId;
     }
 
     event Stake(address indexed user, uint indexed amount);
@@ -14,4 +14,6 @@ interface IDarwinStaking {
 
     event StakeEvoture(address indexed user, uint indexed evotureTokenId, uint indexed multiplier);
     event WithdrawEvoture(address indexed user, uint indexed evotureTokenId);
+
+    function getUserInfo(address _user) external view returns (UserInfo memory);
 }

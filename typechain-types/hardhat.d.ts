@@ -109,6 +109,14 @@ declare module "hardhat/types/runtime" {
       signerOrOptions?: ethers.Signer | FactoryOptions
     ): Promise<Contracts.IUniswapV2Factory__factory>;
     getContractFactory(
+      name: "IUniswapV2Router01",
+      signerOrOptions?: ethers.Signer | FactoryOptions
+    ): Promise<Contracts.IUniswapV2Router01__factory>;
+    getContractFactory(
+      name: "IUniswapV2Router02",
+      signerOrOptions?: ethers.Signer | FactoryOptions
+    ): Promise<Contracts.IUniswapV2Router02__factory>;
+    getContractFactory(
       name: "Darwin",
       signerOrOptions?: ethers.Signer | FactoryOptions
     ): Promise<Contracts.Darwin__factory>;
@@ -128,6 +136,10 @@ declare module "hardhat/types/runtime" {
       name: "IDarwin",
       signerOrOptions?: ethers.Signer | FactoryOptions
     ): Promise<Contracts.IDarwin__factory>;
+    getContractFactory(
+      name: "DarwinPresale",
+      signerOrOptions?: ethers.Signer | FactoryOptions
+    ): Promise<Contracts.DarwinPresale__factory>;
     getContractFactory(
       name: "DarwinPrivateSale",
       signerOrOptions?: ethers.Signer | FactoryOptions
@@ -181,6 +193,10 @@ declare module "hardhat/types/runtime" {
       signerOrOptions?: ethers.Signer | FactoryOptions
     ): Promise<Contracts.ILootboxTicket__factory>;
     getContractFactory(
+      name: "IMultiplierNFT",
+      signerOrOptions?: ethers.Signer | FactoryOptions
+    ): Promise<Contracts.IMultiplierNFT__factory>;
+    getContractFactory(
       name: "IStakedDarwin",
       signerOrOptions?: ethers.Signer | FactoryOptions
     ): Promise<Contracts.IStakedDarwin__factory>;
@@ -188,6 +204,10 @@ declare module "hardhat/types/runtime" {
       name: "LootboxTicket",
       signerOrOptions?: ethers.Signer | FactoryOptions
     ): Promise<Contracts.LootboxTicket__factory>;
+    getContractFactory(
+      name: "MultiplierNFT",
+      signerOrOptions?: ethers.Signer | FactoryOptions
+    ): Promise<Contracts.MultiplierNFT__factory>;
     getContractFactory(
       name: "ERC20Upgradeable",
       signerOrOptions?: ethers.Signer | FactoryOptions
@@ -318,6 +338,16 @@ declare module "hardhat/types/runtime" {
       signer?: ethers.Signer
     ): Promise<Contracts.IUniswapV2Factory>;
     getContractAt(
+      name: "IUniswapV2Router01",
+      address: string,
+      signer?: ethers.Signer
+    ): Promise<Contracts.IUniswapV2Router01>;
+    getContractAt(
+      name: "IUniswapV2Router02",
+      address: string,
+      signer?: ethers.Signer
+    ): Promise<Contracts.IUniswapV2Router02>;
+    getContractAt(
       name: "Darwin",
       address: string,
       signer?: ethers.Signer
@@ -342,6 +372,11 @@ declare module "hardhat/types/runtime" {
       address: string,
       signer?: ethers.Signer
     ): Promise<Contracts.IDarwin>;
+    getContractAt(
+      name: "DarwinPresale",
+      address: string,
+      signer?: ethers.Signer
+    ): Promise<Contracts.DarwinPresale>;
     getContractAt(
       name: "DarwinPrivateSale",
       address: string,
@@ -408,6 +443,11 @@ declare module "hardhat/types/runtime" {
       signer?: ethers.Signer
     ): Promise<Contracts.ILootboxTicket>;
     getContractAt(
+      name: "IMultiplierNFT",
+      address: string,
+      signer?: ethers.Signer
+    ): Promise<Contracts.IMultiplierNFT>;
+    getContractAt(
       name: "IStakedDarwin",
       address: string,
       signer?: ethers.Signer
@@ -417,6 +457,11 @@ declare module "hardhat/types/runtime" {
       address: string,
       signer?: ethers.Signer
     ): Promise<Contracts.LootboxTicket>;
+    getContractAt(
+      name: "MultiplierNFT",
+      address: string,
+      signer?: ethers.Signer
+    ): Promise<Contracts.MultiplierNFT>;
     getContractAt(
       name: "ERC20Upgradeable",
       address: string,

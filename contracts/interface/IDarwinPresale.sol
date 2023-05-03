@@ -4,6 +4,18 @@ pragma solidity 0.8.14;
 /// @title Interface for the Darwin Presale
 interface IDarwinPresale {
 
+    enum Status {
+        QUEUED,
+        ACTIVE,
+        SUCCESS
+    }
+
+    struct PresaleStatus {
+        uint256 raisedAmount; // Total BNB raised
+        uint256 soldAmount; // Total Darwin sold
+        uint256 numBuyers; // Number of unique participants
+    }
+
     /// Presale contract is already initialized
     error AlreadyInitialized();
     /// Presale contract is not initialized
@@ -36,6 +48,6 @@ interface IDarwinPresale {
     event Wallet1Set(address indexed wallet1);
     event Wallet2Set(address indexed wallet2);
     event RouterSet(address indexed router);
-    event LpProvided(uint256 indexed lpAmount, uint256 indexed remainingAmount);
+    event PresaleCompleted(uint256 indexed ethAmount, uint256 indexed unsoldDarwinAmount);
     
 }

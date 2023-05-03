@@ -80,5 +80,4 @@ interface IDarwinCommunity {
     event CommunityFundDistributed(uint256 fundWeek, uint256[] candidates, uint256[] tokens);
 
     function setDarwinAddress(address account) external;
-    function lockedStakedDarwin(uint proposalId, address user) external returns (LockInfo memory);
 }

@@ -22,7 +22,7 @@ export interface IDarwinPresaleInterface extends utils.Interface {
   functions: {};
 
   events: {
-    "LpProvided(uint256,uint256)": EventFragment;
+    "PresaleCompleted(uint256,uint256)": EventFragment;
     "PresaleEndDateSet(uint256)": EventFragment;
     "RouterSet(address)": EventFragment;
     "UserDeposit(address,uint256,uint256)": EventFragment;
@@ -30,7 +30,7 @@ export interface IDarwinPresaleInterface extends utils.Interface {
     "Wallet2Set(address)": EventFragment;
   };
 
-  getEvent(nameOrSignatureOrTopic: "LpProvided"): EventFragment;
+  getEvent(nameOrSignatureOrTopic: "PresaleCompleted"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "PresaleEndDateSet"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "RouterSet"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "UserDeposit"): EventFragment;
@@ -38,16 +38,17 @@ export interface IDarwinPresaleInterface extends utils.Interface {
   getEvent(nameOrSignatureOrTopic: "Wallet2Set"): EventFragment;
 }
 
-export interface LpProvidedEventObject {
-  lpAmount: BigNumber;
-  remainingAmount: BigNumber;
+export interface PresaleCompletedEventObject {
+  ethAmount: BigNumber;
+  unsoldDarwinAmount: BigNumber;
 }
-export type LpProvidedEvent = TypedEvent<
+export type PresaleCompletedEvent = TypedEvent<
   [BigNumber, BigNumber],
-  LpProvidedEventObject
+  PresaleCompletedEventObject
 >;
 
-export type LpProvidedEventFilter = TypedEventFilter<LpProvidedEvent>;
+export type PresaleCompletedEventFilter =
+  TypedEventFilter<PresaleCompletedEvent>;
 
 export interface PresaleEndDateSetEventObject {
   endDate: BigNumber;
@@ -124,14 +125,14 @@ export interface IDarwinPresale extends BaseContract {
   callStatic: {};
 
   filters: {
-    "LpProvided(uint256,uint256)"(
-      lpAmount?: PromiseOrValue<BigNumberish> | null,
-      remainingAmount?: PromiseOrValue<BigNumberish> | null
-    ): LpProvidedEventFilter;
-    LpProvided(
-      lpAmount?: PromiseOrValue<BigNumberish> | null,
-      remainingAmount?: PromiseOrValue<BigNumberish> | null
-    ): LpProvidedEventFilter;
+    "PresaleCompleted(uint256,uint256)"(
+      ethAmount?: PromiseOrValue<BigNumberish> | null,
+      unsoldDarwinAmount?: PromiseOrValue<BigNumberish> | null
+    ): PresaleCompletedEventFilter;
+    PresaleCompleted(
+      ethAmount?: PromiseOrValue<BigNumberish> | null,
+      unsoldDarwinAmount?: PromiseOrValue<BigNumberish> | null
+    ): PresaleCompletedEventFilter;
 
     "PresaleEndDateSet(uint256)"(
       endDate?: PromiseOrValue<BigNumberish> | null

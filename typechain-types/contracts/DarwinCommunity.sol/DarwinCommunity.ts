@@ -98,16 +98,6 @@ export declare namespace IDarwinCommunity {
     inSupport: boolean;
     darwinAmount: BigNumber;
   };
-
-  export type LockInfoStruct = {
-    darwinAmount: PromiseOrValue<BigNumberish>;
-    lockEnd: PromiseOrValue<BigNumberish>;
-  };
-
-  export type LockInfoStructOutput = [BigNumber, BigNumber] & {
-    darwinAmount: BigNumber;
-    lockEnd: BigNumber;
-  };
 }
 
 export interface DarwinCommunityInterface extends utils.Interface {
@@ -120,13 +110,12 @@ export interface DarwinCommunityInterface extends utils.Interface {
     "SENIOR_PROPOSER()": FunctionFragment;
     "VOTE_LOCK_PERIOD()": FunctionFragment;
     "cancel(uint256)": FunctionFragment;
-    "castVote(uint256,bool,uint256)": FunctionFragment;
+    "castVote(uint256,bool)": FunctionFragment;
     "darwin()": FunctionFragment;
     "deactivateFundCandidate(uint256)": FunctionFragment;
     "distributeCommunityFund(uint256,uint256[],uint256[],uint256,uint256)": FunctionFragment;
     "emitInitialFundsEvents()": FunctionFragment;
     "execute(uint256)": FunctionFragment;
-    "freedStakedDarwin(address)": FunctionFragment;
     "getActiveFundCandidates()": FunctionFragment;
     "getActiveFundDandidateIds()": FunctionFragment;
     "getProposal(uint256)": FunctionFragment;
@@ -139,7 +128,6 @@ export interface DarwinCommunityInterface extends utils.Interface {
     "isProposalSignatureRestricted(string)": FunctionFragment;
     "lastCommunityFundCandidateId()": FunctionFragment;
     "lastProposalId()": FunctionFragment;
-    "lockedStakedDarwin(uint256,address)": FunctionFragment;
     "maxVotingPeriod()": FunctionFragment;
     "minDarwinTransferToAccess()": FunctionFragment;
     "minVotingDelay()": FunctionFragment;
@@ -162,9 +150,9 @@ export interface DarwinCommunityInterface extends utils.Interface {
     "setProposer(address,bool)": FunctionFragment;
     "setSeniorProposer(address,bool)": FunctionFragment;
     "stakedDarwin()": FunctionFragment;
+    "staking()": FunctionFragment;
     "state(uint256)": FunctionFragment;
     "supportsInterface(bytes4)": FunctionFragment;
-    "withdrawStakedDarwin()": FunctionFragment;
   };
 
   getFunction(
@@ -183,7 +171,6 @@ export interface DarwinCommunityInterface extends utils.Interface {
       | "distributeCommunityFund"
       | "emitInitialFundsEvents"
       | "execute"
-      | "freedStakedDarwin"
       | "getActiveFundCandidates"
       | "getActiveFundDandidateIds"
       | "getProposal"
@@ -196,7 +183,6 @@ export interface DarwinCommunityInterface extends utils.Interface {
       | "isProposalSignatureRestricted"
       | "lastCommunityFundCandidateId"
       | "lastProposalId"
-      | "lockedStakedDarwin"
       | "maxVotingPeriod"
       | "minDarwinTransferToAccess"
       | "minVotingDelay"
@@ -219,9 +205,9 @@ export interface DarwinCommunityInterface extends utils.Interface {
       | "setProposer"
       | "setSeniorProposer"
       | "stakedDarwin"
+      | "staking"
       | "state"
       | "supportsInterface"
-      | "withdrawStakedDarwin"
   ): FunctionFragment;
 
   encodeFunctionData(functionFragment: "ADMIN", values?: undefined): string;
@@ -249,11 +235,7 @@ export interface DarwinCommunityInterface extends utils.Interface {
   ): string;
   encodeFunctionData(
     functionFragment: "castVote",
-    values: [
-      PromiseOrValue<BigNumberish>,
-      PromiseOrValue<boolean>,
-      PromiseOrValue<BigNumberish>
-    ]
+    values: [PromiseOrValue<BigNumberish>, PromiseOrValue<boolean>]
   ): string;
   encodeFunctionData(functionFragment: "darwin", values?: undefined): string;
   encodeFunctionData(
@@ -277,10 +259,6 @@ export interface DarwinCommunityInterface extends utils.Interface {
   encodeFunctionData(
     functionFragment: "execute",
     values: [PromiseOrValue<BigNumberish>]
-  ): string;
-  encodeFunctionData(
-    functionFragment: "freedStakedDarwin",
-    values: [PromiseOrValue<string>]
   ): string;
   encodeFunctionData(
     functionFragment: "getActiveFundCandidates",
@@ -334,10 +312,6 @@ export interface DarwinCommunityInterface extends utils.Interface {
   encodeFunctionData(
     functionFragment: "lastProposalId",
     values?: undefined
-  ): string;
-  encodeFunctionData(
-    functionFragment: "lockedStakedDarwin",
-    values: [PromiseOrValue<BigNumberish>, PromiseOrValue<string>]
   ): string;
   encodeFunctionData(
     functionFragment: "maxVotingPeriod",
@@ -436,6 +410,7 @@ export interface DarwinCommunityInterface extends utils.Interface {
     functionFragment: "stakedDarwin",
     values?: undefined
   ): string;
+  encodeFunctionData(functionFragment: "staking", values?: undefined): string;
   encodeFunctionData(
     functionFragment: "state",
     values: [PromiseOrValue<BigNumberish>]
@@ -443,10 +418,6 @@ export interface DarwinCommunityInterface extends utils.Interface {
   encodeFunctionData(
     functionFragment: "supportsInterface",
     values: [PromiseOrValue<BytesLike>]
-  ): string;
-  encodeFunctionData(
-    functionFragment: "withdrawStakedDarwin",
-    values?: undefined
   ): string;
 
   decodeFunctionResult(functionFragment: "ADMIN", data: BytesLike): Result;
@@ -485,10 +456,6 @@ export interface DarwinCommunityInterface extends utils.Interface {
   ): Result;
   decodeFunctionResult(functionFragment: "execute", data: BytesLike): Result;
   decodeFunctionResult(
-    functionFragment: "freedStakedDarwin",
-    data: BytesLike
-  ): Result;
-  decodeFunctionResult(
     functionFragment: "getActiveFundCandidates",
     data: BytesLike
   ): Result;
@@ -525,10 +492,6 @@ export interface DarwinCommunityInterface extends utils.Interface {
   ): Result;
   decodeFunctionResult(
     functionFragment: "lastProposalId",
-    data: BytesLike
-  ): Result;
-  decodeFunctionResult(
-    functionFragment: "lockedStakedDarwin",
     data: BytesLike
   ): Result;
   decodeFunctionResult(
@@ -607,13 +570,10 @@ export interface DarwinCommunityInterface extends utils.Interface {
     functionFragment: "stakedDarwin",
     data: BytesLike
   ): Result;
+  decodeFunctionResult(functionFragment: "staking", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "state", data: BytesLike): Result;
   decodeFunctionResult(
     functionFragment: "supportsInterface",
-    data: BytesLike
-  ): Result;
-  decodeFunctionResult(
-    functionFragment: "withdrawStakedDarwin",
     data: BytesLike
   ): Result;
 
@@ -872,7 +832,6 @@ export interface DarwinCommunity extends BaseContract {
     castVote(
       proposalId: PromiseOrValue<BigNumberish>,
       inSupport: PromiseOrValue<boolean>,
-      darwinAmount: PromiseOrValue<BigNumberish>,
       overrides?: Overrides & { from?: PromiseOrValue<string> }
     ): Promise<ContractTransaction>;
 
@@ -900,11 +859,6 @@ export interface DarwinCommunity extends BaseContract {
       proposalId: PromiseOrValue<BigNumberish>,
       overrides?: PayableOverrides & { from?: PromiseOrValue<string> }
     ): Promise<ContractTransaction>;
-
-    freedStakedDarwin(
-      user: PromiseOrValue<string>,
-      overrides?: CallOverrides
-    ): Promise<[BigNumber] & { total: BigNumber }>;
 
     getActiveFundCandidates(
       overrides?: CallOverrides
@@ -961,12 +915,6 @@ export interface DarwinCommunity extends BaseContract {
     ): Promise<[BigNumber]>;
 
     lastProposalId(overrides?: CallOverrides): Promise<[BigNumber]>;
-
-    lockedStakedDarwin(
-      proposalId: PromiseOrValue<BigNumberish>,
-      user: PromiseOrValue<string>,
-      overrides?: CallOverrides
-    ): Promise<[IDarwinCommunity.LockInfoStructOutput]>;
 
     maxVotingPeriod(overrides?: CallOverrides): Promise<[BigNumber]>;
 
@@ -1073,6 +1021,8 @@ export interface DarwinCommunity extends BaseContract {
 
     stakedDarwin(overrides?: CallOverrides): Promise<[string]>;
 
+    staking(overrides?: CallOverrides): Promise<[string]>;
+
     state(
       proposalId: PromiseOrValue<BigNumberish>,
       overrides?: CallOverrides
@@ -1082,10 +1032,6 @@ export interface DarwinCommunity extends BaseContract {
       interfaceId: PromiseOrValue<BytesLike>,
       overrides?: CallOverrides
     ): Promise<[boolean]>;
-
-    withdrawStakedDarwin(
-      overrides?: Overrides & { from?: PromiseOrValue<string> }
-    ): Promise<ContractTransaction>;
   };
 
   ADMIN(overrides?: CallOverrides): Promise<string>;
@@ -1110,7 +1056,6 @@ export interface DarwinCommunity extends BaseContract {
   castVote(
     proposalId: PromiseOrValue<BigNumberish>,
     inSupport: PromiseOrValue<boolean>,
-    darwinAmount: PromiseOrValue<BigNumberish>,
     overrides?: Overrides & { from?: PromiseOrValue<string> }
   ): Promise<ContractTransaction>;
 
@@ -1138,11 +1083,6 @@ export interface DarwinCommunity extends BaseContract {
     proposalId: PromiseOrValue<BigNumberish>,
     overrides?: PayableOverrides & { from?: PromiseOrValue<string> }
   ): Promise<ContractTransaction>;
-
-  freedStakedDarwin(
-    user: PromiseOrValue<string>,
-    overrides?: CallOverrides
-  ): Promise<BigNumber>;
 
   getActiveFundCandidates(
     overrides?: CallOverrides
@@ -1195,12 +1135,6 @@ export interface DarwinCommunity extends BaseContract {
   lastCommunityFundCandidateId(overrides?: CallOverrides): Promise<BigNumber>;
 
   lastProposalId(overrides?: CallOverrides): Promise<BigNumber>;
-
-  lockedStakedDarwin(
-    proposalId: PromiseOrValue<BigNumberish>,
-    user: PromiseOrValue<string>,
-    overrides?: CallOverrides
-  ): Promise<IDarwinCommunity.LockInfoStructOutput>;
 
   maxVotingPeriod(overrides?: CallOverrides): Promise<BigNumber>;
 
@@ -1305,6 +1239,8 @@ export interface DarwinCommunity extends BaseContract {
 
   stakedDarwin(overrides?: CallOverrides): Promise<string>;
 
+  staking(overrides?: CallOverrides): Promise<string>;
+
   state(
     proposalId: PromiseOrValue<BigNumberish>,
     overrides?: CallOverrides
@@ -1314,10 +1250,6 @@ export interface DarwinCommunity extends BaseContract {
     interfaceId: PromiseOrValue<BytesLike>,
     overrides?: CallOverrides
   ): Promise<boolean>;
-
-  withdrawStakedDarwin(
-    overrides?: Overrides & { from?: PromiseOrValue<string> }
-  ): Promise<ContractTransaction>;
 
   callStatic: {
     ADMIN(overrides?: CallOverrides): Promise<string>;
@@ -1342,7 +1274,6 @@ export interface DarwinCommunity extends BaseContract {
     castVote(
       proposalId: PromiseOrValue<BigNumberish>,
       inSupport: PromiseOrValue<boolean>,
-      darwinAmount: PromiseOrValue<BigNumberish>,
       overrides?: CallOverrides
     ): Promise<void>;
 
@@ -1368,11 +1299,6 @@ export interface DarwinCommunity extends BaseContract {
       proposalId: PromiseOrValue<BigNumberish>,
       overrides?: CallOverrides
     ): Promise<void>;
-
-    freedStakedDarwin(
-      user: PromiseOrValue<string>,
-      overrides?: CallOverrides
-    ): Promise<BigNumber>;
 
     getActiveFundCandidates(
       overrides?: CallOverrides
@@ -1425,12 +1351,6 @@ export interface DarwinCommunity extends BaseContract {
     lastCommunityFundCandidateId(overrides?: CallOverrides): Promise<BigNumber>;
 
     lastProposalId(overrides?: CallOverrides): Promise<BigNumber>;
-
-    lockedStakedDarwin(
-      proposalId: PromiseOrValue<BigNumberish>,
-      user: PromiseOrValue<string>,
-      overrides?: CallOverrides
-    ): Promise<IDarwinCommunity.LockInfoStructOutput>;
 
     maxVotingPeriod(overrides?: CallOverrides): Promise<BigNumber>;
 
@@ -1537,6 +1457,8 @@ export interface DarwinCommunity extends BaseContract {
 
     stakedDarwin(overrides?: CallOverrides): Promise<string>;
 
+    staking(overrides?: CallOverrides): Promise<string>;
+
     state(
       proposalId: PromiseOrValue<BigNumberish>,
       overrides?: CallOverrides
@@ -1546,8 +1468,6 @@ export interface DarwinCommunity extends BaseContract {
       interfaceId: PromiseOrValue<BytesLike>,
       overrides?: CallOverrides
     ): Promise<boolean>;
-
-    withdrawStakedDarwin(overrides?: CallOverrides): Promise<void>;
   };
 
   filters: {
@@ -1721,7 +1641,6 @@ export interface DarwinCommunity extends BaseContract {
     castVote(
       proposalId: PromiseOrValue<BigNumberish>,
       inSupport: PromiseOrValue<boolean>,
-      darwinAmount: PromiseOrValue<BigNumberish>,
       overrides?: Overrides & { from?: PromiseOrValue<string> }
     ): Promise<BigNumber>;
 
@@ -1748,11 +1667,6 @@ export interface DarwinCommunity extends BaseContract {
     execute(
       proposalId: PromiseOrValue<BigNumberish>,
       overrides?: PayableOverrides & { from?: PromiseOrValue<string> }
-    ): Promise<BigNumber>;
-
-    freedStakedDarwin(
-      user: PromiseOrValue<string>,
-      overrides?: CallOverrides
     ): Promise<BigNumber>;
 
     getActiveFundCandidates(overrides?: CallOverrides): Promise<BigNumber>;
@@ -1804,12 +1718,6 @@ export interface DarwinCommunity extends BaseContract {
     lastCommunityFundCandidateId(overrides?: CallOverrides): Promise<BigNumber>;
 
     lastProposalId(overrides?: CallOverrides): Promise<BigNumber>;
-
-    lockedStakedDarwin(
-      proposalId: PromiseOrValue<BigNumberish>,
-      user: PromiseOrValue<string>,
-      overrides?: CallOverrides
-    ): Promise<BigNumber>;
 
     maxVotingPeriod(overrides?: CallOverrides): Promise<BigNumber>;
 
@@ -1916,6 +1824,8 @@ export interface DarwinCommunity extends BaseContract {
 
     stakedDarwin(overrides?: CallOverrides): Promise<BigNumber>;
 
+    staking(overrides?: CallOverrides): Promise<BigNumber>;
+
     state(
       proposalId: PromiseOrValue<BigNumberish>,
       overrides?: CallOverrides
@@ -1924,10 +1834,6 @@ export interface DarwinCommunity extends BaseContract {
     supportsInterface(
       interfaceId: PromiseOrValue<BytesLike>,
       overrides?: CallOverrides
-    ): Promise<BigNumber>;
-
-    withdrawStakedDarwin(
-      overrides?: Overrides & { from?: PromiseOrValue<string> }
     ): Promise<BigNumber>;
   };
 
@@ -1956,7 +1862,6 @@ export interface DarwinCommunity extends BaseContract {
     castVote(
       proposalId: PromiseOrValue<BigNumberish>,
       inSupport: PromiseOrValue<boolean>,
-      darwinAmount: PromiseOrValue<BigNumberish>,
       overrides?: Overrides & { from?: PromiseOrValue<string> }
     ): Promise<PopulatedTransaction>;
 
@@ -1983,11 +1888,6 @@ export interface DarwinCommunity extends BaseContract {
     execute(
       proposalId: PromiseOrValue<BigNumberish>,
       overrides?: PayableOverrides & { from?: PromiseOrValue<string> }
-    ): Promise<PopulatedTransaction>;
-
-    freedStakedDarwin(
-      user: PromiseOrValue<string>,
-      overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 
     getActiveFundCandidates(
@@ -2045,12 +1945,6 @@ export interface DarwinCommunity extends BaseContract {
     ): Promise<PopulatedTransaction>;
 
     lastProposalId(overrides?: CallOverrides): Promise<PopulatedTransaction>;
-
-    lockedStakedDarwin(
-      proposalId: PromiseOrValue<BigNumberish>,
-      user: PromiseOrValue<string>,
-      overrides?: CallOverrides
-    ): Promise<PopulatedTransaction>;
 
     maxVotingPeriod(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
@@ -2161,6 +2055,8 @@ export interface DarwinCommunity extends BaseContract {
 
     stakedDarwin(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
+    staking(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+
     state(
       proposalId: PromiseOrValue<BigNumberish>,
       overrides?: CallOverrides
@@ -2169,10 +2065,6 @@ export interface DarwinCommunity extends BaseContract {
     supportsInterface(
       interfaceId: PromiseOrValue<BytesLike>,
       overrides?: CallOverrides
-    ): Promise<PopulatedTransaction>;
-
-    withdrawStakedDarwin(
-      overrides?: Overrides & { from?: PromiseOrValue<string> }
     ): Promise<PopulatedTransaction>;
   };
 }

@@ -27,6 +27,27 @@ import type {
   PromiseOrValue,
 } from "../common";
 
+export declare namespace IDarwinStaking {
+  export type UserInfoStruct = {
+    lastClaimTimestamp: PromiseOrValue<BigNumberish>;
+    lockEnd: PromiseOrValue<BigNumberish>;
+    boost: PromiseOrValue<BigNumberish>;
+    tokenId: PromiseOrValue<BigNumberish>;
+  };
+
+  export type UserInfoStructOutput = [
+    BigNumber,
+    BigNumber,
+    BigNumber,
+    BigNumber
+  ] & {
+    lastClaimTimestamp: BigNumber;
+    lockEnd: BigNumber;
+    boost: BigNumber;
+    tokenId: BigNumber;
+  };
+}
+
 export interface DarwinStakingInterface extends utils.Interface {
   functions: {
     "BASE_APR()": FunctionFragment;
@@ -34,9 +55,11 @@ export interface DarwinStakingInterface extends utils.Interface {
     "claimableDarwin(address)": FunctionFragment;
     "darwin()": FunctionFragment;
     "evotures()": FunctionFragment;
+    "getUserInfo(address)": FunctionFragment;
+    "multiplier()": FunctionFragment;
     "onERC721Received(address,address,uint256,bytes)": FunctionFragment;
     "stake(uint256,uint256)": FunctionFragment;
-    "stakeEvoture(uint256)": FunctionFragment;
+    "stakeEvoture(uint256,bool)": FunctionFragment;
     "stakedDarwin()": FunctionFragment;
     "userInfo(address)": FunctionFragment;
     "withdraw(uint256)": FunctionFragment;
@@ -50,6 +73,8 @@ export interface DarwinStakingInterface extends utils.Interface {
       | "claimableDarwin"
       | "darwin"
       | "evotures"
+      | "getUserInfo"
+      | "multiplier"
       | "onERC721Received"
       | "stake"
       | "stakeEvoture"
@@ -71,6 +96,14 @@ export interface DarwinStakingInterface extends utils.Interface {
   encodeFunctionData(functionFragment: "darwin", values?: undefined): string;
   encodeFunctionData(functionFragment: "evotures", values?: undefined): string;
   encodeFunctionData(
+    functionFragment: "getUserInfo",
+    values: [PromiseOrValue<string>]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "multiplier",
+    values?: undefined
+  ): string;
+  encodeFunctionData(
     functionFragment: "onERC721Received",
     values: [
       PromiseOrValue<string>,
@@ -85,7 +118,7 @@ export interface DarwinStakingInterface extends utils.Interface {
   ): string;
   encodeFunctionData(
     functionFragment: "stakeEvoture",
-    values: [PromiseOrValue<BigNumberish>]
+    values: [PromiseOrValue<BigNumberish>, PromiseOrValue<boolean>]
   ): string;
   encodeFunctionData(
     functionFragment: "stakedDarwin",
@@ -115,6 +148,11 @@ export interface DarwinStakingInterface extends utils.Interface {
   ): Result;
   decodeFunctionResult(functionFragment: "darwin", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "evotures", data: BytesLike): Result;
+  decodeFunctionResult(
+    functionFragment: "getUserInfo",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(functionFragment: "multiplier", data: BytesLike): Result;
   decodeFunctionResult(
     functionFragment: "onERC721Received",
     data: BytesLike
@@ -231,6 +269,13 @@ export interface DarwinStaking extends BaseContract {
 
     evotures(overrides?: CallOverrides): Promise<[string]>;
 
+    getUserInfo(
+      _user: PromiseOrValue<string>,
+      overrides?: CallOverrides
+    ): Promise<[IDarwinStaking.UserInfoStructOutput]>;
+
+    multiplier(overrides?: CallOverrides): Promise<[string]>;
+
     onERC721Received(
       arg0: PromiseOrValue<string>,
       arg1: PromiseOrValue<string>,
@@ -246,7 +291,8 @@ export interface DarwinStaking extends BaseContract {
     ): Promise<ContractTransaction>;
 
     stakeEvoture(
-      _evotureTokenId: PromiseOrValue<BigNumberish>,
+      _tokenId: PromiseOrValue<BigNumberish>,
+      _lootBox: PromiseOrValue<boolean>,
       overrides?: Overrides & { from?: PromiseOrValue<string> }
     ): Promise<ContractTransaction>;
 
@@ -260,7 +306,7 @@ export interface DarwinStaking extends BaseContract {
         lastClaimTimestamp: BigNumber;
         lockEnd: BigNumber;
         boost: BigNumber;
-        evotureTokenId: BigNumber;
+        tokenId: BigNumber;
       }
     >;
 
@@ -287,6 +333,13 @@ export interface DarwinStaking extends BaseContract {
 
   evotures(overrides?: CallOverrides): Promise<string>;
 
+  getUserInfo(
+    _user: PromiseOrValue<string>,
+    overrides?: CallOverrides
+  ): Promise<IDarwinStaking.UserInfoStructOutput>;
+
+  multiplier(overrides?: CallOverrides): Promise<string>;
+
   onERC721Received(
     arg0: PromiseOrValue<string>,
     arg1: PromiseOrValue<string>,
@@ -302,7 +355,8 @@ export interface DarwinStaking extends BaseContract {
   ): Promise<ContractTransaction>;
 
   stakeEvoture(
-    _evotureTokenId: PromiseOrValue<BigNumberish>,
+    _tokenId: PromiseOrValue<BigNumberish>,
+    _lootBox: PromiseOrValue<boolean>,
     overrides?: Overrides & { from?: PromiseOrValue<string> }
   ): Promise<ContractTransaction>;
 
@@ -316,7 +370,7 @@ export interface DarwinStaking extends BaseContract {
       lastClaimTimestamp: BigNumber;
       lockEnd: BigNumber;
       boost: BigNumber;
-      evotureTokenId: BigNumber;
+      tokenId: BigNumber;
     }
   >;
 
@@ -343,6 +397,13 @@ export interface DarwinStaking extends BaseContract {
 
     evotures(overrides?: CallOverrides): Promise<string>;
 
+    getUserInfo(
+      _user: PromiseOrValue<string>,
+      overrides?: CallOverrides
+    ): Promise<IDarwinStaking.UserInfoStructOutput>;
+
+    multiplier(overrides?: CallOverrides): Promise<string>;
+
     onERC721Received(
       arg0: PromiseOrValue<string>,
       arg1: PromiseOrValue<string>,
@@ -358,7 +419,8 @@ export interface DarwinStaking extends BaseContract {
     ): Promise<void>;
 
     stakeEvoture(
-      _evotureTokenId: PromiseOrValue<BigNumberish>,
+      _tokenId: PromiseOrValue<BigNumberish>,
+      _lootBox: PromiseOrValue<boolean>,
       overrides?: CallOverrides
     ): Promise<void>;
 
@@ -372,7 +434,7 @@ export interface DarwinStaking extends BaseContract {
         lastClaimTimestamp: BigNumber;
         lockEnd: BigNumber;
         boost: BigNumber;
-        evotureTokenId: BigNumber;
+        tokenId: BigNumber;
       }
     >;
 
@@ -440,6 +502,13 @@ export interface DarwinStaking extends BaseContract {
 
     evotures(overrides?: CallOverrides): Promise<BigNumber>;
 
+    getUserInfo(
+      _user: PromiseOrValue<string>,
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
+
+    multiplier(overrides?: CallOverrides): Promise<BigNumber>;
+
     onERC721Received(
       arg0: PromiseOrValue<string>,
       arg1: PromiseOrValue<string>,
@@ -455,7 +524,8 @@ export interface DarwinStaking extends BaseContract {
     ): Promise<BigNumber>;
 
     stakeEvoture(
-      _evotureTokenId: PromiseOrValue<BigNumberish>,
+      _tokenId: PromiseOrValue<BigNumberish>,
+      _lootBox: PromiseOrValue<boolean>,
       overrides?: Overrides & { from?: PromiseOrValue<string> }
     ): Promise<BigNumber>;
 
@@ -490,6 +560,13 @@ export interface DarwinStaking extends BaseContract {
 
     evotures(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
+    getUserInfo(
+      _user: PromiseOrValue<string>,
+      overrides?: CallOverrides
+    ): Promise<PopulatedTransaction>;
+
+    multiplier(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+
     onERC721Received(
       arg0: PromiseOrValue<string>,
       arg1: PromiseOrValue<string>,
@@ -505,7 +582,8 @@ export interface DarwinStaking extends BaseContract {
     ): Promise<PopulatedTransaction>;
 
     stakeEvoture(
-      _evotureTokenId: PromiseOrValue<BigNumberish>,
+      _tokenId: PromiseOrValue<BigNumberish>,
+      _lootBox: PromiseOrValue<boolean>,
       overrides?: Overrides & { from?: PromiseOrValue<string> }
     ): Promise<PopulatedTransaction>;
 

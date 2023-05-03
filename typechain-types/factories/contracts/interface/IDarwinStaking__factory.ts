@@ -98,6 +98,47 @@ const _abi = [
     name: "WithdrawEvoture",
     type: "event",
   },
+  {
+    inputs: [
+      {
+        internalType: "address",
+        name: "_user",
+        type: "address",
+      },
+    ],
+    name: "getUserInfo",
+    outputs: [
+      {
+        components: [
+          {
+            internalType: "uint256",
+            name: "lastClaimTimestamp",
+            type: "uint256",
+          },
+          {
+            internalType: "uint256",
+            name: "lockEnd",
+            type: "uint256",
+          },
+          {
+            internalType: "uint256",
+            name: "boost",
+            type: "uint256",
+          },
+          {
+            internalType: "uint256",
+            name: "tokenId",
+            type: "uint256",
+          },
+        ],
+        internalType: "struct IDarwinStaking.UserInfo",
+        name: "",
+        type: "tuple",
+      },
+    ],
+    stateMutability: "view",
+    type: "function",
+  },
 ] as const;
 
 export class IDarwinStaking__factory {

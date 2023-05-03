@@ -207,8 +207,8 @@ export interface DarwinPrivateSaleInterface extends utils.Interface {
   ): Result;
 
   events: {
-    "LpProvided(uint256,uint256)": EventFragment;
     "OwnershipTransferred(address,address)": EventFragment;
+    "PresaleCompleted(uint256,uint256)": EventFragment;
     "PresaleEndDateSet(uint256)": EventFragment;
     "RouterSet(address)": EventFragment;
     "UserDeposit(address,uint256,uint256)": EventFragment;
@@ -216,25 +216,14 @@ export interface DarwinPrivateSaleInterface extends utils.Interface {
     "Wallet2Set(address)": EventFragment;
   };
 
-  getEvent(nameOrSignatureOrTopic: "LpProvided"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "OwnershipTransferred"): EventFragment;
+  getEvent(nameOrSignatureOrTopic: "PresaleCompleted"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "PresaleEndDateSet"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "RouterSet"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "UserDeposit"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "Wallet1Set"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "Wallet2Set"): EventFragment;
 }
-
-export interface LpProvidedEventObject {
-  lpAmount: BigNumber;
-  remainingAmount: BigNumber;
-}
-export type LpProvidedEvent = TypedEvent<
-  [BigNumber, BigNumber],
-  LpProvidedEventObject
->;
-
-export type LpProvidedEventFilter = TypedEventFilter<LpProvidedEvent>;
 
 export interface OwnershipTransferredEventObject {
   previousOwner: string;
@@ -247,6 +236,18 @@ export type OwnershipTransferredEvent = TypedEvent<
 
 export type OwnershipTransferredEventFilter =
   TypedEventFilter<OwnershipTransferredEvent>;
+
+export interface PresaleCompletedEventObject {
+  ethAmount: BigNumber;
+  unsoldDarwinAmount: BigNumber;
+}
+export type PresaleCompletedEvent = TypedEvent<
+  [BigNumber, BigNumber],
+  PresaleCompletedEventObject
+>;
+
+export type PresaleCompletedEventFilter =
+  TypedEventFilter<PresaleCompletedEvent>;
 
 export interface PresaleEndDateSetEventObject {
   endDate: BigNumber;
@@ -558,15 +559,6 @@ export interface DarwinPrivateSale extends BaseContract {
   };
 
   filters: {
-    "LpProvided(uint256,uint256)"(
-      lpAmount?: PromiseOrValue<BigNumberish> | null,
-      remainingAmount?: PromiseOrValue<BigNumberish> | null
-    ): LpProvidedEventFilter;
-    LpProvided(
-      lpAmount?: PromiseOrValue<BigNumberish> | null,
-      remainingAmount?: PromiseOrValue<BigNumberish> | null
-    ): LpProvidedEventFilter;
-
     "OwnershipTransferred(address,address)"(
       previousOwner?: PromiseOrValue<string> | null,
       newOwner?: PromiseOrValue<string> | null
@@ -575,6 +567,15 @@ export interface DarwinPrivateSale extends BaseContract {
       previousOwner?: PromiseOrValue<string> | null,
       newOwner?: PromiseOrValue<string> | null
     ): OwnershipTransferredEventFilter;
+
+    "PresaleCompleted(uint256,uint256)"(
+      ethAmount?: PromiseOrValue<BigNumberish> | null,
+      unsoldDarwinAmount?: PromiseOrValue<BigNumberish> | null
+    ): PresaleCompletedEventFilter;
+    PresaleCompleted(
+      ethAmount?: PromiseOrValue<BigNumberish> | null,
+      unsoldDarwinAmount?: PromiseOrValue<BigNumberish> | null
+    ): PresaleCompletedEventFilter;
 
     "PresaleEndDateSet(uint256)"(
       endDate?: PromiseOrValue<BigNumberish> | null

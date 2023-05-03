@@ -27,41 +27,18 @@ import type {
   PromiseOrValue,
 } from "../../common";
 
-export declare namespace IDarwinCommunity {
-  export type LockInfoStruct = {
-    darwinAmount: PromiseOrValue<BigNumberish>;
-    lockEnd: PromiseOrValue<BigNumberish>;
-  };
-
-  export type LockInfoStructOutput = [BigNumber, BigNumber] & {
-    darwinAmount: BigNumber;
-    lockEnd: BigNumber;
-  };
-}
-
 export interface IDarwinCommunityInterface extends utils.Interface {
   functions: {
-    "lockedStakedDarwin(uint256,address)": FunctionFragment;
     "setDarwinAddress(address)": FunctionFragment;
   };
 
-  getFunction(
-    nameOrSignatureOrTopic: "lockedStakedDarwin" | "setDarwinAddress"
-  ): FunctionFragment;
+  getFunction(nameOrSignatureOrTopic: "setDarwinAddress"): FunctionFragment;
 
-  encodeFunctionData(
-    functionFragment: "lockedStakedDarwin",
-    values: [PromiseOrValue<BigNumberish>, PromiseOrValue<string>]
-  ): string;
   encodeFunctionData(
     functionFragment: "setDarwinAddress",
     values: [PromiseOrValue<string>]
   ): string;
 
-  decodeFunctionResult(
-    functionFragment: "lockedStakedDarwin",
-    data: BytesLike
-  ): Result;
   decodeFunctionResult(
     functionFragment: "setDarwinAddress",
     data: BytesLike
@@ -257,23 +234,11 @@ export interface IDarwinCommunity extends BaseContract {
   removeListener: OnEvent<this>;
 
   functions: {
-    lockedStakedDarwin(
-      proposalId: PromiseOrValue<BigNumberish>,
-      user: PromiseOrValue<string>,
-      overrides?: Overrides & { from?: PromiseOrValue<string> }
-    ): Promise<ContractTransaction>;
-
     setDarwinAddress(
       account: PromiseOrValue<string>,
       overrides?: Overrides & { from?: PromiseOrValue<string> }
     ): Promise<ContractTransaction>;
   };
-
-  lockedStakedDarwin(
-    proposalId: PromiseOrValue<BigNumberish>,
-    user: PromiseOrValue<string>,
-    overrides?: Overrides & { from?: PromiseOrValue<string> }
-  ): Promise<ContractTransaction>;
 
   setDarwinAddress(
     account: PromiseOrValue<string>,
@@ -281,12 +246,6 @@ export interface IDarwinCommunity extends BaseContract {
   ): Promise<ContractTransaction>;
 
   callStatic: {
-    lockedStakedDarwin(
-      proposalId: PromiseOrValue<BigNumberish>,
-      user: PromiseOrValue<string>,
-      overrides?: CallOverrides
-    ): Promise<IDarwinCommunity.LockInfoStructOutput>;
-
     setDarwinAddress(
       account: PromiseOrValue<string>,
       overrides?: CallOverrides
@@ -409,12 +368,6 @@ export interface IDarwinCommunity extends BaseContract {
   };
 
   estimateGas: {
-    lockedStakedDarwin(
-      proposalId: PromiseOrValue<BigNumberish>,
-      user: PromiseOrValue<string>,
-      overrides?: Overrides & { from?: PromiseOrValue<string> }
-    ): Promise<BigNumber>;
-
     setDarwinAddress(
       account: PromiseOrValue<string>,
       overrides?: Overrides & { from?: PromiseOrValue<string> }
@@ -422,12 +375,6 @@ export interface IDarwinCommunity extends BaseContract {
   };
 
   populateTransaction: {
-    lockedStakedDarwin(
-      proposalId: PromiseOrValue<BigNumberish>,
-      user: PromiseOrValue<string>,
-      overrides?: Overrides & { from?: PromiseOrValue<string> }
-    ): Promise<PopulatedTransaction>;
-
     setDarwinAddress(
       account: PromiseOrValue<string>,
       overrides?: Overrides & { from?: PromiseOrValue<string> }

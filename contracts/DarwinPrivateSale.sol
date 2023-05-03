@@ -33,18 +33,6 @@ contract DarwinPrivateSale is IDarwinPresale, ReentrancyGuard, Ownable {
 
     address public wallet1;
 
-    enum Status {
-        QUEUED,
-        ACTIVE,
-        SUCCESS
-    }
-
-    struct PresaleStatus {
-        uint256 raisedAmount; // Total BNB raised
-        uint256 soldAmount; // Total Darwin sold
-        uint256 numBuyers; // Number of unique participants
-    }
-
     /// @notice Mapping of total BNB deposited by user
     mapping(address => uint256) public userDeposits;
 

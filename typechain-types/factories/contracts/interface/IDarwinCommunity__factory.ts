@@ -264,42 +264,6 @@ const _abi = [
   {
     inputs: [
       {
-        internalType: "uint256",
-        name: "proposalId",
-        type: "uint256",
-      },
-      {
-        internalType: "address",
-        name: "user",
-        type: "address",
-      },
-    ],
-    name: "lockedStakedDarwin",
-    outputs: [
-      {
-        components: [
-          {
-            internalType: "uint256",
-            name: "darwinAmount",
-            type: "uint256",
-          },
-          {
-            internalType: "uint256",
-            name: "lockEnd",
-            type: "uint256",
-          },
-        ],
-        internalType: "struct IDarwinCommunity.LockInfo",
-        name: "",
-        type: "tuple",
-      },
-    ],
-    stateMutability: "nonpayable",
-    type: "function",
-  },
-  {
-    inputs: [
-      {
         internalType: "address",
         name: "account",
         type: "address",

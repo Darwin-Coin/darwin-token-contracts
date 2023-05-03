@@ -31,17 +31,17 @@ export interface LootboxTicketInterface extends utils.Interface {
   functions: {
     "approve(address,uint256)": FunctionFragment;
     "balanceOf(address)": FunctionFragment;
+    "darwin()": FunctionFragment;
     "dev()": FunctionFragment;
-    "evoturesContract()": FunctionFragment;
     "getApproved(uint256)": FunctionFragment;
-    "initialize(address)": FunctionFragment;
+    "initialize(address,address)": FunctionFragment;
     "isApprovedForAll(address,address)": FunctionFragment;
     "lastTicketId()": FunctionFragment;
-    "mint(address,uint8)": FunctionFragment;
+    "mint(address)": FunctionFragment;
+    "multiplierNFT()": FunctionFragment;
     "name()": FunctionFragment;
     "openLootBox(uint256)": FunctionFragment;
     "ownerOf(uint256)": FunctionFragment;
-    "rarity(uint256)": FunctionFragment;
     "safeTransferFrom(address,address,uint256)": FunctionFragment;
     "safeTransferFrom(address,address,uint256,bytes)": FunctionFragment;
     "setApprovalForAll(address,bool)": FunctionFragment;
@@ -55,17 +55,17 @@ export interface LootboxTicketInterface extends utils.Interface {
     nameOrSignatureOrTopic:
       | "approve"
       | "balanceOf"
+      | "darwin"
       | "dev"
-      | "evoturesContract"
       | "getApproved"
       | "initialize"
       | "isApprovedForAll"
       | "lastTicketId"
       | "mint"
+      | "multiplierNFT"
       | "name"
       | "openLootBox"
       | "ownerOf"
-      | "rarity"
       | "safeTransferFrom(address,address,uint256)"
       | "safeTransferFrom(address,address,uint256,bytes)"
       | "setApprovalForAll"
@@ -83,18 +83,15 @@ export interface LootboxTicketInterface extends utils.Interface {
     functionFragment: "balanceOf",
     values: [PromiseOrValue<string>]
   ): string;
+  encodeFunctionData(functionFragment: "darwin", values?: undefined): string;
   encodeFunctionData(functionFragment: "dev", values?: undefined): string;
-  encodeFunctionData(
-    functionFragment: "evoturesContract",
-    values?: undefined
-  ): string;
   encodeFunctionData(
     functionFragment: "getApproved",
     values: [PromiseOrValue<BigNumberish>]
   ): string;
   encodeFunctionData(
     functionFragment: "initialize",
-    values: [PromiseOrValue<string>]
+    values: [PromiseOrValue<string>, PromiseOrValue<string>]
   ): string;
   encodeFunctionData(
     functionFragment: "isApprovedForAll",
@@ -106,7 +103,11 @@ export interface LootboxTicketInterface extends utils.Interface {
   ): string;
   encodeFunctionData(
     functionFragment: "mint",
-    values: [PromiseOrValue<string>, PromiseOrValue<BigNumberish>]
+    values: [PromiseOrValue<string>]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "multiplierNFT",
+    values?: undefined
   ): string;
   encodeFunctionData(functionFragment: "name", values?: undefined): string;
   encodeFunctionData(
@@ -115,10 +116,6 @@ export interface LootboxTicketInterface extends utils.Interface {
   ): string;
   encodeFunctionData(
     functionFragment: "ownerOf",
-    values: [PromiseOrValue<BigNumberish>]
-  ): string;
-  encodeFunctionData(
-    functionFragment: "rarity",
     values: [PromiseOrValue<BigNumberish>]
   ): string;
   encodeFunctionData(
@@ -162,11 +159,8 @@ export interface LootboxTicketInterface extends utils.Interface {
 
   decodeFunctionResult(functionFragment: "approve", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "balanceOf", data: BytesLike): Result;
+  decodeFunctionResult(functionFragment: "darwin", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "dev", data: BytesLike): Result;
-  decodeFunctionResult(
-    functionFragment: "evoturesContract",
-    data: BytesLike
-  ): Result;
   decodeFunctionResult(
     functionFragment: "getApproved",
     data: BytesLike
@@ -181,13 +175,16 @@ export interface LootboxTicketInterface extends utils.Interface {
     data: BytesLike
   ): Result;
   decodeFunctionResult(functionFragment: "mint", data: BytesLike): Result;
+  decodeFunctionResult(
+    functionFragment: "multiplierNFT",
+    data: BytesLike
+  ): Result;
   decodeFunctionResult(functionFragment: "name", data: BytesLike): Result;
   decodeFunctionResult(
     functionFragment: "openLootBox",
     data: BytesLike
   ): Result;
   decodeFunctionResult(functionFragment: "ownerOf", data: BytesLike): Result;
-  decodeFunctionResult(functionFragment: "rarity", data: BytesLike): Result;
   decodeFunctionResult(
     functionFragment: "safeTransferFrom(address,address,uint256)",
     data: BytesLike
@@ -296,9 +293,9 @@ export interface LootboxTicket extends BaseContract {
       overrides?: CallOverrides
     ): Promise<[BigNumber]>;
 
-    dev(overrides?: CallOverrides): Promise<[string]>;
+    darwin(overrides?: CallOverrides): Promise<[string]>;
 
-    evoturesContract(overrides?: CallOverrides): Promise<[string]>;
+    dev(overrides?: CallOverrides): Promise<[string]>;
 
     getApproved(
       tokenId: PromiseOrValue<BigNumberish>,
@@ -307,6 +304,7 @@ export interface LootboxTicket extends BaseContract {
 
     initialize(
       _dev: PromiseOrValue<string>,
+      _darwin: PromiseOrValue<string>,
       overrides?: Overrides & { from?: PromiseOrValue<string> }
     ): Promise<ContractTransaction>;
 
@@ -320,9 +318,10 @@ export interface LootboxTicket extends BaseContract {
 
     mint(
       _to: PromiseOrValue<string>,
-      _rarity: PromiseOrValue<BigNumberish>,
       overrides?: Overrides & { from?: PromiseOrValue<string> }
     ): Promise<ContractTransaction>;
+
+    multiplierNFT(overrides?: CallOverrides): Promise<[string]>;
 
     name(overrides?: CallOverrides): Promise<[string]>;
 
@@ -335,11 +334,6 @@ export interface LootboxTicket extends BaseContract {
       tokenId: PromiseOrValue<BigNumberish>,
       overrides?: CallOverrides
     ): Promise<[string]>;
-
-    rarity(
-      arg0: PromiseOrValue<BigNumberish>,
-      overrides?: CallOverrides
-    ): Promise<[number]>;
 
     "safeTransferFrom(address,address,uint256)"(
       from: PromiseOrValue<string>,
@@ -393,9 +387,9 @@ export interface LootboxTicket extends BaseContract {
     overrides?: CallOverrides
   ): Promise<BigNumber>;
 
-  dev(overrides?: CallOverrides): Promise<string>;
+  darwin(overrides?: CallOverrides): Promise<string>;
 
-  evoturesContract(overrides?: CallOverrides): Promise<string>;
+  dev(overrides?: CallOverrides): Promise<string>;
 
   getApproved(
     tokenId: PromiseOrValue<BigNumberish>,
@@ -404,6 +398,7 @@ export interface LootboxTicket extends BaseContract {
 
   initialize(
     _dev: PromiseOrValue<string>,
+    _darwin: PromiseOrValue<string>,
     overrides?: Overrides & { from?: PromiseOrValue<string> }
   ): Promise<ContractTransaction>;
 
@@ -417,9 +412,10 @@ export interface LootboxTicket extends BaseContract {
 
   mint(
     _to: PromiseOrValue<string>,
-    _rarity: PromiseOrValue<BigNumberish>,
     overrides?: Overrides & { from?: PromiseOrValue<string> }
   ): Promise<ContractTransaction>;
+
+  multiplierNFT(overrides?: CallOverrides): Promise<string>;
 
   name(overrides?: CallOverrides): Promise<string>;
 
@@ -432,11 +428,6 @@ export interface LootboxTicket extends BaseContract {
     tokenId: PromiseOrValue<BigNumberish>,
     overrides?: CallOverrides
   ): Promise<string>;
-
-  rarity(
-    arg0: PromiseOrValue<BigNumberish>,
-    overrides?: CallOverrides
-  ): Promise<number>;
 
   "safeTransferFrom(address,address,uint256)"(
     from: PromiseOrValue<string>,
@@ -490,9 +481,9 @@ export interface LootboxTicket extends BaseContract {
       overrides?: CallOverrides
     ): Promise<BigNumber>;
 
-    dev(overrides?: CallOverrides): Promise<string>;
+    darwin(overrides?: CallOverrides): Promise<string>;
 
-    evoturesContract(overrides?: CallOverrides): Promise<string>;
+    dev(overrides?: CallOverrides): Promise<string>;
 
     getApproved(
       tokenId: PromiseOrValue<BigNumberish>,
@@ -501,6 +492,7 @@ export interface LootboxTicket extends BaseContract {
 
     initialize(
       _dev: PromiseOrValue<string>,
+      _darwin: PromiseOrValue<string>,
       overrides?: CallOverrides
     ): Promise<void>;
 
@@ -512,11 +504,9 @@ export interface LootboxTicket extends BaseContract {
 
     lastTicketId(overrides?: CallOverrides): Promise<BigNumber>;
 
-    mint(
-      _to: PromiseOrValue<string>,
-      _rarity: PromiseOrValue<BigNumberish>,
-      overrides?: CallOverrides
-    ): Promise<void>;
+    mint(_to: PromiseOrValue<string>, overrides?: CallOverrides): Promise<void>;
+
+    multiplierNFT(overrides?: CallOverrides): Promise<string>;
 
     name(overrides?: CallOverrides): Promise<string>;
 
@@ -529,11 +519,6 @@ export interface LootboxTicket extends BaseContract {
       tokenId: PromiseOrValue<BigNumberish>,
       overrides?: CallOverrides
     ): Promise<string>;
-
-    rarity(
-      arg0: PromiseOrValue<BigNumberish>,
-      overrides?: CallOverrides
-    ): Promise<number>;
 
     "safeTransferFrom(address,address,uint256)"(
       from: PromiseOrValue<string>,
@@ -623,9 +608,9 @@ export interface LootboxTicket extends BaseContract {
       overrides?: CallOverrides
     ): Promise<BigNumber>;
 
-    dev(overrides?: CallOverrides): Promise<BigNumber>;
+    darwin(overrides?: CallOverrides): Promise<BigNumber>;
 
-    evoturesContract(overrides?: CallOverrides): Promise<BigNumber>;
+    dev(overrides?: CallOverrides): Promise<BigNumber>;
 
     getApproved(
       tokenId: PromiseOrValue<BigNumberish>,
@@ -634,6 +619,7 @@ export interface LootboxTicket extends BaseContract {
 
     initialize(
       _dev: PromiseOrValue<string>,
+      _darwin: PromiseOrValue<string>,
       overrides?: Overrides & { from?: PromiseOrValue<string> }
     ): Promise<BigNumber>;
 
@@ -647,9 +633,10 @@ export interface LootboxTicket extends BaseContract {
 
     mint(
       _to: PromiseOrValue<string>,
-      _rarity: PromiseOrValue<BigNumberish>,
       overrides?: Overrides & { from?: PromiseOrValue<string> }
     ): Promise<BigNumber>;
+
+    multiplierNFT(overrides?: CallOverrides): Promise<BigNumber>;
 
     name(overrides?: CallOverrides): Promise<BigNumber>;
 
@@ -660,11 +647,6 @@ export interface LootboxTicket extends BaseContract {
 
     ownerOf(
       tokenId: PromiseOrValue<BigNumberish>,
-      overrides?: CallOverrides
-    ): Promise<BigNumber>;
-
-    rarity(
-      arg0: PromiseOrValue<BigNumberish>,
       overrides?: CallOverrides
     ): Promise<BigNumber>;
 
@@ -721,9 +703,9 @@ export interface LootboxTicket extends BaseContract {
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 
-    dev(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+    darwin(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
-    evoturesContract(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+    dev(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
     getApproved(
       tokenId: PromiseOrValue<BigNumberish>,
@@ -732,6 +714,7 @@ export interface LootboxTicket extends BaseContract {
 
     initialize(
       _dev: PromiseOrValue<string>,
+      _darwin: PromiseOrValue<string>,
       overrides?: Overrides & { from?: PromiseOrValue<string> }
     ): Promise<PopulatedTransaction>;
 
@@ -745,9 +728,10 @@ export interface LootboxTicket extends BaseContract {
 
     mint(
       _to: PromiseOrValue<string>,
-      _rarity: PromiseOrValue<BigNumberish>,
       overrides?: Overrides & { from?: PromiseOrValue<string> }
     ): Promise<PopulatedTransaction>;
+
+    multiplierNFT(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
     name(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
@@ -758,11 +742,6 @@ export interface LootboxTicket extends BaseContract {
 
     ownerOf(
       tokenId: PromiseOrValue<BigNumberish>,
-      overrides?: CallOverrides
-    ): Promise<PopulatedTransaction>;
-
-    rarity(
-      arg0: PromiseOrValue<BigNumberish>,
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 

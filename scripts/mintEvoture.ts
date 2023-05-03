@@ -1,7 +1,7 @@
 import * as hardhat from "hardhat";
 import { ethers } from "hardhat";
 import { EvoturesNFT, LootboxTicket } from "../typechain-types/contracts";
-import { ADDRESSES_ARB_GOERLI } from "./constants";
+import { ADDRESSES_ARB_GOERLI, ADDRESSES_ARB } from "./constants";
 
 enum Rarity {
     COMMON,
@@ -17,8 +17,10 @@ enum Alignment {
 }
 
 async function main() {
-  const EVOTURES = ADDRESSES_ARB_GOERLI.evotures;
-  const TICKETS = ADDRESSES_ARB_GOERLI.tickets;
+  const TEST = false;
+  const ADDRESSES = TEST ? ADDRESSES_ARB_GOERLI : ADDRESSES_ARB;
+  const EVOTURES = ADDRESSES.evotures;
+  const TICKETS = ADDRESSES.tickets;
 
   const [owner] = await ethers.getSigners();
 

@@ -71,17 +71,17 @@ const _abi = [
       {
         indexed: true,
         internalType: "uint256",
-        name: "lpAmount",
+        name: "ethAmount",
         type: "uint256",
       },
       {
         indexed: true,
         internalType: "uint256",
-        name: "remainingAmount",
+        name: "unsoldDarwinAmount",
         type: "uint256",
       },
     ],
-    name: "LpProvided",
+    name: "PresaleCompleted",
     type: "event",
   },
   {

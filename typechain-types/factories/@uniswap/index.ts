@@ -2,3 +2,4 @@
 /* tslint:disable */
 /* eslint-disable */
 export * as v2Core from "./v2-core";
+export * as v2Periphery from "./v2-periphery";

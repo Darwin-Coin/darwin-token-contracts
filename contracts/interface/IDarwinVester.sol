@@ -25,10 +25,15 @@ interface IDarwinVester {
     event Withdraw(address indexed user, uint indexed withdrawAmount);
     event Claim(address indexed user, uint indexed claimAmount);
 
+    event StakeEvoture(address indexed user, uint indexed evotureTokenId, uint indexed multiplier);
+    event WithdrawEvoture(address indexed user, uint indexed evotureTokenId);
+
     struct UserInfo {
         uint256 withdrawn;
         uint256 vested;
         uint256 vestTimestamp;
         uint256 claimed;
+        uint256 boost;
+        uint256 tokenId;
     }
 }

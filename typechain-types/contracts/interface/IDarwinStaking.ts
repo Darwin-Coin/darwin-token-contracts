@@ -5,10 +5,17 @@ import type {
   BaseContract,
   BigNumber,
   BigNumberish,
+  BytesLike,
+  CallOverrides,
+  PopulatedTransaction,
   Signer,
   utils,
 } from "ethers";
-import type { EventFragment } from "@ethersproject/abi";
+import type {
+  FunctionFragment,
+  Result,
+  EventFragment,
+} from "@ethersproject/abi";
 import type { Listener, Provider } from "@ethersproject/providers";
 import type {
   TypedEventFilter,
@@ -18,8 +25,43 @@ import type {
   PromiseOrValue,
 } from "../../common";
 
+export declare namespace IDarwinStaking {
+  export type UserInfoStruct = {
+    lastClaimTimestamp: PromiseOrValue<BigNumberish>;
+    lockEnd: PromiseOrValue<BigNumberish>;
+    boost: PromiseOrValue<BigNumberish>;
+    tokenId: PromiseOrValue<BigNumberish>;
+  };
+
+  export type UserInfoStructOutput = [
+    BigNumber,
+    BigNumber,
+    BigNumber,
+    BigNumber
+  ] & {
+    lastClaimTimestamp: BigNumber;
+    lockEnd: BigNumber;
+    boost: BigNumber;
+    tokenId: BigNumber;
+  };
+}
+
 export interface IDarwinStakingInterface extends utils.Interface {
-  functions: {};
+  functions: {
+    "getUserInfo(address)": FunctionFragment;
+  };
+
+  getFunction(nameOrSignatureOrTopic: "getUserInfo"): FunctionFragment;
+
+  encodeFunctionData(
+    functionFragment: "getUserInfo",
+    values: [PromiseOrValue<string>]
+  ): string;
+
+  decodeFunctionResult(
+    functionFragment: "getUserInfo",
+    data: BytesLike
+  ): Result;
 
   events: {
     "Stake(address,uint256)": EventFragment;
@@ -103,9 +145,24 @@ export interface IDarwinStaking extends BaseContract {
   once: OnEvent<this>;
   removeListener: OnEvent<this>;
 
-  functions: {};
+  functions: {
+    getUserInfo(
+      _user: PromiseOrValue<string>,
+      overrides?: CallOverrides
+    ): Promise<[IDarwinStaking.UserInfoStructOutput]>;
+  };
 
-  callStatic: {};
+  getUserInfo(
+    _user: PromiseOrValue<string>,
+    overrides?: CallOverrides
+  ): Promise<IDarwinStaking.UserInfoStructOutput>;
+
+  callStatic: {
+    getUserInfo(
+      _user: PromiseOrValue<string>,
+      overrides?: CallOverrides
+    ): Promise<IDarwinStaking.UserInfoStructOutput>;
+  };
 
   filters: {
     "Stake(address,uint256)"(
@@ -149,7 +206,17 @@ export interface IDarwinStaking extends BaseContract {
     ): WithdrawEvotureEventFilter;
   };
 
-  estimateGas: {};
+  estimateGas: {
+    getUserInfo(
+      _user: PromiseOrValue<string>,
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
+  };
 
-  populateTransaction: {};
+  populateTransaction: {
+    getUserInfo(
+      _user: PromiseOrValue<string>,
+      overrides?: CallOverrides
+    ): Promise<PopulatedTransaction>;
+  };
 }

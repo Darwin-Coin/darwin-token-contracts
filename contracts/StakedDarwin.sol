@@ -12,9 +12,8 @@ contract StakedDarwin is IStakedDarwin {
 
     uint public totalSupply;
     mapping(address => uint) public balanceOf;
-    mapping(address => mapping(address => uint)) public allowance;
 
-    // The contract will be deployed thru create2 directly within the Darwin Protocol initialized
+    // The contract will be deployed thru create2 directly within the Darwin Protocol initialize()
     constructor() {
         darwin = msg.sender;
     }
@@ -43,42 +42,11 @@ contract StakedDarwin is IStakedDarwin {
         emit Transfer(from, address(0), value);
     }
 
-    function _approve(address _owner, address spender, uint value) private {
-        allowance[_owner][spender] = value;
-        emit Approval(_owner, spender, value);
-    }
-
-    function _transfer(address from, address to, uint value) private {
-        require(value <= balanceOf[from], "StakedDarwin: TRANSFER_EXCEEDS_BALANCE");
-        balanceOf[from] -= value;
-        balanceOf[to] += value;
-        emit Transfer(from, to, value);
-    }
-
     function mint(address to, uint value) external onlyStaking {
         _mint(to, value);
     }
 
     function burn(address from, uint value) external onlyStaking {
         _burn(from, value);
-    }
-
-    function approve(address spender, uint value) external returns (bool) {
-        _approve(msg.sender, spender, value);
-        return true;
-    }
-
-    function transfer(address to, uint value) external returns (bool) {
-        _transfer(msg.sender, to, value);
-        return true;
-    }
-
-    function transferFrom(address from, address to, uint value) external returns (bool) {
-        if (allowance[from][msg.sender] != type(uint).max) {
-            require(value <= allowance[from][msg.sender], "StakedDarwin: TRANSFERFROM_EXCEEDS_ALLOWANCE");
-            allowance[from][msg.sender] -= value;
-        }
-        _transfer(from, to, value);
-        return true;
     }
 }

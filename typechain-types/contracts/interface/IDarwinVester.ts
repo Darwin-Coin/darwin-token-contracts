@@ -23,13 +23,17 @@ export interface IDarwinVesterInterface extends utils.Interface {
 
   events: {
     "Claim(address,uint256)": EventFragment;
+    "StakeEvoture(address,uint256,uint256)": EventFragment;
     "Vest(address,uint256)": EventFragment;
     "Withdraw(address,uint256)": EventFragment;
+    "WithdrawEvoture(address,uint256)": EventFragment;
   };
 
   getEvent(nameOrSignatureOrTopic: "Claim"): EventFragment;
+  getEvent(nameOrSignatureOrTopic: "StakeEvoture"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "Vest"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "Withdraw"): EventFragment;
+  getEvent(nameOrSignatureOrTopic: "WithdrawEvoture"): EventFragment;
 }
 
 export interface ClaimEventObject {
@@ -39,6 +43,18 @@ export interface ClaimEventObject {
 export type ClaimEvent = TypedEvent<[string, BigNumber], ClaimEventObject>;
 
 export type ClaimEventFilter = TypedEventFilter<ClaimEvent>;
+
+export interface StakeEvotureEventObject {
+  user: string;
+  evotureTokenId: BigNumber;
+  multiplier: BigNumber;
+}
+export type StakeEvotureEvent = TypedEvent<
+  [string, BigNumber, BigNumber],
+  StakeEvotureEventObject
+>;
+
+export type StakeEvotureEventFilter = TypedEventFilter<StakeEvotureEvent>;
 
 export interface VestEventObject {
   user: string;
@@ -58,6 +74,17 @@ export type WithdrawEvent = TypedEvent<
 >;
 
 export type WithdrawEventFilter = TypedEventFilter<WithdrawEvent>;
+
+export interface WithdrawEvotureEventObject {
+  user: string;
+  evotureTokenId: BigNumber;
+}
+export type WithdrawEvotureEvent = TypedEvent<
+  [string, BigNumber],
+  WithdrawEvotureEventObject
+>;
+
+export type WithdrawEvotureEventFilter = TypedEventFilter<WithdrawEvotureEvent>;
 
 export interface IDarwinVester extends BaseContract {
   connect(signerOrProvider: Signer | Provider | string): this;
@@ -99,6 +126,17 @@ export interface IDarwinVester extends BaseContract {
       claimAmount?: PromiseOrValue<BigNumberish> | null
     ): ClaimEventFilter;
 
+    "StakeEvoture(address,uint256,uint256)"(
+      user?: PromiseOrValue<string> | null,
+      evotureTokenId?: PromiseOrValue<BigNumberish> | null,
+      multiplier?: PromiseOrValue<BigNumberish> | null
+    ): StakeEvotureEventFilter;
+    StakeEvoture(
+      user?: PromiseOrValue<string> | null,
+      evotureTokenId?: PromiseOrValue<BigNumberish> | null,
+      multiplier?: PromiseOrValue<BigNumberish> | null
+    ): StakeEvotureEventFilter;
+
     "Vest(address,uint256)"(
       user?: PromiseOrValue<string> | null,
       vestAmount?: PromiseOrValue<BigNumberish> | null
@@ -116,6 +154,15 @@ export interface IDarwinVester extends BaseContract {
       user?: PromiseOrValue<string> | null,
       withdrawAmount?: PromiseOrValue<BigNumberish> | null
     ): WithdrawEventFilter;
+
+    "WithdrawEvoture(address,uint256)"(
+      user?: PromiseOrValue<string> | null,
+      evotureTokenId?: PromiseOrValue<BigNumberish> | null
+    ): WithdrawEvotureEventFilter;
+    WithdrawEvoture(
+      user?: PromiseOrValue<string> | null,
+      evotureTokenId?: PromiseOrValue<BigNumberish> | null
+    ): WithdrawEvotureEventFilter;
   };
 
   estimateGas: {};

@@ -24,14 +24,14 @@ import type {
 
 export interface ILootboxTicketInterface extends utils.Interface {
   functions: {
-    "initialize(address)": FunctionFragment;
+    "initialize(address,address)": FunctionFragment;
   };
 
   getFunction(nameOrSignatureOrTopic: "initialize"): FunctionFragment;
 
   encodeFunctionData(
     functionFragment: "initialize",
-    values: [PromiseOrValue<string>]
+    values: [PromiseOrValue<string>, PromiseOrValue<string>]
   ): string;
 
   decodeFunctionResult(functionFragment: "initialize", data: BytesLike): Result;
@@ -68,18 +68,21 @@ export interface ILootboxTicket extends BaseContract {
   functions: {
     initialize(
       _dev: PromiseOrValue<string>,
+      _darwin: PromiseOrValue<string>,
       overrides?: Overrides & { from?: PromiseOrValue<string> }
     ): Promise<ContractTransaction>;
   };
 
   initialize(
     _dev: PromiseOrValue<string>,
+    _darwin: PromiseOrValue<string>,
     overrides?: Overrides & { from?: PromiseOrValue<string> }
   ): Promise<ContractTransaction>;
 
   callStatic: {
     initialize(
       _dev: PromiseOrValue<string>,
+      _darwin: PromiseOrValue<string>,
       overrides?: CallOverrides
     ): Promise<void>;
   };
@@ -89,6 +92,7 @@ export interface ILootboxTicket extends BaseContract {
   estimateGas: {
     initialize(
       _dev: PromiseOrValue<string>,
+      _darwin: PromiseOrValue<string>,
       overrides?: Overrides & { from?: PromiseOrValue<string> }
     ): Promise<BigNumber>;
   };
@@ -96,6 +100,7 @@ export interface ILootboxTicket extends BaseContract {
   populateTransaction: {
     initialize(
       _dev: PromiseOrValue<string>,
+      _darwin: PromiseOrValue<string>,
       overrides?: Overrides & { from?: PromiseOrValue<string> }
     ): Promise<PopulatedTransaction>;
   };

@@ -7,7 +7,7 @@ import { BigNumber } from "ethers";
 import * as hardhat from "hardhat";
 import { ethers, upgrades } from "hardhat";
 import { DarwinBurner, DarwinCommunity } from "../typechain-types";
-import { Darwin, DarwinPrivateSale, DarwinStaking, DarwinVester5, DarwinVester7, EvoturesNFT, LootboxTicket, StakedDarwin } from "../typechain-types/contracts";
+import { Darwin, DarwinPrivateSale, DarwinStaking, DarwinVester5, DarwinVester7, EvoturesNFT, LootboxTicket, MultiplierNFT, StakedDarwin } from "../typechain-types/contracts";
 import { ADDRESSES, ADDRESSES_ARB } from "./constants";
 
 
@@ -15,7 +15,9 @@ type UserInfo = {
     withdrawn: BigNumber,
     vested: BigNumber,
     vestTimestamp: BigNumber,
-    claimed: BigNumber
+    claimed: BigNumber,
+    boost: BigNumber,
+    tokenId: BigNumber
 }
 
 
@@ -34,7 +36,16 @@ async function main() {
   const buyersInfo: UserInfo[] = [];
 
   for (let i = 0; i < privateSaleBuyers.length; i++) {
-    buyersInfo.push(await vesterBSC.userInfo(privateSaleBuyers[i]));
+    const user = await vesterBSC.userInfo(privateSaleBuyers[i]);
+    const jsUser: UserInfo = {
+      withdrawn: user.withdrawn,
+      vested: user.vested,
+      vestTimestamp: user.vestTimestamp,
+      claimed: user.claimed,
+      boost: BigNumber.from(0),
+      tokenId: BigNumber.from(0)
+    }
+    buyersInfo.push(jsUser);
   }
 
   console.log(`✅ Sold Darwin and Private Buyers Info fetched from BSC`);
@@ -53,6 +64,7 @@ async function main() {
   const darwinBurnerFactory = await ethers.getContractFactory("DarwinBurner");
   const stakingFactory = await ethers.getContractFactory("DarwinStaking");
   const evoturesFactory = await ethers.getContractFactory("EvoturesNFT");
+  const multiplierFactory = await ethers.getContractFactory("MultiplierNFT");
   const ticketFactory = await ethers.getContractFactory("LootboxTicket");
 
 
@@ -68,8 +80,20 @@ async function main() {
   });
 
 
+  //! [DEPLOY] MULTIPLIER
+  const multiplier = await multiplierFactory.deploy() as MultiplierNFT;
+  await multiplier.deployed();
+  console.log(`🔨 Deployed Multiplier NFT at: ${multiplier.address}`);
+
+  //? [VERIFY] MULTIPLIER
+  await hardhat.run("verify:verify", {
+    address: multiplier.address,
+    constructorArguments: []
+  });
+
+
   //! [ATTACH] TICKET
-  const ticket = ticketFactory.attach(await evotures.ticketsContract()) as LootboxTicket;
+  const ticket = ticketFactory.attach(await multiplier.ticketsContract()) as LootboxTicket;
   await ticket.deployed();
   console.log(`🔨 Deployed Lootbox Ticket at: ${ticket.address}`);
 
@@ -93,14 +117,14 @@ async function main() {
 
 
   //! [DEPLOY] VESTER7
-  const vester7 = await darwinVester7Factory.deploy(privateSaleBuyers, buyersInfo) as DarwinVester7;
+  const vester7 = await darwinVester7Factory.deploy(privateSaleBuyers, buyersInfo, evotures.address, multiplier.address) as DarwinVester7;
   await vester7.deployed();
   console.log(`🔨 Deployed Vester7 at: ${vester7.address}`);
 
   //? [VERIFY] VESTER7
   await hardhat.run("verify:verify", {
     address: vester7.address,
-    constructorArguments: [privateSaleBuyers, buyersInfo]
+    constructorArguments: [privateSaleBuyers, buyersInfo, evotures.address, multiplier.address]
   });
 
 
@@ -157,14 +181,14 @@ async function main() {
 
 
   //! [DEPLOY] STAKING
-  const staking = await stakingFactory.deploy(darwin.address, stakedDarwin.address, evotures.address) as DarwinStaking;
+  const staking = await stakingFactory.deploy(darwin.address, stakedDarwin.address, evotures.address, multiplier.address) as DarwinStaking;
   await staking.deployed();
   console.log(`🔨 Deployed Darwin Staking at: ${staking.address}`);
 
   //? [VERIFY] STAKING
   await hardhat.run("verify:verify", {
     address: staking.address,
-    constructorArguments: [darwin.address, stakedDarwin.address, evotures.address]
+    constructorArguments: [darwin.address, stakedDarwin.address, evotures.address, multiplier.address]
   });
 
   //* [INIT] DARWIN WITH STAKING
@@ -236,6 +260,10 @@ async function main() {
     await tx.wait();
   }
   console.log(`🏁 Private-Sale Buyers fulfilled (25%)`);
+
+  //* [INIT] MULTIPLIER
+  await multiplier.init(darwin.address);
+  console.log(`🏁 Multiplier initialized`);
 
   //* [INIT] VESTER5
   await vester5.init(darwin.address);

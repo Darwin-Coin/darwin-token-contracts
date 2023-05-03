@@ -135,14 +135,18 @@ export interface DarwinVester5Interface extends utils.Interface {
   events: {
     "Claim(address,uint256)": EventFragment;
     "OwnershipTransferred(address,address)": EventFragment;
+    "StakeEvoture(address,uint256,uint256)": EventFragment;
     "Vest(address,uint256)": EventFragment;
     "Withdraw(address,uint256)": EventFragment;
+    "WithdrawEvoture(address,uint256)": EventFragment;
   };
 
   getEvent(nameOrSignatureOrTopic: "Claim"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "OwnershipTransferred"): EventFragment;
+  getEvent(nameOrSignatureOrTopic: "StakeEvoture"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "Vest"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "Withdraw"): EventFragment;
+  getEvent(nameOrSignatureOrTopic: "WithdrawEvoture"): EventFragment;
 }
 
 export interface ClaimEventObject {
@@ -165,6 +169,18 @@ export type OwnershipTransferredEvent = TypedEvent<
 export type OwnershipTransferredEventFilter =
   TypedEventFilter<OwnershipTransferredEvent>;
 
+export interface StakeEvotureEventObject {
+  user: string;
+  evotureTokenId: BigNumber;
+  multiplier: BigNumber;
+}
+export type StakeEvotureEvent = TypedEvent<
+  [string, BigNumber, BigNumber],
+  StakeEvotureEventObject
+>;
+
+export type StakeEvotureEventFilter = TypedEventFilter<StakeEvotureEvent>;
+
 export interface VestEventObject {
   user: string;
   vestAmount: BigNumber;
@@ -183,6 +199,17 @@ export type WithdrawEvent = TypedEvent<
 >;
 
 export type WithdrawEventFilter = TypedEventFilter<WithdrawEvent>;
+
+export interface WithdrawEvotureEventObject {
+  user: string;
+  evotureTokenId: BigNumber;
+}
+export type WithdrawEvotureEvent = TypedEvent<
+  [string, BigNumber],
+  WithdrawEvotureEventObject
+>;
+
+export type WithdrawEvotureEventFilter = TypedEventFilter<WithdrawEvotureEvent>;
 
 export interface DarwinVester5 extends BaseContract {
   connect(signerOrProvider: Signer | Provider | string): this;
@@ -246,11 +273,13 @@ export interface DarwinVester5 extends BaseContract {
       arg0: PromiseOrValue<string>,
       overrides?: CallOverrides
     ): Promise<
-      [BigNumber, BigNumber, BigNumber, BigNumber] & {
+      [BigNumber, BigNumber, BigNumber, BigNumber, BigNumber, BigNumber] & {
         withdrawn: BigNumber;
         vested: BigNumber;
         vestTimestamp: BigNumber;
         claimed: BigNumber;
+        boost: BigNumber;
+        tokenId: BigNumber;
       }
     >;
 
@@ -302,11 +331,13 @@ export interface DarwinVester5 extends BaseContract {
     arg0: PromiseOrValue<string>,
     overrides?: CallOverrides
   ): Promise<
-    [BigNumber, BigNumber, BigNumber, BigNumber] & {
+    [BigNumber, BigNumber, BigNumber, BigNumber, BigNumber, BigNumber] & {
       withdrawn: BigNumber;
       vested: BigNumber;
       vestTimestamp: BigNumber;
       claimed: BigNumber;
+      boost: BigNumber;
+      tokenId: BigNumber;
     }
   >;
 
@@ -356,11 +387,13 @@ export interface DarwinVester5 extends BaseContract {
       arg0: PromiseOrValue<string>,
       overrides?: CallOverrides
     ): Promise<
-      [BigNumber, BigNumber, BigNumber, BigNumber] & {
+      [BigNumber, BigNumber, BigNumber, BigNumber, BigNumber, BigNumber] & {
         withdrawn: BigNumber;
         vested: BigNumber;
         vestTimestamp: BigNumber;
         claimed: BigNumber;
+        boost: BigNumber;
+        tokenId: BigNumber;
       }
     >;
 
@@ -396,6 +429,17 @@ export interface DarwinVester5 extends BaseContract {
       newOwner?: PromiseOrValue<string> | null
     ): OwnershipTransferredEventFilter;
 
+    "StakeEvoture(address,uint256,uint256)"(
+      user?: PromiseOrValue<string> | null,
+      evotureTokenId?: PromiseOrValue<BigNumberish> | null,
+      multiplier?: PromiseOrValue<BigNumberish> | null
+    ): StakeEvotureEventFilter;
+    StakeEvoture(
+      user?: PromiseOrValue<string> | null,
+      evotureTokenId?: PromiseOrValue<BigNumberish> | null,
+      multiplier?: PromiseOrValue<BigNumberish> | null
+    ): StakeEvotureEventFilter;
+
     "Vest(address,uint256)"(
       user?: PromiseOrValue<string> | null,
       vestAmount?: PromiseOrValue<BigNumberish> | null
@@ -413,6 +457,15 @@ export interface DarwinVester5 extends BaseContract {
       user?: PromiseOrValue<string> | null,
       withdrawAmount?: PromiseOrValue<BigNumberish> | null
     ): WithdrawEventFilter;
+
+    "WithdrawEvoture(address,uint256)"(
+      user?: PromiseOrValue<string> | null,
+      evotureTokenId?: PromiseOrValue<BigNumberish> | null
+    ): WithdrawEvotureEventFilter;
+    WithdrawEvoture(
+      user?: PromiseOrValue<string> | null,
+      evotureTokenId?: PromiseOrValue<BigNumberish> | null
+    ): WithdrawEvotureEventFilter;
   };
 
   estimateGas: {

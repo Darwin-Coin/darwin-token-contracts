@@ -17,6 +17,11 @@ const _abi = [
         name: "_dev",
         type: "address",
       },
+      {
+        internalType: "address",
+        name: "_darwin",
+        type: "address",
+      },
     ],
     name: "initialize",
     outputs: [],
