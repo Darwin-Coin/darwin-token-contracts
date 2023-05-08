@@ -273,12 +273,21 @@ export interface DarwinVester5 extends BaseContract {
       arg0: PromiseOrValue<string>,
       overrides?: CallOverrides
     ): Promise<
-      [BigNumber, BigNumber, BigNumber, BigNumber, BigNumber, BigNumber] & {
+      [
+        BigNumber,
+        BigNumber,
+        BigNumber,
+        BigNumber,
+        BigNumber,
+        string,
+        BigNumber
+      ] & {
         withdrawn: BigNumber;
         vested: BigNumber;
         vestTimestamp: BigNumber;
         claimed: BigNumber;
         boost: BigNumber;
+        nft: string;
         tokenId: BigNumber;
       }
     >;
@@ -331,12 +340,21 @@ export interface DarwinVester5 extends BaseContract {
     arg0: PromiseOrValue<string>,
     overrides?: CallOverrides
   ): Promise<
-    [BigNumber, BigNumber, BigNumber, BigNumber, BigNumber, BigNumber] & {
+    [
+      BigNumber,
+      BigNumber,
+      BigNumber,
+      BigNumber,
+      BigNumber,
+      string,
+      BigNumber
+    ] & {
       withdrawn: BigNumber;
       vested: BigNumber;
       vestTimestamp: BigNumber;
       claimed: BigNumber;
       boost: BigNumber;
+      nft: string;
       tokenId: BigNumber;
     }
   >;
@@ -387,12 +405,21 @@ export interface DarwinVester5 extends BaseContract {
       arg0: PromiseOrValue<string>,
       overrides?: CallOverrides
     ): Promise<
-      [BigNumber, BigNumber, BigNumber, BigNumber, BigNumber, BigNumber] & {
+      [
+        BigNumber,
+        BigNumber,
+        BigNumber,
+        BigNumber,
+        BigNumber,
+        string,
+        BigNumber
+      ] & {
         withdrawn: BigNumber;
         vested: BigNumber;
         vestTimestamp: BigNumber;
         claimed: BigNumber;
         boost: BigNumber;
+        nft: string;
         tokenId: BigNumber;
       }
     >;

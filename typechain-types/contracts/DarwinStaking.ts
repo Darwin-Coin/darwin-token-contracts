@@ -32,6 +32,7 @@ export declare namespace IDarwinStaking {
     lastClaimTimestamp: PromiseOrValue<BigNumberish>;
     lockEnd: PromiseOrValue<BigNumberish>;
     boost: PromiseOrValue<BigNumberish>;
+    nft: PromiseOrValue<string>;
     tokenId: PromiseOrValue<BigNumberish>;
   };
 
@@ -39,11 +40,13 @@ export declare namespace IDarwinStaking {
     BigNumber,
     BigNumber,
     BigNumber,
+    string,
     BigNumber
   ] & {
     lastClaimTimestamp: BigNumber;
     lockEnd: BigNumber;
     boost: BigNumber;
+    nft: string;
     tokenId: BigNumber;
   };
 }
@@ -52,15 +55,17 @@ export interface DarwinStakingInterface extends utils.Interface {
   functions: {
     "BASE_APR()": FunctionFragment;
     "LOCK_BONUS_APR()": FunctionFragment;
+    "addSupportedNFT(address)": FunctionFragment;
     "claimableDarwin(address)": FunctionFragment;
     "darwin()": FunctionFragment;
-    "evotures()": FunctionFragment;
+    "dev()": FunctionFragment;
     "getUserInfo(address)": FunctionFragment;
-    "multiplier()": FunctionFragment;
     "onERC721Received(address,address,uint256,bytes)": FunctionFragment;
+    "removeSupportedNFT(address)": FunctionFragment;
     "stake(uint256,uint256)": FunctionFragment;
-    "stakeEvoture(uint256,bool)": FunctionFragment;
+    "stakeEvoture(address,uint256)": FunctionFragment;
     "stakedDarwin()": FunctionFragment;
+    "supportedNFT(address)": FunctionFragment;
     "userInfo(address)": FunctionFragment;
     "withdraw(uint256)": FunctionFragment;
     "withdrawEvoture()": FunctionFragment;
@@ -70,15 +75,17 @@ export interface DarwinStakingInterface extends utils.Interface {
     nameOrSignatureOrTopic:
       | "BASE_APR"
       | "LOCK_BONUS_APR"
+      | "addSupportedNFT"
       | "claimableDarwin"
       | "darwin"
-      | "evotures"
+      | "dev"
       | "getUserInfo"
-      | "multiplier"
       | "onERC721Received"
+      | "removeSupportedNFT"
       | "stake"
       | "stakeEvoture"
       | "stakedDarwin"
+      | "supportedNFT"
       | "userInfo"
       | "withdraw"
       | "withdrawEvoture"
@@ -90,18 +97,18 @@ export interface DarwinStakingInterface extends utils.Interface {
     values?: undefined
   ): string;
   encodeFunctionData(
+    functionFragment: "addSupportedNFT",
+    values: [PromiseOrValue<string>]
+  ): string;
+  encodeFunctionData(
     functionFragment: "claimableDarwin",
     values: [PromiseOrValue<string>]
   ): string;
   encodeFunctionData(functionFragment: "darwin", values?: undefined): string;
-  encodeFunctionData(functionFragment: "evotures", values?: undefined): string;
+  encodeFunctionData(functionFragment: "dev", values?: undefined): string;
   encodeFunctionData(
     functionFragment: "getUserInfo",
     values: [PromiseOrValue<string>]
-  ): string;
-  encodeFunctionData(
-    functionFragment: "multiplier",
-    values?: undefined
   ): string;
   encodeFunctionData(
     functionFragment: "onERC721Received",
@@ -113,16 +120,24 @@ export interface DarwinStakingInterface extends utils.Interface {
     ]
   ): string;
   encodeFunctionData(
+    functionFragment: "removeSupportedNFT",
+    values: [PromiseOrValue<string>]
+  ): string;
+  encodeFunctionData(
     functionFragment: "stake",
     values: [PromiseOrValue<BigNumberish>, PromiseOrValue<BigNumberish>]
   ): string;
   encodeFunctionData(
     functionFragment: "stakeEvoture",
-    values: [PromiseOrValue<BigNumberish>, PromiseOrValue<boolean>]
+    values: [PromiseOrValue<string>, PromiseOrValue<BigNumberish>]
   ): string;
   encodeFunctionData(
     functionFragment: "stakedDarwin",
     values?: undefined
+  ): string;
+  encodeFunctionData(
+    functionFragment: "supportedNFT",
+    values: [PromiseOrValue<string>]
   ): string;
   encodeFunctionData(
     functionFragment: "userInfo",
@@ -143,18 +158,25 @@ export interface DarwinStakingInterface extends utils.Interface {
     data: BytesLike
   ): Result;
   decodeFunctionResult(
+    functionFragment: "addSupportedNFT",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
     functionFragment: "claimableDarwin",
     data: BytesLike
   ): Result;
   decodeFunctionResult(functionFragment: "darwin", data: BytesLike): Result;
-  decodeFunctionResult(functionFragment: "evotures", data: BytesLike): Result;
+  decodeFunctionResult(functionFragment: "dev", data: BytesLike): Result;
   decodeFunctionResult(
     functionFragment: "getUserInfo",
     data: BytesLike
   ): Result;
-  decodeFunctionResult(functionFragment: "multiplier", data: BytesLike): Result;
   decodeFunctionResult(
     functionFragment: "onERC721Received",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
+    functionFragment: "removeSupportedNFT",
     data: BytesLike
   ): Result;
   decodeFunctionResult(functionFragment: "stake", data: BytesLike): Result;
@@ -164,6 +186,10 @@ export interface DarwinStakingInterface extends utils.Interface {
   ): Result;
   decodeFunctionResult(
     functionFragment: "stakedDarwin",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
+    functionFragment: "supportedNFT",
     data: BytesLike
   ): Result;
   decodeFunctionResult(functionFragment: "userInfo", data: BytesLike): Result;
@@ -260,6 +286,11 @@ export interface DarwinStaking extends BaseContract {
 
     LOCK_BONUS_APR(overrides?: CallOverrides): Promise<[BigNumber]>;
 
+    addSupportedNFT(
+      _nft: PromiseOrValue<string>,
+      overrides?: Overrides & { from?: PromiseOrValue<string> }
+    ): Promise<ContractTransaction>;
+
     claimableDarwin(
       _user: PromiseOrValue<string>,
       overrides?: CallOverrides
@@ -267,20 +298,23 @@ export interface DarwinStaking extends BaseContract {
 
     darwin(overrides?: CallOverrides): Promise<[string]>;
 
-    evotures(overrides?: CallOverrides): Promise<[string]>;
+    dev(overrides?: CallOverrides): Promise<[string]>;
 
     getUserInfo(
       _user: PromiseOrValue<string>,
       overrides?: CallOverrides
     ): Promise<[IDarwinStaking.UserInfoStructOutput]>;
 
-    multiplier(overrides?: CallOverrides): Promise<[string]>;
-
     onERC721Received(
       arg0: PromiseOrValue<string>,
       arg1: PromiseOrValue<string>,
       arg2: PromiseOrValue<BigNumberish>,
       arg3: PromiseOrValue<BytesLike>,
+      overrides?: Overrides & { from?: PromiseOrValue<string> }
+    ): Promise<ContractTransaction>;
+
+    removeSupportedNFT(
+      _nft: PromiseOrValue<string>,
       overrides?: Overrides & { from?: PromiseOrValue<string> }
     ): Promise<ContractTransaction>;
 
@@ -291,21 +325,27 @@ export interface DarwinStaking extends BaseContract {
     ): Promise<ContractTransaction>;
 
     stakeEvoture(
+      _nft: PromiseOrValue<string>,
       _tokenId: PromiseOrValue<BigNumberish>,
-      _lootBox: PromiseOrValue<boolean>,
       overrides?: Overrides & { from?: PromiseOrValue<string> }
     ): Promise<ContractTransaction>;
 
     stakedDarwin(overrides?: CallOverrides): Promise<[string]>;
 
+    supportedNFT(
+      arg0: PromiseOrValue<string>,
+      overrides?: CallOverrides
+    ): Promise<[boolean]>;
+
     userInfo(
       arg0: PromiseOrValue<string>,
       overrides?: CallOverrides
     ): Promise<
-      [BigNumber, BigNumber, BigNumber, BigNumber] & {
+      [BigNumber, BigNumber, BigNumber, string, BigNumber] & {
         lastClaimTimestamp: BigNumber;
         lockEnd: BigNumber;
         boost: BigNumber;
+        nft: string;
         tokenId: BigNumber;
       }
     >;
@@ -324,6 +364,11 @@ export interface DarwinStaking extends BaseContract {
 
   LOCK_BONUS_APR(overrides?: CallOverrides): Promise<BigNumber>;
 
+  addSupportedNFT(
+    _nft: PromiseOrValue<string>,
+    overrides?: Overrides & { from?: PromiseOrValue<string> }
+  ): Promise<ContractTransaction>;
+
   claimableDarwin(
     _user: PromiseOrValue<string>,
     overrides?: CallOverrides
@@ -331,20 +376,23 @@ export interface DarwinStaking extends BaseContract {
 
   darwin(overrides?: CallOverrides): Promise<string>;
 
-  evotures(overrides?: CallOverrides): Promise<string>;
+  dev(overrides?: CallOverrides): Promise<string>;
 
   getUserInfo(
     _user: PromiseOrValue<string>,
     overrides?: CallOverrides
   ): Promise<IDarwinStaking.UserInfoStructOutput>;
 
-  multiplier(overrides?: CallOverrides): Promise<string>;
-
   onERC721Received(
     arg0: PromiseOrValue<string>,
     arg1: PromiseOrValue<string>,
     arg2: PromiseOrValue<BigNumberish>,
     arg3: PromiseOrValue<BytesLike>,
+    overrides?: Overrides & { from?: PromiseOrValue<string> }
+  ): Promise<ContractTransaction>;
+
+  removeSupportedNFT(
+    _nft: PromiseOrValue<string>,
     overrides?: Overrides & { from?: PromiseOrValue<string> }
   ): Promise<ContractTransaction>;
 
@@ -355,21 +403,27 @@ export interface DarwinStaking extends BaseContract {
   ): Promise<ContractTransaction>;
 
   stakeEvoture(
+    _nft: PromiseOrValue<string>,
     _tokenId: PromiseOrValue<BigNumberish>,
-    _lootBox: PromiseOrValue<boolean>,
     overrides?: Overrides & { from?: PromiseOrValue<string> }
   ): Promise<ContractTransaction>;
 
   stakedDarwin(overrides?: CallOverrides): Promise<string>;
 
+  supportedNFT(
+    arg0: PromiseOrValue<string>,
+    overrides?: CallOverrides
+  ): Promise<boolean>;
+
   userInfo(
     arg0: PromiseOrValue<string>,
     overrides?: CallOverrides
   ): Promise<
-    [BigNumber, BigNumber, BigNumber, BigNumber] & {
+    [BigNumber, BigNumber, BigNumber, string, BigNumber] & {
       lastClaimTimestamp: BigNumber;
       lockEnd: BigNumber;
       boost: BigNumber;
+      nft: string;
       tokenId: BigNumber;
     }
   >;
@@ -388,6 +442,11 @@ export interface DarwinStaking extends BaseContract {
 
     LOCK_BONUS_APR(overrides?: CallOverrides): Promise<BigNumber>;
 
+    addSupportedNFT(
+      _nft: PromiseOrValue<string>,
+      overrides?: CallOverrides
+    ): Promise<void>;
+
     claimableDarwin(
       _user: PromiseOrValue<string>,
       overrides?: CallOverrides
@@ -395,14 +454,12 @@ export interface DarwinStaking extends BaseContract {
 
     darwin(overrides?: CallOverrides): Promise<string>;
 
-    evotures(overrides?: CallOverrides): Promise<string>;
+    dev(overrides?: CallOverrides): Promise<string>;
 
     getUserInfo(
       _user: PromiseOrValue<string>,
       overrides?: CallOverrides
     ): Promise<IDarwinStaking.UserInfoStructOutput>;
-
-    multiplier(overrides?: CallOverrides): Promise<string>;
 
     onERC721Received(
       arg0: PromiseOrValue<string>,
@@ -412,6 +469,11 @@ export interface DarwinStaking extends BaseContract {
       overrides?: CallOverrides
     ): Promise<string>;
 
+    removeSupportedNFT(
+      _nft: PromiseOrValue<string>,
+      overrides?: CallOverrides
+    ): Promise<void>;
+
     stake(
       _amount: PromiseOrValue<BigNumberish>,
       _lockPeriod: PromiseOrValue<BigNumberish>,
@@ -419,21 +481,27 @@ export interface DarwinStaking extends BaseContract {
     ): Promise<void>;
 
     stakeEvoture(
+      _nft: PromiseOrValue<string>,
       _tokenId: PromiseOrValue<BigNumberish>,
-      _lootBox: PromiseOrValue<boolean>,
       overrides?: CallOverrides
     ): Promise<void>;
 
     stakedDarwin(overrides?: CallOverrides): Promise<string>;
 
+    supportedNFT(
+      arg0: PromiseOrValue<string>,
+      overrides?: CallOverrides
+    ): Promise<boolean>;
+
     userInfo(
       arg0: PromiseOrValue<string>,
       overrides?: CallOverrides
     ): Promise<
-      [BigNumber, BigNumber, BigNumber, BigNumber] & {
+      [BigNumber, BigNumber, BigNumber, string, BigNumber] & {
         lastClaimTimestamp: BigNumber;
         lockEnd: BigNumber;
         boost: BigNumber;
+        nft: string;
         tokenId: BigNumber;
       }
     >;
@@ -493,6 +561,11 @@ export interface DarwinStaking extends BaseContract {
 
     LOCK_BONUS_APR(overrides?: CallOverrides): Promise<BigNumber>;
 
+    addSupportedNFT(
+      _nft: PromiseOrValue<string>,
+      overrides?: Overrides & { from?: PromiseOrValue<string> }
+    ): Promise<BigNumber>;
+
     claimableDarwin(
       _user: PromiseOrValue<string>,
       overrides?: CallOverrides
@@ -500,20 +573,23 @@ export interface DarwinStaking extends BaseContract {
 
     darwin(overrides?: CallOverrides): Promise<BigNumber>;
 
-    evotures(overrides?: CallOverrides): Promise<BigNumber>;
+    dev(overrides?: CallOverrides): Promise<BigNumber>;
 
     getUserInfo(
       _user: PromiseOrValue<string>,
       overrides?: CallOverrides
     ): Promise<BigNumber>;
 
-    multiplier(overrides?: CallOverrides): Promise<BigNumber>;
-
     onERC721Received(
       arg0: PromiseOrValue<string>,
       arg1: PromiseOrValue<string>,
       arg2: PromiseOrValue<BigNumberish>,
       arg3: PromiseOrValue<BytesLike>,
+      overrides?: Overrides & { from?: PromiseOrValue<string> }
+    ): Promise<BigNumber>;
+
+    removeSupportedNFT(
+      _nft: PromiseOrValue<string>,
       overrides?: Overrides & { from?: PromiseOrValue<string> }
     ): Promise<BigNumber>;
 
@@ -524,12 +600,17 @@ export interface DarwinStaking extends BaseContract {
     ): Promise<BigNumber>;
 
     stakeEvoture(
+      _nft: PromiseOrValue<string>,
       _tokenId: PromiseOrValue<BigNumberish>,
-      _lootBox: PromiseOrValue<boolean>,
       overrides?: Overrides & { from?: PromiseOrValue<string> }
     ): Promise<BigNumber>;
 
     stakedDarwin(overrides?: CallOverrides): Promise<BigNumber>;
+
+    supportedNFT(
+      arg0: PromiseOrValue<string>,
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
 
     userInfo(
       arg0: PromiseOrValue<string>,
@@ -551,6 +632,11 @@ export interface DarwinStaking extends BaseContract {
 
     LOCK_BONUS_APR(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
+    addSupportedNFT(
+      _nft: PromiseOrValue<string>,
+      overrides?: Overrides & { from?: PromiseOrValue<string> }
+    ): Promise<PopulatedTransaction>;
+
     claimableDarwin(
       _user: PromiseOrValue<string>,
       overrides?: CallOverrides
@@ -558,20 +644,23 @@ export interface DarwinStaking extends BaseContract {
 
     darwin(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
-    evotures(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+    dev(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
     getUserInfo(
       _user: PromiseOrValue<string>,
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 
-    multiplier(overrides?: CallOverrides): Promise<PopulatedTransaction>;
-
     onERC721Received(
       arg0: PromiseOrValue<string>,
       arg1: PromiseOrValue<string>,
       arg2: PromiseOrValue<BigNumberish>,
       arg3: PromiseOrValue<BytesLike>,
+      overrides?: Overrides & { from?: PromiseOrValue<string> }
+    ): Promise<PopulatedTransaction>;
+
+    removeSupportedNFT(
+      _nft: PromiseOrValue<string>,
       overrides?: Overrides & { from?: PromiseOrValue<string> }
     ): Promise<PopulatedTransaction>;
 
@@ -582,12 +671,17 @@ export interface DarwinStaking extends BaseContract {
     ): Promise<PopulatedTransaction>;
 
     stakeEvoture(
+      _nft: PromiseOrValue<string>,
       _tokenId: PromiseOrValue<BigNumberish>,
-      _lootBox: PromiseOrValue<boolean>,
       overrides?: Overrides & { from?: PromiseOrValue<string> }
     ): Promise<PopulatedTransaction>;
 
     stakedDarwin(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+
+    supportedNFT(
+      arg0: PromiseOrValue<string>,
+      overrides?: CallOverrides
+    ): Promise<PopulatedTransaction>;
 
     userInfo(
       arg0: PromiseOrValue<string>,

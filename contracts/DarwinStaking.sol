@@ -12,20 +12,22 @@ import "./interface/IMultiplierNFT.sol";
 contract DarwinStaking is IDarwinStaking, ReentrancyGuard, IERC721Receiver {
     IERC20 public darwin;
     IERC20 public stakedDarwin;
-    IMultiplierNFT public evotures;
-    IMultiplierNFT public multiplier;
+    address public dev;
 
     uint public constant BASE_APR = 5e18; // 5%
     uint public constant LOCK_BONUS_APR = 2e18; // 2% more if locked
     uint private constant _SECONDS_IN_YEAR = 31_536_000;
 
+    mapping(address => bool) public supportedNFT;
     mapping(address => UserInfo) public userInfo;
 
-    constructor(address _darwin, address _stakedDarwin, address _evotures, address _multiplier) {
+    constructor(address _darwin, address _stakedDarwin, address[] memory _supportedNFTs) {
+        dev = msg.sender;
         darwin = IERC20(_darwin);
         stakedDarwin = IERC20(_stakedDarwin);
-        evotures = IMultiplierNFT(_evotures);
-        multiplier = IMultiplierNFT(_multiplier);
+        for (uint i = 0; i < _supportedNFTs.length; i++) {
+            supportedNFT[_supportedNFTs[i]] = true;
+        }
     }
 
     function stake(uint _amount, uint _lockPeriod) external nonReentrant {
@@ -86,35 +88,39 @@ contract DarwinStaking is IDarwinStaking, ReentrancyGuard, IERC721Receiver {
         }
     }
 
-    function stakeEvoture(uint _tokenId, bool _lootBox) external nonReentrant {
-        require(userInfo[msg.sender].boost == 0, "DarwinStaking: EVOTURE_ALREADY_STAKED");
+    function stakeEvoture(address _nft, uint _tokenId) external nonReentrant {
+        require(userInfo[msg.sender].nft == address(0), "DarwinStaking: NFT_ALREADY_STAKED");
+        require(supportedNFT[_nft], "DarwinStaking: UNSUPPORTED_NFT");
 
         _claim();
-
-        IMultiplierNFT nft = evotures;
-        if (_lootBox) {
-            nft = multiplier;
-        }
-        IERC721(address(nft)).safeTransferFrom(msg.sender, address(this), _tokenId);
-        userInfo[msg.sender].boost = nft.multipliers(_tokenId);
+        IERC721(_nft).safeTransferFrom(msg.sender, address(this), _tokenId);
+        userInfo[msg.sender].nft = _nft;
+        userInfo[msg.sender].boost = IMultiplierNFT(_nft).multipliers(_tokenId);
         userInfo[msg.sender].tokenId = _tokenId;
 
         emit StakeEvoture(msg.sender, _tokenId, userInfo[msg.sender].boost);
     }
 
     function withdrawEvoture() external nonReentrant {
-        require(userInfo[msg.sender].boost > 0, "DarwinStaking: NO_EVOTURE_TO_WITHDRAW");
+        require(userInfo[msg.sender].nft != address(0), "DarwinStaking: NO_NFT_TO_WITHDRAW");
 
         _claim();
-
-        IMultiplierNFT nft = evotures;
-        if (IERC721(address(nft)).ownerOf(userInfo[msg.sender].tokenId) != address(this)) {
-            nft = multiplier;
-        }
-        IERC721(address(nft)).safeTransferFrom(address(this), msg.sender, userInfo[msg.sender].tokenId);
+        IERC721(userInfo[msg.sender].nft).safeTransferFrom(address(this), msg.sender, userInfo[msg.sender].tokenId);
+        userInfo[msg.sender].nft = address(0);
         userInfo[msg.sender].boost = 0;
+        userInfo[msg.sender].tokenId = 0;
 
         emit WithdrawEvoture(msg.sender, userInfo[msg.sender].tokenId);
+    }
+
+    function addSupportedNFT(address _nft) external {
+        require(msg.sender == dev, "DarwinStaking: CALLER_IS_NOT_DEV");
+        supportedNFT[_nft] = true;
+    }
+
+    function removeSupportedNFT(address _nft) external {
+        require(msg.sender == dev, "DarwinStaking: CALLER_IS_NOT_DEV");
+        supportedNFT[_nft] = false;
     }
 
     function getUserInfo(address _user) external view returns (UserInfo memory) {

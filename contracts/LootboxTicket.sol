@@ -77,49 +77,31 @@ contract LootboxTicket is ERC721("Lootbox Tickets","TICKETS"), ILootboxTicket {
 
     function _getRandomMultiplierOrDarwin() private view returns(uint m, uint d) {
         uint rand = _pseudoRand();
-        if (rand < 25) {
-            d = 100_000;
-        } else if (rand < 75) {
-            d = 90_000;
-        } else if (rand < 150) {
-            d = 80_000;
-        } else if (rand < 400) {
-            d = 70_000;
-        } else if (rand < 900) {
-            d = 60_000;
-        } else if (rand < 1_650) {
-            d = 50_000;
-        } else if (rand < 4_150) {
-            d = 40_000;
-        } else if (rand < 9_150) {
-            d = 30_000;
-        } else if (rand < 16_650) {
-            d = 20_000;
-        } else if (rand < 106_650) {
+        if (rand < 90_000) {
             uint r = rand % 9;
             d = 2_000 + r * 1_000;
-        } else if (rand < 2_356_650) {
+        } else if (rand < 2_340_000) {
             uint r = rand % 90;
             d = 110 + r * 10;
-        } else if (rand < 3_606_650) {
+        } else if (rand < 3_590_000) {
             uint r = rand % 25;
             d = 76 + r;
-        } else if (rand < 4_981_650) {
+        } else if (rand < 4_965_000) {
             uint r = rand % 25;
             d = 51 + r;
-        } else if (rand < 6_481_650) {
+        } else if (rand < 6_465_000) {
             uint r = rand % 25;
             d = 26 + r;
-        } else if (rand < 8_356_650) {
+        } else if (rand < 8_340_000) {
             uint r = rand % 25;
             d = 1 + r;
-        } else if (rand < 8_356_660) {
+        } else if (rand < 8_340_010) {
             m = 500;
-        } else if (rand < 8_356_760) {
+        } else if (rand < 8_340_110) {
             m = 100;
-        } else if (rand < 8_357_760) {
+        } else if (rand < 8_350_110) {
             m = 50;
-        } else if (rand < 8_491_000) {
+        } else if (rand < 8_500_000) {
             m = 25;
         } else {
             m = 10;

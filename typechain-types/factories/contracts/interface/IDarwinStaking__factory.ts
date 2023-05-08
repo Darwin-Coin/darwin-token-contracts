@@ -126,6 +126,11 @@ const _abi = [
             type: "uint256",
           },
           {
+            internalType: "address",
+            name: "nft",
+            type: "address",
+          },
+          {
             internalType: "uint256",
             name: "tokenId",
             type: "uint256",

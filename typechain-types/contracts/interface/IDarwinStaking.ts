@@ -30,6 +30,7 @@ export declare namespace IDarwinStaking {
     lastClaimTimestamp: PromiseOrValue<BigNumberish>;
     lockEnd: PromiseOrValue<BigNumberish>;
     boost: PromiseOrValue<BigNumberish>;
+    nft: PromiseOrValue<string>;
     tokenId: PromiseOrValue<BigNumberish>;
   };
 
@@ -37,11 +38,13 @@ export declare namespace IDarwinStaking {
     BigNumber,
     BigNumber,
     BigNumber,
+    string,
     BigNumber
   ] & {
     lastClaimTimestamp: BigNumber;
     lockEnd: BigNumber;
     boost: BigNumber;
+    nft: string;
     tokenId: BigNumber;
   };
 }

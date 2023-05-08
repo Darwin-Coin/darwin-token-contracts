@@ -31,13 +31,23 @@ contract EvoturesNFT is ERC721("Evotures NFTs","EVOTURES"), IMultiplierNFT {
             } else if (id > 1000) {
                 id-=1000;
             }
-            // TODO: READ MULTIPLIERS FROM THE EVOTURES XLSL
+            if (id < 3) {
+                mult = 500;
+            } else if (id < 8) {
+                mult = 400;
+            } else if (id < 20) {
+                mult = 300;
+            } else if (id < 40) {
+                mult = 250;
+            } else {
+                mult = 200;
+            }
             mint(msg.sender, mult);
         }
     }
 
     function mint(address _to, uint _multiplier) public {
-        require(msg.sender == dev && lastTokenId < 2101, "EvoturesNFT: CALLER_IS_NOT_DEV");
+        require(msg.sender == dev && lastTokenId < 2101, "EvoturesNFT: CALLER_IS_NOT_DEV_OR_MAX_ID");
         _safeMint(_to, lastTokenId);
         multipliers[lastTokenId] = _multiplier;
         lastTokenId++;
@@ -53,12 +63,10 @@ contract EvoturesNFT is ERC721("Evotures NFTs","EVOTURES"), IMultiplierNFT {
         return bytes(baseURI).length > 0 ? string(abi.encodePacked(baseURI, tokenId.toString(), ".json")) : "";
     }
 
-    // TODO: SET BASE URI
     function _baseURI() internal pure override returns (string memory) {
-        return "ipfs://QmXNRXbSeJVJTGFRa69u9A1wz1H17pkB8S4EXvVQtuRfTE/";
+        return "ipfs://bafybeiegbgy7a2g22pnoxgxkxjztgzz5xnw3naobpfbnb4vl6tsguppcpi/";
     }
 
-    // TODO: SET CONTARCT URI
     function contractURI() public pure returns (string memory) {
         return "https://darwinprotocol.io/evotures.json";
     }

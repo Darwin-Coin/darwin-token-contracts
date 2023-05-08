@@ -2,7 +2,7 @@
 pragma solidity 0.8.14;
 
 /// @title Interface for the Darwin Vester
-interface IDarwinVester {
+interface IOldVester {
 
     /// Presale contract is already initialized
     error AlreadyInitialized();
@@ -10,8 +10,6 @@ interface IDarwinVester {
     error NotInitialized();
     /// Caller is not private sale
     error NotPrivateSale();
-    /// Caller is not vester
-    error NotVestUser();
     /// Parameter cannot be the zero address
     error ZeroAddress();
     /// Selected amount exceeds the withdrawable amount
@@ -25,16 +23,12 @@ interface IDarwinVester {
     event Withdraw(address indexed user, uint indexed withdrawAmount);
     event Claim(address indexed user, uint indexed claimAmount);
 
-    event StakeEvoture(address indexed user, uint indexed evotureTokenId, uint indexed multiplier);
-    event WithdrawEvoture(address indexed user, uint indexed evotureTokenId);
-
     struct UserInfo {
         uint256 withdrawn;
         uint256 vested;
         uint256 vestTimestamp;
         uint256 claimed;
-        uint256 boost;
-        address nft;
-        uint256 tokenId;
     }
+
+    function deposit(address _user, uint _amount) external;
 }

@@ -7,7 +7,7 @@ import { BigNumber } from "ethers";
 import * as hardhat from "hardhat";
 import { ethers, upgrades } from "hardhat";
 import { DarwinBurner, DarwinCommunity } from "../typechain-types";
-import { Darwin, DarwinPrivateSale, DarwinStaking, DarwinVester5, DarwinVester7, EvoturesNFT, LootboxTicket, MultiplierNFT, StakedDarwin } from "../typechain-types/contracts";
+import { Darwin, DarwinPrivateSale, DarwinStaking, DarwinVester5, DarwinVester7, EvoturesNFT, LootboxTicket, MultiplierNFT, OldVester, StakedDarwin } from "../typechain-types/contracts";
 import { ADDRESSES, ADDRESSES_ARB } from "./constants";
 
 
@@ -17,20 +17,22 @@ type UserInfo = {
     vestTimestamp: BigNumber,
     claimed: BigNumber,
     boost: BigNumber,
+    nft: string,
     tokenId: BigNumber
 }
 
 
 async function main() {
+  const ZERO_ADDRESS = "0x0000000000000000000000000000000000000000";
   // BSC
   hardhat.changeNetwork("bsc");
   console.log(`⛓️ Chain: BSC`);
 
   // DECLARE BSC FACTORIES
   const darwinPrivateSaleFactory = await ethers.getContractFactory("DarwinPrivateSale");
-  const darwinVester7Factory = await ethers.getContractFactory("DarwinVester7");
   const privateBSC = darwinPrivateSaleFactory.attach(ADDRESSES.privateSales[0]) as DarwinPrivateSale;
-  const vesterBSC = darwinVester7Factory.attach(ADDRESSES.vester) as DarwinVester7;
+  const oldVesterFactory = await ethers.getContractFactory("OldVester");
+  const vesterBSC = oldVesterFactory.attach(ADDRESSES.vester) as OldVester;
   const privateSoldDarwin = (await privateBSC.status()).soldAmount;
   const privateSaleBuyers = ADDRESSES.privateSaleBuyers;
   const buyersInfo: UserInfo[] = [];
@@ -43,6 +45,7 @@ async function main() {
       vestTimestamp: user.vestTimestamp,
       claimed: user.claimed,
       boost: BigNumber.from(0),
+      nft: ZERO_ADDRESS,
       tokenId: BigNumber.from(0)
     }
     buyersInfo.push(jsUser);
@@ -58,6 +61,7 @@ async function main() {
 
   // DECLARE ARBITRUM FACTORIES
   const darwinVester5Factory = await ethers.getContractFactory("DarwinVester5");
+  const darwinVester7Factory = await ethers.getContractFactory("DarwinVester7");
   const darwinCommunityFactory = await ethers.getContractFactory("DarwinCommunity");
   const darwinFactory = await ethers.getContractFactory("Darwin");
   const stakedDarwinFactory = await ethers.getContractFactory("StakedDarwin");
@@ -117,14 +121,14 @@ async function main() {
 
 
   //! [DEPLOY] VESTER7
-  const vester7 = await darwinVester7Factory.deploy(privateSaleBuyers, buyersInfo, evotures.address, multiplier.address) as DarwinVester7;
+  const vester7 = await darwinVester7Factory.deploy(privateSaleBuyers, buyersInfo, [evotures.address, multiplier.address]) as DarwinVester7;
   await vester7.deployed();
   console.log(`🔨 Deployed Vester7 at: ${vester7.address}`);
 
   //? [VERIFY] VESTER7
   await hardhat.run("verify:verify", {
     address: vester7.address,
-    constructorArguments: [privateSaleBuyers, buyersInfo, evotures.address, multiplier.address]
+    constructorArguments: [privateSaleBuyers, buyersInfo, [evotures.address, multiplier.address]]
   });
 
 
@@ -181,14 +185,14 @@ async function main() {
 
 
   //! [DEPLOY] STAKING
-  const staking = await stakingFactory.deploy(darwin.address, stakedDarwin.address, evotures.address, multiplier.address) as DarwinStaking;
+  const staking = await stakingFactory.deploy(darwin.address, stakedDarwin.address, [evotures.address, multiplier.address]) as DarwinStaking;
   await staking.deployed();
   console.log(`🔨 Deployed Darwin Staking at: ${staking.address}`);
 
   //? [VERIFY] STAKING
   await hardhat.run("verify:verify", {
     address: staking.address,
-    constructorArguments: [darwin.address, stakedDarwin.address, evotures.address, multiplier.address]
+    constructorArguments: [darwin.address, stakedDarwin.address, [evotures.address, multiplier.address]]
   });
 
   //* [INIT] DARWIN WITH STAKING

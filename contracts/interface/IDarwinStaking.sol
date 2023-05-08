@@ -6,6 +6,7 @@ interface IDarwinStaking {
         uint lastClaimTimestamp;
         uint lockEnd;
         uint boost; // (1, 5, 10, 25, 50)
+        address nft;
         uint tokenId;
     }
 

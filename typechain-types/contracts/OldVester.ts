@@ -27,56 +27,21 @@ import type {
   PromiseOrValue,
 } from "../common";
 
-export declare namespace IDarwinVester {
-  export type UserInfoStruct = {
-    withdrawn: PromiseOrValue<BigNumberish>;
-    vested: PromiseOrValue<BigNumberish>;
-    vestTimestamp: PromiseOrValue<BigNumberish>;
-    claimed: PromiseOrValue<BigNumberish>;
-    boost: PromiseOrValue<BigNumberish>;
-    nft: PromiseOrValue<string>;
-    tokenId: PromiseOrValue<BigNumberish>;
-  };
-
-  export type UserInfoStructOutput = [
-    BigNumber,
-    BigNumber,
-    BigNumber,
-    BigNumber,
-    BigNumber,
-    string,
-    BigNumber
-  ] & {
-    withdrawn: BigNumber;
-    vested: BigNumber;
-    vestTimestamp: BigNumber;
-    claimed: BigNumber;
-    boost: BigNumber;
-    nft: string;
-    tokenId: BigNumber;
-  };
-}
-
-export interface DarwinVester7Interface extends utils.Interface {
+export interface OldVesterInterface extends utils.Interface {
   functions: {
     "INTEREST()": FunctionFragment;
     "MONTHS()": FunctionFragment;
     "VESTING_TIME()": FunctionFragment;
-    "addSupportedNFT(address)": FunctionFragment;
     "claimableDarwin(address)": FunctionFragment;
     "darwin()": FunctionFragment;
-    "deployer()": FunctionFragment;
+    "deposit(address,uint256)": FunctionFragment;
     "init(address)": FunctionFragment;
-    "onERC721Received(address,address,uint256,bytes)": FunctionFragment;
     "owner()": FunctionFragment;
-    "removeSupportedNFT(address)": FunctionFragment;
+    "privateSale()": FunctionFragment;
     "renounceOwnership()": FunctionFragment;
-    "stakeEvoture(address,uint256)": FunctionFragment;
-    "supportedNFT(address)": FunctionFragment;
     "transferOwnership(address)": FunctionFragment;
     "userInfo(address)": FunctionFragment;
     "withdraw(uint256)": FunctionFragment;
-    "withdrawEvoture()": FunctionFragment;
     "withdrawableDarwin(address)": FunctionFragment;
   };
 
@@ -85,21 +50,16 @@ export interface DarwinVester7Interface extends utils.Interface {
       | "INTEREST"
       | "MONTHS"
       | "VESTING_TIME"
-      | "addSupportedNFT"
       | "claimableDarwin"
       | "darwin"
-      | "deployer"
+      | "deposit"
       | "init"
-      | "onERC721Received"
       | "owner"
-      | "removeSupportedNFT"
+      | "privateSale"
       | "renounceOwnership"
-      | "stakeEvoture"
-      | "supportedNFT"
       | "transferOwnership"
       | "userInfo"
       | "withdraw"
-      | "withdrawEvoture"
       | "withdrawableDarwin"
   ): FunctionFragment;
 
@@ -110,44 +70,26 @@ export interface DarwinVester7Interface extends utils.Interface {
     values?: undefined
   ): string;
   encodeFunctionData(
-    functionFragment: "addSupportedNFT",
-    values: [PromiseOrValue<string>]
-  ): string;
-  encodeFunctionData(
     functionFragment: "claimableDarwin",
     values: [PromiseOrValue<string>]
   ): string;
   encodeFunctionData(functionFragment: "darwin", values?: undefined): string;
-  encodeFunctionData(functionFragment: "deployer", values?: undefined): string;
+  encodeFunctionData(
+    functionFragment: "deposit",
+    values: [PromiseOrValue<string>, PromiseOrValue<BigNumberish>]
+  ): string;
   encodeFunctionData(
     functionFragment: "init",
     values: [PromiseOrValue<string>]
   ): string;
-  encodeFunctionData(
-    functionFragment: "onERC721Received",
-    values: [
-      PromiseOrValue<string>,
-      PromiseOrValue<string>,
-      PromiseOrValue<BigNumberish>,
-      PromiseOrValue<BytesLike>
-    ]
-  ): string;
   encodeFunctionData(functionFragment: "owner", values?: undefined): string;
   encodeFunctionData(
-    functionFragment: "removeSupportedNFT",
-    values: [PromiseOrValue<string>]
+    functionFragment: "privateSale",
+    values?: undefined
   ): string;
   encodeFunctionData(
     functionFragment: "renounceOwnership",
     values?: undefined
-  ): string;
-  encodeFunctionData(
-    functionFragment: "stakeEvoture",
-    values: [PromiseOrValue<string>, PromiseOrValue<BigNumberish>]
-  ): string;
-  encodeFunctionData(
-    functionFragment: "supportedNFT",
-    values: [PromiseOrValue<string>]
   ): string;
   encodeFunctionData(
     functionFragment: "transferOwnership",
@@ -162,10 +104,6 @@ export interface DarwinVester7Interface extends utils.Interface {
     values: [PromiseOrValue<BigNumberish>]
   ): string;
   encodeFunctionData(
-    functionFragment: "withdrawEvoture",
-    values?: undefined
-  ): string;
-  encodeFunctionData(
     functionFragment: "withdrawableDarwin",
     values: [PromiseOrValue<string>]
   ): string;
@@ -177,35 +115,19 @@ export interface DarwinVester7Interface extends utils.Interface {
     data: BytesLike
   ): Result;
   decodeFunctionResult(
-    functionFragment: "addSupportedNFT",
-    data: BytesLike
-  ): Result;
-  decodeFunctionResult(
     functionFragment: "claimableDarwin",
     data: BytesLike
   ): Result;
   decodeFunctionResult(functionFragment: "darwin", data: BytesLike): Result;
-  decodeFunctionResult(functionFragment: "deployer", data: BytesLike): Result;
+  decodeFunctionResult(functionFragment: "deposit", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "init", data: BytesLike): Result;
-  decodeFunctionResult(
-    functionFragment: "onERC721Received",
-    data: BytesLike
-  ): Result;
   decodeFunctionResult(functionFragment: "owner", data: BytesLike): Result;
   decodeFunctionResult(
-    functionFragment: "removeSupportedNFT",
+    functionFragment: "privateSale",
     data: BytesLike
   ): Result;
   decodeFunctionResult(
     functionFragment: "renounceOwnership",
-    data: BytesLike
-  ): Result;
-  decodeFunctionResult(
-    functionFragment: "stakeEvoture",
-    data: BytesLike
-  ): Result;
-  decodeFunctionResult(
-    functionFragment: "supportedNFT",
     data: BytesLike
   ): Result;
   decodeFunctionResult(
@@ -215,10 +137,6 @@ export interface DarwinVester7Interface extends utils.Interface {
   decodeFunctionResult(functionFragment: "userInfo", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "withdraw", data: BytesLike): Result;
   decodeFunctionResult(
-    functionFragment: "withdrawEvoture",
-    data: BytesLike
-  ): Result;
-  decodeFunctionResult(
     functionFragment: "withdrawableDarwin",
     data: BytesLike
   ): Result;
@@ -226,18 +144,14 @@ export interface DarwinVester7Interface extends utils.Interface {
   events: {
     "Claim(address,uint256)": EventFragment;
     "OwnershipTransferred(address,address)": EventFragment;
-    "StakeEvoture(address,uint256,uint256)": EventFragment;
     "Vest(address,uint256)": EventFragment;
     "Withdraw(address,uint256)": EventFragment;
-    "WithdrawEvoture(address,uint256)": EventFragment;
   };
 
   getEvent(nameOrSignatureOrTopic: "Claim"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "OwnershipTransferred"): EventFragment;
-  getEvent(nameOrSignatureOrTopic: "StakeEvoture"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "Vest"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "Withdraw"): EventFragment;
-  getEvent(nameOrSignatureOrTopic: "WithdrawEvoture"): EventFragment;
 }
 
 export interface ClaimEventObject {
@@ -260,18 +174,6 @@ export type OwnershipTransferredEvent = TypedEvent<
 export type OwnershipTransferredEventFilter =
   TypedEventFilter<OwnershipTransferredEvent>;
 
-export interface StakeEvotureEventObject {
-  user: string;
-  evotureTokenId: BigNumber;
-  multiplier: BigNumber;
-}
-export type StakeEvotureEvent = TypedEvent<
-  [string, BigNumber, BigNumber],
-  StakeEvotureEventObject
->;
-
-export type StakeEvotureEventFilter = TypedEventFilter<StakeEvotureEvent>;
-
 export interface VestEventObject {
   user: string;
   vestAmount: BigNumber;
@@ -291,23 +193,12 @@ export type WithdrawEvent = TypedEvent<
 
 export type WithdrawEventFilter = TypedEventFilter<WithdrawEvent>;
 
-export interface WithdrawEvotureEventObject {
-  user: string;
-  evotureTokenId: BigNumber;
-}
-export type WithdrawEvotureEvent = TypedEvent<
-  [string, BigNumber],
-  WithdrawEvotureEventObject
->;
-
-export type WithdrawEvotureEventFilter = TypedEventFilter<WithdrawEvotureEvent>;
-
-export interface DarwinVester7 extends BaseContract {
+export interface OldVester extends BaseContract {
   connect(signerOrProvider: Signer | Provider | string): this;
   attach(addressOrName: string): this;
   deployed(): Promise<this>;
 
-  interface: DarwinVester7Interface;
+  interface: OldVesterInterface;
 
   queryFilter<TEvent extends TypedEvent>(
     event: TypedEventFilter<TEvent>,
@@ -335,11 +226,6 @@ export interface DarwinVester7 extends BaseContract {
 
     VESTING_TIME(overrides?: CallOverrides): Promise<[BigNumber]>;
 
-    addSupportedNFT(
-      _nft: PromiseOrValue<string>,
-      overrides?: Overrides & { from?: PromiseOrValue<string> }
-    ): Promise<ContractTransaction>;
-
     claimableDarwin(
       _user: PromiseOrValue<string>,
       overrides?: CallOverrides
@@ -347,42 +233,24 @@ export interface DarwinVester7 extends BaseContract {
 
     darwin(overrides?: CallOverrides): Promise<[string]>;
 
-    deployer(overrides?: CallOverrides): Promise<[string]>;
-
-    init(
-      _darwin: PromiseOrValue<string>,
+    deposit(
+      _user: PromiseOrValue<string>,
+      _amount: PromiseOrValue<BigNumberish>,
       overrides?: Overrides & { from?: PromiseOrValue<string> }
     ): Promise<ContractTransaction>;
 
-    onERC721Received(
-      arg0: PromiseOrValue<string>,
-      arg1: PromiseOrValue<string>,
-      arg2: PromiseOrValue<BigNumberish>,
-      arg3: PromiseOrValue<BytesLike>,
+    init(
+      _privateSale: PromiseOrValue<string>,
       overrides?: Overrides & { from?: PromiseOrValue<string> }
     ): Promise<ContractTransaction>;
 
     owner(overrides?: CallOverrides): Promise<[string]>;
 
-    removeSupportedNFT(
-      _nft: PromiseOrValue<string>,
-      overrides?: Overrides & { from?: PromiseOrValue<string> }
-    ): Promise<ContractTransaction>;
+    privateSale(overrides?: CallOverrides): Promise<[string]>;
 
     renounceOwnership(
       overrides?: Overrides & { from?: PromiseOrValue<string> }
     ): Promise<ContractTransaction>;
-
-    stakeEvoture(
-      _nft: PromiseOrValue<string>,
-      _tokenId: PromiseOrValue<BigNumberish>,
-      overrides?: Overrides & { from?: PromiseOrValue<string> }
-    ): Promise<ContractTransaction>;
-
-    supportedNFT(
-      arg0: PromiseOrValue<string>,
-      overrides?: CallOverrides
-    ): Promise<[boolean]>;
 
     transferOwnership(
       newOwner: PromiseOrValue<string>,
@@ -393,31 +261,16 @@ export interface DarwinVester7 extends BaseContract {
       arg0: PromiseOrValue<string>,
       overrides?: CallOverrides
     ): Promise<
-      [
-        BigNumber,
-        BigNumber,
-        BigNumber,
-        BigNumber,
-        BigNumber,
-        string,
-        BigNumber
-      ] & {
+      [BigNumber, BigNumber, BigNumber, BigNumber] & {
         withdrawn: BigNumber;
         vested: BigNumber;
         vestTimestamp: BigNumber;
         claimed: BigNumber;
-        boost: BigNumber;
-        nft: string;
-        tokenId: BigNumber;
       }
     >;
 
     withdraw(
       _amount: PromiseOrValue<BigNumberish>,
-      overrides?: Overrides & { from?: PromiseOrValue<string> }
-    ): Promise<ContractTransaction>;
-
-    withdrawEvoture(
       overrides?: Overrides & { from?: PromiseOrValue<string> }
     ): Promise<ContractTransaction>;
 
@@ -433,11 +286,6 @@ export interface DarwinVester7 extends BaseContract {
 
   VESTING_TIME(overrides?: CallOverrides): Promise<BigNumber>;
 
-  addSupportedNFT(
-    _nft: PromiseOrValue<string>,
-    overrides?: Overrides & { from?: PromiseOrValue<string> }
-  ): Promise<ContractTransaction>;
-
   claimableDarwin(
     _user: PromiseOrValue<string>,
     overrides?: CallOverrides
@@ -445,42 +293,24 @@ export interface DarwinVester7 extends BaseContract {
 
   darwin(overrides?: CallOverrides): Promise<string>;
 
-  deployer(overrides?: CallOverrides): Promise<string>;
-
-  init(
-    _darwin: PromiseOrValue<string>,
+  deposit(
+    _user: PromiseOrValue<string>,
+    _amount: PromiseOrValue<BigNumberish>,
     overrides?: Overrides & { from?: PromiseOrValue<string> }
   ): Promise<ContractTransaction>;
 
-  onERC721Received(
-    arg0: PromiseOrValue<string>,
-    arg1: PromiseOrValue<string>,
-    arg2: PromiseOrValue<BigNumberish>,
-    arg3: PromiseOrValue<BytesLike>,
+  init(
+    _privateSale: PromiseOrValue<string>,
     overrides?: Overrides & { from?: PromiseOrValue<string> }
   ): Promise<ContractTransaction>;
 
   owner(overrides?: CallOverrides): Promise<string>;
 
-  removeSupportedNFT(
-    _nft: PromiseOrValue<string>,
-    overrides?: Overrides & { from?: PromiseOrValue<string> }
-  ): Promise<ContractTransaction>;
+  privateSale(overrides?: CallOverrides): Promise<string>;
 
   renounceOwnership(
     overrides?: Overrides & { from?: PromiseOrValue<string> }
   ): Promise<ContractTransaction>;
-
-  stakeEvoture(
-    _nft: PromiseOrValue<string>,
-    _tokenId: PromiseOrValue<BigNumberish>,
-    overrides?: Overrides & { from?: PromiseOrValue<string> }
-  ): Promise<ContractTransaction>;
-
-  supportedNFT(
-    arg0: PromiseOrValue<string>,
-    overrides?: CallOverrides
-  ): Promise<boolean>;
 
   transferOwnership(
     newOwner: PromiseOrValue<string>,
@@ -491,31 +321,16 @@ export interface DarwinVester7 extends BaseContract {
     arg0: PromiseOrValue<string>,
     overrides?: CallOverrides
   ): Promise<
-    [
-      BigNumber,
-      BigNumber,
-      BigNumber,
-      BigNumber,
-      BigNumber,
-      string,
-      BigNumber
-    ] & {
+    [BigNumber, BigNumber, BigNumber, BigNumber] & {
       withdrawn: BigNumber;
       vested: BigNumber;
       vestTimestamp: BigNumber;
       claimed: BigNumber;
-      boost: BigNumber;
-      nft: string;
-      tokenId: BigNumber;
     }
   >;
 
   withdraw(
     _amount: PromiseOrValue<BigNumberish>,
-    overrides?: Overrides & { from?: PromiseOrValue<string> }
-  ): Promise<ContractTransaction>;
-
-  withdrawEvoture(
     overrides?: Overrides & { from?: PromiseOrValue<string> }
   ): Promise<ContractTransaction>;
 
@@ -531,11 +346,6 @@ export interface DarwinVester7 extends BaseContract {
 
     VESTING_TIME(overrides?: CallOverrides): Promise<BigNumber>;
 
-    addSupportedNFT(
-      _nft: PromiseOrValue<string>,
-      overrides?: CallOverrides
-    ): Promise<void>;
-
     claimableDarwin(
       _user: PromiseOrValue<string>,
       overrides?: CallOverrides
@@ -543,40 +353,22 @@ export interface DarwinVester7 extends BaseContract {
 
     darwin(overrides?: CallOverrides): Promise<string>;
 
-    deployer(overrides?: CallOverrides): Promise<string>;
-
-    init(
-      _darwin: PromiseOrValue<string>,
+    deposit(
+      _user: PromiseOrValue<string>,
+      _amount: PromiseOrValue<BigNumberish>,
       overrides?: CallOverrides
     ): Promise<void>;
 
-    onERC721Received(
-      arg0: PromiseOrValue<string>,
-      arg1: PromiseOrValue<string>,
-      arg2: PromiseOrValue<BigNumberish>,
-      arg3: PromiseOrValue<BytesLike>,
+    init(
+      _privateSale: PromiseOrValue<string>,
       overrides?: CallOverrides
-    ): Promise<string>;
+    ): Promise<void>;
 
     owner(overrides?: CallOverrides): Promise<string>;
 
-    removeSupportedNFT(
-      _nft: PromiseOrValue<string>,
-      overrides?: CallOverrides
-    ): Promise<void>;
+    privateSale(overrides?: CallOverrides): Promise<string>;
 
     renounceOwnership(overrides?: CallOverrides): Promise<void>;
-
-    stakeEvoture(
-      _nft: PromiseOrValue<string>,
-      _tokenId: PromiseOrValue<BigNumberish>,
-      overrides?: CallOverrides
-    ): Promise<void>;
-
-    supportedNFT(
-      arg0: PromiseOrValue<string>,
-      overrides?: CallOverrides
-    ): Promise<boolean>;
 
     transferOwnership(
       newOwner: PromiseOrValue<string>,
@@ -587,22 +379,11 @@ export interface DarwinVester7 extends BaseContract {
       arg0: PromiseOrValue<string>,
       overrides?: CallOverrides
     ): Promise<
-      [
-        BigNumber,
-        BigNumber,
-        BigNumber,
-        BigNumber,
-        BigNumber,
-        string,
-        BigNumber
-      ] & {
+      [BigNumber, BigNumber, BigNumber, BigNumber] & {
         withdrawn: BigNumber;
         vested: BigNumber;
         vestTimestamp: BigNumber;
         claimed: BigNumber;
-        boost: BigNumber;
-        nft: string;
-        tokenId: BigNumber;
       }
     >;
 
@@ -610,8 +391,6 @@ export interface DarwinVester7 extends BaseContract {
       _amount: PromiseOrValue<BigNumberish>,
       overrides?: CallOverrides
     ): Promise<void>;
-
-    withdrawEvoture(overrides?: CallOverrides): Promise<void>;
 
     withdrawableDarwin(
       _user: PromiseOrValue<string>,
@@ -638,17 +417,6 @@ export interface DarwinVester7 extends BaseContract {
       newOwner?: PromiseOrValue<string> | null
     ): OwnershipTransferredEventFilter;
 
-    "StakeEvoture(address,uint256,uint256)"(
-      user?: PromiseOrValue<string> | null,
-      evotureTokenId?: PromiseOrValue<BigNumberish> | null,
-      multiplier?: PromiseOrValue<BigNumberish> | null
-    ): StakeEvotureEventFilter;
-    StakeEvoture(
-      user?: PromiseOrValue<string> | null,
-      evotureTokenId?: PromiseOrValue<BigNumberish> | null,
-      multiplier?: PromiseOrValue<BigNumberish> | null
-    ): StakeEvotureEventFilter;
-
     "Vest(address,uint256)"(
       user?: PromiseOrValue<string> | null,
       vestAmount?: PromiseOrValue<BigNumberish> | null
@@ -666,15 +434,6 @@ export interface DarwinVester7 extends BaseContract {
       user?: PromiseOrValue<string> | null,
       withdrawAmount?: PromiseOrValue<BigNumberish> | null
     ): WithdrawEventFilter;
-
-    "WithdrawEvoture(address,uint256)"(
-      user?: PromiseOrValue<string> | null,
-      evotureTokenId?: PromiseOrValue<BigNumberish> | null
-    ): WithdrawEvotureEventFilter;
-    WithdrawEvoture(
-      user?: PromiseOrValue<string> | null,
-      evotureTokenId?: PromiseOrValue<BigNumberish> | null
-    ): WithdrawEvotureEventFilter;
   };
 
   estimateGas: {
@@ -684,11 +443,6 @@ export interface DarwinVester7 extends BaseContract {
 
     VESTING_TIME(overrides?: CallOverrides): Promise<BigNumber>;
 
-    addSupportedNFT(
-      _nft: PromiseOrValue<string>,
-      overrides?: Overrides & { from?: PromiseOrValue<string> }
-    ): Promise<BigNumber>;
-
     claimableDarwin(
       _user: PromiseOrValue<string>,
       overrides?: CallOverrides
@@ -696,41 +450,23 @@ export interface DarwinVester7 extends BaseContract {
 
     darwin(overrides?: CallOverrides): Promise<BigNumber>;
 
-    deployer(overrides?: CallOverrides): Promise<BigNumber>;
-
-    init(
-      _darwin: PromiseOrValue<string>,
+    deposit(
+      _user: PromiseOrValue<string>,
+      _amount: PromiseOrValue<BigNumberish>,
       overrides?: Overrides & { from?: PromiseOrValue<string> }
     ): Promise<BigNumber>;
 
-    onERC721Received(
-      arg0: PromiseOrValue<string>,
-      arg1: PromiseOrValue<string>,
-      arg2: PromiseOrValue<BigNumberish>,
-      arg3: PromiseOrValue<BytesLike>,
+    init(
+      _privateSale: PromiseOrValue<string>,
       overrides?: Overrides & { from?: PromiseOrValue<string> }
     ): Promise<BigNumber>;
 
     owner(overrides?: CallOverrides): Promise<BigNumber>;
 
-    removeSupportedNFT(
-      _nft: PromiseOrValue<string>,
-      overrides?: Overrides & { from?: PromiseOrValue<string> }
-    ): Promise<BigNumber>;
+    privateSale(overrides?: CallOverrides): Promise<BigNumber>;
 
     renounceOwnership(
       overrides?: Overrides & { from?: PromiseOrValue<string> }
-    ): Promise<BigNumber>;
-
-    stakeEvoture(
-      _nft: PromiseOrValue<string>,
-      _tokenId: PromiseOrValue<BigNumberish>,
-      overrides?: Overrides & { from?: PromiseOrValue<string> }
-    ): Promise<BigNumber>;
-
-    supportedNFT(
-      arg0: PromiseOrValue<string>,
-      overrides?: CallOverrides
     ): Promise<BigNumber>;
 
     transferOwnership(
@@ -745,10 +481,6 @@ export interface DarwinVester7 extends BaseContract {
 
     withdraw(
       _amount: PromiseOrValue<BigNumberish>,
-      overrides?: Overrides & { from?: PromiseOrValue<string> }
-    ): Promise<BigNumber>;
-
-    withdrawEvoture(
       overrides?: Overrides & { from?: PromiseOrValue<string> }
     ): Promise<BigNumber>;
 
@@ -765,11 +497,6 @@ export interface DarwinVester7 extends BaseContract {
 
     VESTING_TIME(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
-    addSupportedNFT(
-      _nft: PromiseOrValue<string>,
-      overrides?: Overrides & { from?: PromiseOrValue<string> }
-    ): Promise<PopulatedTransaction>;
-
     claimableDarwin(
       _user: PromiseOrValue<string>,
       overrides?: CallOverrides
@@ -777,41 +504,23 @@ export interface DarwinVester7 extends BaseContract {
 
     darwin(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
-    deployer(overrides?: CallOverrides): Promise<PopulatedTransaction>;
-
-    init(
-      _darwin: PromiseOrValue<string>,
+    deposit(
+      _user: PromiseOrValue<string>,
+      _amount: PromiseOrValue<BigNumberish>,
       overrides?: Overrides & { from?: PromiseOrValue<string> }
     ): Promise<PopulatedTransaction>;
 
-    onERC721Received(
-      arg0: PromiseOrValue<string>,
-      arg1: PromiseOrValue<string>,
-      arg2: PromiseOrValue<BigNumberish>,
-      arg3: PromiseOrValue<BytesLike>,
+    init(
+      _privateSale: PromiseOrValue<string>,
       overrides?: Overrides & { from?: PromiseOrValue<string> }
     ): Promise<PopulatedTransaction>;
 
     owner(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
-    removeSupportedNFT(
-      _nft: PromiseOrValue<string>,
-      overrides?: Overrides & { from?: PromiseOrValue<string> }
-    ): Promise<PopulatedTransaction>;
+    privateSale(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
     renounceOwnership(
       overrides?: Overrides & { from?: PromiseOrValue<string> }
-    ): Promise<PopulatedTransaction>;
-
-    stakeEvoture(
-      _nft: PromiseOrValue<string>,
-      _tokenId: PromiseOrValue<BigNumberish>,
-      overrides?: Overrides & { from?: PromiseOrValue<string> }
-    ): Promise<PopulatedTransaction>;
-
-    supportedNFT(
-      arg0: PromiseOrValue<string>,
-      overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 
     transferOwnership(
@@ -826,10 +535,6 @@ export interface DarwinVester7 extends BaseContract {
 
     withdraw(
       _amount: PromiseOrValue<BigNumberish>,
-      overrides?: Overrides & { from?: PromiseOrValue<string> }
-    ): Promise<PopulatedTransaction>;
-
-    withdrawEvoture(
       overrides?: Overrides & { from?: PromiseOrValue<string> }
     ): Promise<PopulatedTransaction>;
 

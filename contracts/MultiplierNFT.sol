@@ -51,7 +51,7 @@ contract MultiplierNFT is ERC721("Multiplier NFTs","MULTI"), IMultiplierNFT {
     }
 
     function _baseURI() internal pure override returns (string memory) {
-        return "ipfs://QmQw69vVunkuEGPbs5h6Pm4qFrGPvJQWW5kYsiBE2seGom/";
+        return "ipfs://bafybeicz7c6xldmpoiaytqzrxdnulroxkpe2m65l55vucwev6oa63dtweq/";
     }
 
     function contractURI() public pure returns (string memory) {

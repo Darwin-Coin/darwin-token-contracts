@@ -14,4 +14,5 @@ export { DarwinVester7__factory } from "./DarwinVester7__factory";
 export { EvoturesNFT__factory } from "./EvoturesNFT__factory";
 export { LootboxTicket__factory } from "./LootboxTicket__factory";
 export { MultiplierNFT__factory } from "./MultiplierNFT__factory";
+export { OldVester__factory } from "./OldVester__factory";
 export { StakedDarwin__factory } from "./StakedDarwin__factory";
