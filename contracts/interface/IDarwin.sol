@@ -56,6 +56,8 @@ interface IDarwin {
     function stakedDarwin() external view returns(IStakedDarwin);
     function MAX_SUPPLY() external pure returns(uint256);
 
+    function burn(uint256 amount) external;
+
     /// TransferFrom amount is greater than allowance
     error InsufficientAllowance();
     /// Only the DarwinCommunity can call this function
