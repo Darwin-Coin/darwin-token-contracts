@@ -31,6 +31,7 @@ export interface IDarwinInterface extends utils.Interface {
   functions: {
     "MAX_SUPPLY()": FunctionFragment;
     "bulkTransfer(address[],uint256[])": FunctionFragment;
+    "burn(uint256)": FunctionFragment;
     "communityPause()": FunctionFragment;
     "communityUnPause()": FunctionFragment;
     "distributeRewards(uint256)": FunctionFragment;
@@ -55,6 +56,7 @@ export interface IDarwinInterface extends utils.Interface {
     nameOrSignatureOrTopic:
       | "MAX_SUPPLY"
       | "bulkTransfer"
+      | "burn"
       | "communityPause"
       | "communityUnPause"
       | "distributeRewards"
@@ -82,6 +84,10 @@ export interface IDarwinInterface extends utils.Interface {
   encodeFunctionData(
     functionFragment: "bulkTransfer",
     values: [PromiseOrValue<string>[], PromiseOrValue<BigNumberish>[]]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "burn",
+    values: [PromiseOrValue<BigNumberish>]
   ): string;
   encodeFunctionData(
     functionFragment: "communityPause",
@@ -155,6 +161,7 @@ export interface IDarwinInterface extends utils.Interface {
     functionFragment: "bulkTransfer",
     data: BytesLike
   ): Result;
+  decodeFunctionResult(functionFragment: "burn", data: BytesLike): Result;
   decodeFunctionResult(
     functionFragment: "communityPause",
     data: BytesLike
@@ -338,6 +345,11 @@ export interface IDarwin extends BaseContract {
       overrides?: Overrides & { from?: PromiseOrValue<string> }
     ): Promise<ContractTransaction>;
 
+    burn(
+      amount: PromiseOrValue<BigNumberish>,
+      overrides?: Overrides & { from?: PromiseOrValue<string> }
+    ): Promise<ContractTransaction>;
+
     communityPause(
       overrides?: Overrides & { from?: PromiseOrValue<string> }
     ): Promise<ContractTransaction>;
@@ -433,6 +445,11 @@ export interface IDarwin extends BaseContract {
     overrides?: Overrides & { from?: PromiseOrValue<string> }
   ): Promise<ContractTransaction>;
 
+  burn(
+    amount: PromiseOrValue<BigNumberish>,
+    overrides?: Overrides & { from?: PromiseOrValue<string> }
+  ): Promise<ContractTransaction>;
+
   communityPause(
     overrides?: Overrides & { from?: PromiseOrValue<string> }
   ): Promise<ContractTransaction>;
@@ -525,6 +542,11 @@ export interface IDarwin extends BaseContract {
     bulkTransfer(
       recipients: PromiseOrValue<string>[],
       amounts: PromiseOrValue<BigNumberish>[],
+      overrides?: CallOverrides
+    ): Promise<void>;
+
+    burn(
+      amount: PromiseOrValue<BigNumberish>,
       overrides?: CallOverrides
     ): Promise<void>;
 
@@ -655,6 +677,11 @@ export interface IDarwin extends BaseContract {
       overrides?: Overrides & { from?: PromiseOrValue<string> }
     ): Promise<BigNumber>;
 
+    burn(
+      amount: PromiseOrValue<BigNumberish>,
+      overrides?: Overrides & { from?: PromiseOrValue<string> }
+    ): Promise<BigNumber>;
+
     communityPause(
       overrides?: Overrides & { from?: PromiseOrValue<string> }
     ): Promise<BigNumber>;
@@ -748,6 +775,11 @@ export interface IDarwin extends BaseContract {
     bulkTransfer(
       recipients: PromiseOrValue<string>[],
       amounts: PromiseOrValue<BigNumberish>[],
+      overrides?: Overrides & { from?: PromiseOrValue<string> }
+    ): Promise<PopulatedTransaction>;
+
+    burn(
+      amount: PromiseOrValue<BigNumberish>,
       overrides?: Overrides & { from?: PromiseOrValue<string> }
     ): Promise<PopulatedTransaction>;
 
