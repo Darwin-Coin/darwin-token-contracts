@@ -44,7 +44,7 @@ export const ADDRESSES_ARB_GOERLI = {
     deployer: "0x63a0704e005776B153248A500Dfd950873AFB186",
     darwin: "",
     community: "",
-    drop: "",
+    drop: "0x63a0704e005776B153248A500Dfd950873AFB186", // NOT ACTUALLY DROP ADDRESS
     evotures: "0xF0dEBDc03420d947bC6f53659c424413adC74fDb",
     tickets: "0xFBBE61b464a8eAF1C8BeE435Af695cB947669f9a",
     presale: "",
