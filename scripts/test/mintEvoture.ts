@@ -1,7 +1,7 @@
 import * as hardhat from "hardhat";
 import { ethers } from "hardhat";
-import { EvoturesNFT, LootboxTicket } from "../typechain-types/contracts";
-import { ADDRESSES_ARB_GOERLI, ADDRESSES_ARB } from "./constants";
+import { EvoturesNFT, LootboxTicket } from "../../typechain-types/contracts";
+import { ADDRESSES_ARB_GOERLI, ADDRESSES_ARB } from "../constants";
 
 enum Rarity {
     COMMON,

@@ -1,6 +1,6 @@
 import * as hardhat from "hardhat";
 import { ethers } from "hardhat";
-import { EvoturesNFT, LootboxTicket } from "../typechain-types/contracts";
+import { EvoturesNFT, LootboxTicket } from "../../typechain-types/contracts";
 
 
 async function main() {

@@ -4,9 +4,9 @@
 // When running the script with `npx hardhat run <script>` you'll find the Hardhat
 // Runtime Environment's members available in the global scope.
 import { ethers, upgrades } from "hardhat";
-import { DarwinBurner, DarwinCommunity } from "../typechain-types";
-import { Darwin, DarwinStaking, DarwinVester5, DarwinVester7, EvoturesNFT, LootboxTicket, MultiplierNFT, StakedDarwin } from "../typechain-types/contracts";
-import { ADDRESSES_ARB_GOERLI } from "./constants";
+import { DarwinBurner, DarwinCommunity } from "../../typechain-types";
+import { Darwin, DarwinStaking, DarwinVester5, DarwinVester7, EvoturesNFT, LootboxTicket, MultiplierNFT, StakedDarwin } from "../../typechain-types/contracts";
+import { ADDRESSES_ARB_GOERLI } from "../constants";
 
 
 async function main() {

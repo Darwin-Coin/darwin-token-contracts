@@ -6,9 +6,9 @@
 import { BigNumber } from "ethers";
 import * as hardhat from "hardhat";
 import { ethers, upgrades } from "hardhat";
-import { DarwinBurner, DarwinCommunity } from "../typechain-types";
-import { Darwin, DarwinPrivateSale, DarwinStaking, DarwinVester5, DarwinVester7, EvoturesNFT, LootboxTicket, StakedDarwin } from "../typechain-types/contracts";
-import { ADDRESSES, ADDRESSES_ARB } from "./constants";
+import { DarwinBurner, DarwinCommunity } from "../../typechain-types";
+import { Darwin, DarwinPrivateSale, DarwinStaking, DarwinVester5, DarwinVester7, EvoturesNFT, LootboxTicket, StakedDarwin } from "../../typechain-types/contracts";
+import { ADDRESSES, ADDRESSES_ARB } from "../constants";
 
 
 type UserInfo = {

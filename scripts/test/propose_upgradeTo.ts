@@ -5,9 +5,9 @@
 // Runtime Environment's members available in the global scope.
 import * as hardhat from "hardhat";
 import { ethers } from "hardhat";
-import { DarwinCommunity } from "../typechain-types";
-import { Darwin } from "../typechain-types/contracts";
-import { ADDRESSES } from "./constants";
+import { DarwinCommunity } from "../../typechain-types";
+import { Darwin } from "../../typechain-types/contracts";
+import { ADDRESSES } from "../constants";
 
 
 async function main() {
