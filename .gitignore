@@ -11,5 +11,6 @@ package-lock.json
 
 #Hardhat files
 cache
+artifacts/build-info
 
 .DS_Store
