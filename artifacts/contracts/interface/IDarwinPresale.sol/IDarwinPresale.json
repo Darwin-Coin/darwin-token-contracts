@@ -1,0 +1,162 @@
+{
+  "_format": "hh-sol-artifact-1",
+  "contractName": "IDarwinPresale",
+  "sourceName": "contracts/interface/IDarwinPresale.sol",
+  "abi": [
+    {
+      "inputs": [],
+      "name": "AlreadyInitialized",
+      "type": "error"
+    },
+    {
+      "inputs": [],
+      "name": "AmountExceedsHardcap",
+      "type": "error"
+    },
+    {
+      "inputs": [],
+      "name": "ApproveFailed",
+      "type": "error"
+    },
+    {
+      "inputs": [],
+      "name": "InvalidDepositAmount",
+      "type": "error"
+    },
+    {
+      "inputs": [],
+      "name": "InvalidEndDate",
+      "type": "error"
+    },
+    {
+      "inputs": [],
+      "name": "InvalidStartDate",
+      "type": "error"
+    },
+    {
+      "inputs": [],
+      "name": "NotInitialized",
+      "type": "error"
+    },
+    {
+      "inputs": [],
+      "name": "PresaleNotActive",
+      "type": "error"
+    },
+    {
+      "inputs": [],
+      "name": "PresaleNotEnded",
+      "type": "error"
+    },
+    {
+      "inputs": [],
+      "name": "TransferFailed",
+      "type": "error"
+    },
+    {
+      "inputs": [],
+      "name": "ZeroAddress",
+      "type": "error"
+    },
+    {
+      "anonymous": false,
+      "inputs": [
+        {
+          "indexed": true,
+          "internalType": "uint256",
+          "name": "ethAmount",
+          "type": "uint256"
+        },
+        {
+          "indexed": true,
+          "internalType": "uint256",
+          "name": "unsoldDarwinAmount",
+          "type": "uint256"
+        }
+      ],
+      "name": "PresaleCompleted",
+      "type": "event"
+    },
+    {
+      "anonymous": false,
+      "inputs": [
+        {
+          "indexed": true,
+          "internalType": "uint256",
+          "name": "endDate",
+          "type": "uint256"
+        }
+      ],
+      "name": "PresaleEndDateSet",
+      "type": "event"
+    },
+    {
+      "anonymous": false,
+      "inputs": [
+        {
+          "indexed": true,
+          "internalType": "address",
+          "name": "router",
+          "type": "address"
+        }
+      ],
+      "name": "RouterSet",
+      "type": "event"
+    },
+    {
+      "anonymous": false,
+      "inputs": [
+        {
+          "indexed": true,
+          "internalType": "address",
+          "name": "user",
+          "type": "address"
+        },
+        {
+          "indexed": true,
+          "internalType": "uint256",
+          "name": "amountIn",
+          "type": "uint256"
+        },
+        {
+          "indexed": true,
+          "internalType": "uint256",
+          "name": "darwinAmount",
+          "type": "uint256"
+        }
+      ],
+      "name": "UserDeposit",
+      "type": "event"
+    },
+    {
+      "anonymous": false,
+      "inputs": [
+        {
+          "indexed": true,
+          "internalType": "address",
+          "name": "wallet1",
+          "type": "address"
+        }
+      ],
+      "name": "Wallet1Set",
+      "type": "event"
+    },
+    {
+      "anonymous": false,
+      "inputs": [
+        {
+          "indexed": true,
+          "internalType": "address",
+          "name": "wallet2",
+          "type": "address"
+        }
+      ],
+      "name": "Wallet2Set",
+      "type": "event"
+    }
+  ],
+  "bytecode": "0x",
+  "deployedBytecode": "0x",
+  "linkReferences": {},
+  "deployedLinkReferences": {}
+}
