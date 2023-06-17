@@ -54,6 +54,8 @@ interface IDarwinCommunity {
     event ProposalCanceled(uint256 indexed id);
     /// @notice An event emitted when a proposal has been executed
     event ProposalExecuted(uint256 indexed id);
+    /// @notice An event emitted when a proposal has been called 1 time for execution
+    event ProposalFirstCallExecuted(uint256 indexed id);
     /// @notice An event emitted when a user withdraws the StakedDarwin they previously locked in to cast votes
     event Withdraw(address indexed user, uint256 indexed darwinAmount);
     event ActiveFundCandidateRemoved(uint256 indexed id);

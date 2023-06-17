@@ -54,6 +54,7 @@ export interface IDarwinCommunityInterface extends utils.Interface {
     "ProposalCanceled(uint256)": EventFragment;
     "ProposalCreated(uint256,address,uint256,uint256,string,string,string)": EventFragment;
     "ProposalExecuted(uint256)": EventFragment;
+    "ProposalFirstCallExecuted(uint256)": EventFragment;
     "VoteCast(address,uint256,bool)": EventFragment;
     "Withdraw(address,uint256)": EventFragment;
   };
@@ -67,6 +68,7 @@ export interface IDarwinCommunityInterface extends utils.Interface {
   getEvent(nameOrSignatureOrTopic: "ProposalCanceled"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "ProposalCreated"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "ProposalExecuted"): EventFragment;
+  getEvent(nameOrSignatureOrTopic: "ProposalFirstCallExecuted"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "VoteCast"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "Withdraw"): EventFragment;
 }
@@ -183,6 +185,17 @@ export type ProposalExecutedEvent = TypedEvent<
 
 export type ProposalExecutedEventFilter =
   TypedEventFilter<ProposalExecutedEvent>;
+
+export interface ProposalFirstCallExecutedEventObject {
+  id: BigNumber;
+}
+export type ProposalFirstCallExecutedEvent = TypedEvent<
+  [BigNumber],
+  ProposalFirstCallExecutedEventObject
+>;
+
+export type ProposalFirstCallExecutedEventFilter =
+  TypedEventFilter<ProposalFirstCallExecutedEvent>;
 
 export interface VoteCastEventObject {
   voter: string;
@@ -345,6 +358,13 @@ export interface IDarwinCommunity extends BaseContract {
     ProposalExecuted(
       id?: PromiseOrValue<BigNumberish> | null
     ): ProposalExecutedEventFilter;
+
+    "ProposalFirstCallExecuted(uint256)"(
+      id?: PromiseOrValue<BigNumberish> | null
+    ): ProposalFirstCallExecutedEventFilter;
+    ProposalFirstCallExecuted(
+      id?: PromiseOrValue<BigNumberish> | null
+    ): ProposalFirstCallExecutedEventFilter;
 
     "VoteCast(address,uint256,bool)"(
       voter?: PromiseOrValue<string> | null,

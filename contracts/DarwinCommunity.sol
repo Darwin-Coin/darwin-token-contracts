@@ -430,6 +430,7 @@ contract DarwinCommunity is IDarwinCommunity, AccessControl, ReentrancyGuard {
             _calledExecute[proposalId][msg.sender] = true;
             _calls[proposalId]++;
             if (_calls[proposalId] < CALLS_TO_EXECUTE) {
+                emit ProposalFirstCallExecuted(proposalId);
                 return;
             }
         }

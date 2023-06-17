@@ -587,6 +587,7 @@ export interface DarwinCommunityInterface extends utils.Interface {
     "ProposalCanceled(uint256)": EventFragment;
     "ProposalCreated(uint256,address,uint256,uint256,string,string,string)": EventFragment;
     "ProposalExecuted(uint256)": EventFragment;
+    "ProposalFirstCallExecuted(uint256)": EventFragment;
     "RoleAdminChanged(bytes32,bytes32,bytes32)": EventFragment;
     "RoleGranted(bytes32,address,address)": EventFragment;
     "RoleRevoked(bytes32,address,address)": EventFragment;
@@ -603,6 +604,7 @@ export interface DarwinCommunityInterface extends utils.Interface {
   getEvent(nameOrSignatureOrTopic: "ProposalCanceled"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "ProposalCreated"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "ProposalExecuted"): EventFragment;
+  getEvent(nameOrSignatureOrTopic: "ProposalFirstCallExecuted"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "RoleAdminChanged"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "RoleGranted"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "RoleRevoked"): EventFragment;
@@ -722,6 +724,17 @@ export type ProposalExecutedEvent = TypedEvent<
 
 export type ProposalExecutedEventFilter =
   TypedEventFilter<ProposalExecutedEvent>;
+
+export interface ProposalFirstCallExecutedEventObject {
+  id: BigNumber;
+}
+export type ProposalFirstCallExecutedEvent = TypedEvent<
+  [BigNumber],
+  ProposalFirstCallExecutedEventObject
+>;
+
+export type ProposalFirstCallExecutedEventFilter =
+  TypedEventFilter<ProposalFirstCallExecutedEvent>;
 
 export interface RoleAdminChangedEventObject {
   role: string;
@@ -1563,6 +1576,13 @@ export interface DarwinCommunity extends BaseContract {
     ProposalExecuted(
       id?: PromiseOrValue<BigNumberish> | null
     ): ProposalExecutedEventFilter;
+
+    "ProposalFirstCallExecuted(uint256)"(
+      id?: PromiseOrValue<BigNumberish> | null
+    ): ProposalFirstCallExecutedEventFilter;
+    ProposalFirstCallExecuted(
+      id?: PromiseOrValue<BigNumberish> | null
+    ): ProposalFirstCallExecutedEventFilter;
 
     "RoleAdminChanged(bytes32,bytes32,bytes32)"(
       role?: PromiseOrValue<BytesLike> | null,
