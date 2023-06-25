@@ -185,6 +185,10 @@ declare module "hardhat/types/runtime" {
       signerOrOptions?: ethers.Signer | FactoryOptions
     ): Promise<Contracts.IERC20__factory>;
     getContractFactory(
+      name: "IEvoturesNFT",
+      signerOrOptions?: ethers.Signer | FactoryOptions
+    ): Promise<Contracts.IEvoturesNFT__factory>;
+    getContractFactory(
       name: "ILootboxTicket",
       signerOrOptions?: ethers.Signer | FactoryOptions
     ): Promise<Contracts.ILootboxTicket__factory>;
@@ -436,6 +440,11 @@ declare module "hardhat/types/runtime" {
       address: string,
       signer?: ethers.Signer
     ): Promise<Contracts.IERC20>;
+    getContractAt(
+      name: "IEvoturesNFT",
+      address: string,
+      signer?: ethers.Signer
+    ): Promise<Contracts.IEvoturesNFT>;
     getContractAt(
       name: "ILootboxTicket",
       address: string,

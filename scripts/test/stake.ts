@@ -14,8 +14,8 @@ async function main() {
   // Hardhat always runs the compile task when running scripts with its command
   const [owner] = await hardhat.ethers.getSigners();
 
-  const STAKING = "0xa0C0bB2705E35096903D2b71b8e468EB263C5FBB";
-  const DARWIN = "0xCb32Ffff9FF15eFb57a35827D3cDC0A9A0Aab14A";
+  const STAKING = "0xAd598F666a54d965A0c20E6ABCdf2f2ff6944493";
+  const DARWIN = "0x21321AbD1ac6657d38AFfD50ac8F1b1d6c7BEAb8";
 
   console.log(`💻 Owner: ${owner.address}`);
 
@@ -26,11 +26,14 @@ async function main() {
   const staking = stakingFactory.attach(STAKING) as DarwinStaking;
   const darwin = darwinFactory.attach(DARWIN) as Darwin;
 
-  /* const approveTx = await darwin.approve(staking.address, ethers.utils.parseEther("1000000"));
-  await approveTx.wait();
-  console.log("Darwin approved"); */
+  const unpause = await darwin.emergencyUnPause();
+  await unpause.wait();
 
-  const stakeTx = await staking.stake(ethers.utils.parseEther("0"), 3600);
+  const approveTx = await darwin.approve(staking.address, ethers.utils.parseEther("1000000"));
+  await approveTx.wait();
+  console.log("Darwin approved");
+
+  const stakeTx = await staking.stake(ethers.utils.parseEther("1"), 3600);
   await stakeTx.wait();
   console.log("Darwin staked");
 }

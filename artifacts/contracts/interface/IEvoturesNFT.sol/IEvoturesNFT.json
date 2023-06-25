@@ -1,0 +1,48 @@
+{
+  "_format": "hh-sol-artifact-1",
+  "contractName": "IEvoturesNFT",
+  "sourceName": "contracts/interface/IEvoturesNFT.sol",
+  "abi": [
+    {
+      "inputs": [
+        {
+          "internalType": "uint8",
+          "name": "_evotures",
+          "type": "uint8"
+        },
+        {
+          "internalType": "uint8",
+          "name": "_boosters",
+          "type": "uint8"
+        }
+      ],
+      "name": "mint",
+      "outputs": [],
+      "stateMutability": "payable",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "uint16",
+          "name": "id",
+          "type": "uint16"
+        }
+      ],
+      "name": "multipliers",
+      "outputs": [
+        {
+          "internalType": "uint16",
+          "name": "mult",
+          "type": "uint16"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    }
+  ],
+  "bytecode": "0x",
+  "deployedBytecode": "0x",
+  "linkReferences": {},
+  "deployedLinkReferences": {}
+}

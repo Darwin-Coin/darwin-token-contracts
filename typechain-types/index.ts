@@ -88,6 +88,8 @@ export type { IDarwinStaking } from "./contracts/interface/IDarwinStaking";
 export { IDarwinStaking__factory } from "./factories/contracts/interface/IDarwinStaking__factory";
 export type { IDarwinVester } from "./contracts/interface/IDarwinVester";
 export { IDarwinVester__factory } from "./factories/contracts/interface/IDarwinVester__factory";
+export type { IEvoturesNFT } from "./contracts/interface/IEvoturesNFT";
+export { IEvoturesNFT__factory } from "./factories/contracts/interface/IEvoturesNFT__factory";
 export type { ILootboxTicket } from "./contracts/interface/ILootboxTicket";
 export { ILootboxTicket__factory } from "./factories/contracts/interface/ILootboxTicket__factory";
 export type { IMultiplierNFT } from "./contracts/interface/IMultiplierNFT";

@@ -84,7 +84,7 @@ contract DarwinStaking is IDarwinStaking, ReentrancyGuard, IERC721Receiver {
         claimable = (staked * BASE_APR * timePassedFromLastClaim) / (100e18 * _SECONDS_IN_YEAR) + bonusClaimable;
         
         if (boost > 0) {
-            claimable += ((claimable * boost) / 100);
+            claimable += ((claimable * boost) / 1000);
         }
     }
 

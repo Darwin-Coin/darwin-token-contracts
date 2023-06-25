@@ -148,7 +148,7 @@ contract DarwinVester7 is IDarwinVester, ReentrancyGuard, Ownable, IERC721Receiv
         claimable = (((vested * INTEREST) / 100000) * passedMonthsFromStart) - claimed;
 
         if (boost > 0) {
-            claimable += ((claimable * boost) / 100);
+            claimable += ((claimable * boost) / 1000);
         }
     }
 
