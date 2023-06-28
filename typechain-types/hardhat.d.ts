@@ -117,6 +117,10 @@ declare module "hardhat/types/runtime" {
       signerOrOptions?: ethers.Signer | FactoryOptions
     ): Promise<Contracts.IUniswapV2Router02__factory>;
     getContractFactory(
+      name: "BoosterNFT",
+      signerOrOptions?: ethers.Signer | FactoryOptions
+    ): Promise<Contracts.BoosterNFT__factory>;
+    getContractFactory(
       name: "Darwin",
       signerOrOptions?: ethers.Signer | FactoryOptions
     ): Promise<Contracts.Darwin__factory>;
@@ -160,6 +164,10 @@ declare module "hardhat/types/runtime" {
       name: "EvoturesNFT",
       signerOrOptions?: ethers.Signer | FactoryOptions
     ): Promise<Contracts.EvoturesNFT__factory>;
+    getContractFactory(
+      name: "IBoosterNFT",
+      signerOrOptions?: ethers.Signer | FactoryOptions
+    ): Promise<Contracts.IBoosterNFT__factory>;
     getContractFactory(
       name: "IDarwin",
       signerOrOptions?: ethers.Signer | FactoryOptions
@@ -356,6 +364,11 @@ declare module "hardhat/types/runtime" {
       signer?: ethers.Signer
     ): Promise<Contracts.IUniswapV2Router02>;
     getContractAt(
+      name: "BoosterNFT",
+      address: string,
+      signer?: ethers.Signer
+    ): Promise<Contracts.BoosterNFT>;
+    getContractAt(
       name: "Darwin",
       address: string,
       signer?: ethers.Signer
@@ -410,6 +423,11 @@ declare module "hardhat/types/runtime" {
       address: string,
       signer?: ethers.Signer
     ): Promise<Contracts.EvoturesNFT>;
+    getContractAt(
+      name: "IBoosterNFT",
+      address: string,
+      signer?: ethers.Signer
+    ): Promise<Contracts.IBoosterNFT>;
     getContractAt(
       name: "IDarwin",
       address: string,

@@ -11,6 +11,32 @@ import type {
 
 const _abi = [
   {
+    inputs: [],
+    name: "BOOSTER_PRICE",
+    outputs: [
+      {
+        internalType: "uint56",
+        name: "",
+        type: "uint56",
+      },
+    ],
+    stateMutability: "view",
+    type: "function",
+  },
+  {
+    inputs: [],
+    name: "dev",
+    outputs: [
+      {
+        internalType: "address",
+        name: "",
+        type: "address",
+      },
+    ],
+    stateMutability: "view",
+    type: "function",
+  },
+  {
     inputs: [
       {
         internalType: "uint8",

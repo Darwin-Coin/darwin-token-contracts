@@ -9,6 +9,7 @@ import type * as openzeppelin from "./Openzeppelin";
 export type { openzeppelin };
 import type * as interface from "./interface";
 export type { interface };
+export type { BoosterNFT } from "./BoosterNFT";
 export type { Darwin } from "./Darwin";
 export type { DarwinPresale } from "./DarwinPresale";
 export type { DarwinPrivateSale } from "./DarwinPrivateSale";

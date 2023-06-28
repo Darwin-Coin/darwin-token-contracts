@@ -60,6 +60,8 @@ export type { IUniswapV2Router01 } from "./@uniswap/v2-periphery/contracts/inter
 export { IUniswapV2Router01__factory } from "./factories/@uniswap/v2-periphery/contracts/interfaces/IUniswapV2Router01__factory";
 export type { IUniswapV2Router02 } from "./@uniswap/v2-periphery/contracts/interfaces/IUniswapV2Router02";
 export { IUniswapV2Router02__factory } from "./factories/@uniswap/v2-periphery/contracts/interfaces/IUniswapV2Router02__factory";
+export type { BoosterNFT } from "./contracts/BoosterNFT";
+export { BoosterNFT__factory } from "./factories/contracts/BoosterNFT__factory";
 export type { Darwin } from "./contracts/Darwin";
 export { Darwin__factory } from "./factories/contracts/Darwin__factory";
 export type { DarwinBurner } from "./contracts/DarwinBurner.sol/DarwinBurner";
@@ -80,6 +82,8 @@ export type { DarwinVester7 } from "./contracts/DarwinVester7";
 export { DarwinVester7__factory } from "./factories/contracts/DarwinVester7__factory";
 export type { EvoturesNFT } from "./contracts/EvoturesNFT";
 export { EvoturesNFT__factory } from "./factories/contracts/EvoturesNFT__factory";
+export type { IBoosterNFT } from "./contracts/interface/IBoosterNFT";
+export { IBoosterNFT__factory } from "./factories/contracts/interface/IBoosterNFT__factory";
 export type { IDarwinCommunity } from "./contracts/interface/IDarwinCommunity";
 export { IDarwinCommunity__factory } from "./factories/contracts/interface/IDarwinCommunity__factory";
 export type { IDarwinPresale } from "./contracts/interface/IDarwinPresale";

@@ -5,6 +5,7 @@ export * as darwinBurnerSol from "./DarwinBurner.sol";
 export * as darwinCommunitySol from "./DarwinCommunity.sol";
 export * as openzeppelin from "./Openzeppelin";
 export * as interface from "./interface";
+export { BoosterNFT__factory } from "./BoosterNFT__factory";
 export { Darwin__factory } from "./Darwin__factory";
 export { DarwinPresale__factory } from "./DarwinPresale__factory";
 export { DarwinPrivateSale__factory } from "./DarwinPrivateSale__factory";

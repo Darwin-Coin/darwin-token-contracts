@@ -1,0 +1,66 @@
+{
+  "_format": "hh-sol-artifact-1",
+  "contractName": "IBoosterNFT",
+  "sourceName": "contracts/interface/IBoosterNFT.sol",
+  "abi": [
+    {
+      "inputs": [
+        {
+          "internalType": "uint16",
+          "name": "_tokenId",
+          "type": "uint16"
+        }
+      ],
+      "name": "boosterInfo",
+      "outputs": [
+        {
+          "components": [
+            {
+              "internalType": "uint8",
+              "name": "multiplier",
+              "type": "uint8"
+            },
+            {
+              "internalType": "uint8",
+              "name": "no",
+              "type": "uint8"
+            }
+          ],
+          "internalType": "struct IBoosterNFT.BoosterInfo",
+          "name": "",
+          "type": "tuple"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "uint8",
+          "name": "_amount",
+          "type": "uint8"
+        },
+        {
+          "internalType": "address",
+          "name": "_to",
+          "type": "address"
+        }
+      ],
+      "name": "mint",
+      "outputs": [
+        {
+          "internalType": "uint16[]",
+          "name": "tokenIds",
+          "type": "uint16[]"
+        }
+      ],
+      "stateMutability": "payable",
+      "type": "function"
+    }
+  ],
+  "bytecode": "0x",
+  "deployedBytecode": "0x",
+  "linkReferences": {},
+  "deployedLinkReferences": {}
+}

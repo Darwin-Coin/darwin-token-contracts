@@ -25,12 +25,21 @@ import type {
 
 export interface IEvoturesNFTInterface extends utils.Interface {
   functions: {
+    "BOOSTER_PRICE()": FunctionFragment;
+    "dev()": FunctionFragment;
     "mint(uint8,uint8)": FunctionFragment;
     "multipliers(uint16)": FunctionFragment;
   };
 
-  getFunction(nameOrSignatureOrTopic: "mint" | "multipliers"): FunctionFragment;
+  getFunction(
+    nameOrSignatureOrTopic: "BOOSTER_PRICE" | "dev" | "mint" | "multipliers"
+  ): FunctionFragment;
 
+  encodeFunctionData(
+    functionFragment: "BOOSTER_PRICE",
+    values?: undefined
+  ): string;
+  encodeFunctionData(functionFragment: "dev", values?: undefined): string;
   encodeFunctionData(
     functionFragment: "mint",
     values: [PromiseOrValue<BigNumberish>, PromiseOrValue<BigNumberish>]
@@ -40,6 +49,11 @@ export interface IEvoturesNFTInterface extends utils.Interface {
     values: [PromiseOrValue<BigNumberish>]
   ): string;
 
+  decodeFunctionResult(
+    functionFragment: "BOOSTER_PRICE",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(functionFragment: "dev", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "mint", data: BytesLike): Result;
   decodeFunctionResult(
     functionFragment: "multipliers",
@@ -76,6 +90,10 @@ export interface IEvoturesNFT extends BaseContract {
   removeListener: OnEvent<this>;
 
   functions: {
+    BOOSTER_PRICE(overrides?: CallOverrides): Promise<[BigNumber]>;
+
+    dev(overrides?: CallOverrides): Promise<[string]>;
+
     mint(
       _evotures: PromiseOrValue<BigNumberish>,
       _boosters: PromiseOrValue<BigNumberish>,
@@ -87,6 +105,10 @@ export interface IEvoturesNFT extends BaseContract {
       overrides?: CallOverrides
     ): Promise<[number] & { mult: number }>;
   };
+
+  BOOSTER_PRICE(overrides?: CallOverrides): Promise<BigNumber>;
+
+  dev(overrides?: CallOverrides): Promise<string>;
 
   mint(
     _evotures: PromiseOrValue<BigNumberish>,
@@ -100,6 +122,10 @@ export interface IEvoturesNFT extends BaseContract {
   ): Promise<number>;
 
   callStatic: {
+    BOOSTER_PRICE(overrides?: CallOverrides): Promise<BigNumber>;
+
+    dev(overrides?: CallOverrides): Promise<string>;
+
     mint(
       _evotures: PromiseOrValue<BigNumberish>,
       _boosters: PromiseOrValue<BigNumberish>,
@@ -115,6 +141,10 @@ export interface IEvoturesNFT extends BaseContract {
   filters: {};
 
   estimateGas: {
+    BOOSTER_PRICE(overrides?: CallOverrides): Promise<BigNumber>;
+
+    dev(overrides?: CallOverrides): Promise<BigNumber>;
+
     mint(
       _evotures: PromiseOrValue<BigNumberish>,
       _boosters: PromiseOrValue<BigNumberish>,
@@ -128,6 +158,10 @@ export interface IEvoturesNFT extends BaseContract {
   };
 
   populateTransaction: {
+    BOOSTER_PRICE(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+
+    dev(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+
     mint(
       _evotures: PromiseOrValue<BigNumberish>,
       _boosters: PromiseOrValue<BigNumberish>,
