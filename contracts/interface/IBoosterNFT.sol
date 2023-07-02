@@ -14,6 +14,6 @@ interface IBoosterNFT {
         uint8 no;
     }
 
-    function mint(uint8 _amount, address _to) external payable returns(uint16[] memory tokenIds);
+    function mint(uint8 _amount, address _to) external returns(uint16[] memory tokenIds);
     function boosterInfo(uint16 _tokenId) external view returns(BoosterInfo memory);
 }

@@ -8,7 +8,7 @@ import type {
   BytesLike,
   CallOverrides,
   ContractTransaction,
-  PayableOverrides,
+  Overrides,
   PopulatedTransaction,
   Signer,
   utils,
@@ -96,7 +96,7 @@ export interface IBoosterNFT extends BaseContract {
     mint(
       _amount: PromiseOrValue<BigNumberish>,
       _to: PromiseOrValue<string>,
-      overrides?: PayableOverrides & { from?: PromiseOrValue<string> }
+      overrides?: Overrides & { from?: PromiseOrValue<string> }
     ): Promise<ContractTransaction>;
   };
 
@@ -108,7 +108,7 @@ export interface IBoosterNFT extends BaseContract {
   mint(
     _amount: PromiseOrValue<BigNumberish>,
     _to: PromiseOrValue<string>,
-    overrides?: PayableOverrides & { from?: PromiseOrValue<string> }
+    overrides?: Overrides & { from?: PromiseOrValue<string> }
   ): Promise<ContractTransaction>;
 
   callStatic: {
@@ -135,7 +135,7 @@ export interface IBoosterNFT extends BaseContract {
     mint(
       _amount: PromiseOrValue<BigNumberish>,
       _to: PromiseOrValue<string>,
-      overrides?: PayableOverrides & { from?: PromiseOrValue<string> }
+      overrides?: Overrides & { from?: PromiseOrValue<string> }
     ): Promise<BigNumber>;
   };
 
@@ -148,7 +148,7 @@ export interface IBoosterNFT extends BaseContract {
     mint(
       _amount: PromiseOrValue<BigNumberish>,
       _to: PromiseOrValue<string>,
-      overrides?: PayableOverrides & { from?: PromiseOrValue<string> }
+      overrides?: Overrides & { from?: PromiseOrValue<string> }
     ): Promise<PopulatedTransaction>;
   };
 }

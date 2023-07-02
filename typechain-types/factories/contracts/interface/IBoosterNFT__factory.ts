@@ -62,7 +62,7 @@ const _abi = [
         type: "uint16[]",
       },
     ],
-    stateMutability: "payable",
+    stateMutability: "nonpayable",
     type: "function",
   },
 ] as const;

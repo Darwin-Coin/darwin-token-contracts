@@ -14,6 +14,9 @@ contract BoosterNFT is ERC721("Evotures NFTs","EVOTURES"), IBoosterNFT {
     using Address for address;
     using Strings for uint8;
 
+    address public immutable dev;
+    address public evotures;
+
     uint16 public constant MAX_SUPPLY = 1800;
     uint56 public constant BOOSTER_PRICE = 0.006 ether;
 
@@ -23,6 +26,8 @@ contract BoosterNFT is ERC721("Evotures NFTs","EVOTURES"), IBoosterNFT {
     Kind[] private _unminted;
 
     constructor(Kind[] memory unminted_) {
+        dev = msg.sender;
+
         _safeMint(msg.sender, 1);
         _safeMint(msg.sender, 2);
         lastTokenId = 2;
@@ -32,9 +37,16 @@ contract BoosterNFT is ERC721("Evotures NFTs","EVOTURES"), IBoosterNFT {
         }
     }
 
-    function mint(uint8 _amount, address _to) public payable returns(uint16[] memory) {
+    function setEvotures(address _evotures) external {
+        require(msg.sender == dev, "BoosterNFT::setEvotures: CALLER_NOT_DEV");
+        require(evotures == address(0), "BoosterNFT::setEvotures: EVOTURES_SET");
+
+        evotures = _evotures;
+    }
+
+    function mint(uint8 _amount, address _to) external returns(uint16[] memory) {
+        require(msg.sender == evotures, "BoosterNFT::mint: CALLER_NOT_EVOTURES");
         require((MAX_SUPPLY - lastTokenId) >= _amount, "BoosterNFT::mint: MINT_EXCEEDED");
-        require(msg.value >= _amount*BOOSTER_PRICE, "BoosterNFT::mint: INSUFFICIENT_ETH");
 
         uint16[] memory tokenIds = new uint16[](_amount);
 

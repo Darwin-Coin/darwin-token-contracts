@@ -37,7 +37,7 @@ async function main() {
   const boosterFactory = await ethers.getContractFactory("BoosterNFT");
   const evoturesFactory = await ethers.getContractFactory("EvoturesNFT");
 
-  console.log("Start Balance: " + ethers.utils.formatEther(await owner.getBalance()));
+  console.log("Balance: " + ethers.utils.formatEther(await owner.getBalance()));
 
   //! [DEPLOY] BOOSTERS
   const boosters = await boosterFactory.deploy(boosterUnminted) as BoosterNFT;
@@ -52,6 +52,8 @@ async function main() {
     });
   }
 
+  console.log("Balance: " + ethers.utils.formatEther(await owner.getBalance()));
+
   //! [DEPLOY] EVOTURES
   const evotures = await evoturesFactory.deploy(unminted, boosters.address) as EvoturesNFT;
   await evotures.deployed();
@@ -65,10 +67,16 @@ async function main() {
     });
   }
 
-  console.log("End Balance: " + ethers.utils.formatEther(await owner.getBalance()));
+  console.log("Balance: " + ethers.utils.formatEther(await owner.getBalance()));
+
+  const setEvotures = await boosters.setEvotures(evotures.address);
+  await setEvotures.wait();
+  console.log("🏁 Evotures address set in booster contract");
+
+  console.log("Balance: " + ethers.utils.formatEther(await owner.getBalance()));
 
   /*
-  const evotures = evoturesFactory.attach("0xFf6fC65D8B19dA47D24179A7B0003Ef17C8417E0");
+  const evotures = evoturesFactory.attach("0x0e573497806A579ecb313f16a90a9dB955264100");
   console.log(await evotures.userMinted(owner.address));
   */
 }

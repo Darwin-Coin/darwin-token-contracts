@@ -50,12 +50,12 @@ contract EvoturesNFT is ERC721("Evotures NFTs","EVOTURES"), IEvoturesNFT, IERC72
             totalMinted++;
             _userMinted[msg.sender].push(_unminted[id]);
 
+            // Mint boosters and map them to the minted evoture tokenId
+            _boosters[_unminted[id]] = boosterContract.mint(boosters_, address(this));
+
             // Pop out minted id from unminted array
             _unminted[id] = _unminted[_unminted.length - 1];
             _unminted.pop();
-
-            // Mint boosters and map them to the minted evoture tokenId
-            _boosters[id] = boosterContract.mint{value: boosters_*BOOSTER_PRICE}(boosters_, address(this));
         }
     }
 
@@ -174,4 +174,6 @@ contract EvoturesNFT is ERC721("Evotures NFTs","EVOTURES"), IEvoturesNFT, IERC72
     ) external pure returns (bytes4) {
         return IERC721Receiver.onERC721Received.selector;
     }
+
+    receive() external payable {}
 }

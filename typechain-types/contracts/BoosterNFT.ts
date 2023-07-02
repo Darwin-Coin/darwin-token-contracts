@@ -9,7 +9,6 @@ import type {
   CallOverrides,
   ContractTransaction,
   Overrides,
-  PayableOverrides,
   PopulatedTransaction,
   Signer,
   utils,
@@ -58,6 +57,8 @@ export interface BoosterNFTInterface extends utils.Interface {
     "balanceOf(address)": FunctionFragment;
     "boosterInfo(uint16)": FunctionFragment;
     "contractURI()": FunctionFragment;
+    "dev()": FunctionFragment;
+    "evotures()": FunctionFragment;
     "getApproved(uint256)": FunctionFragment;
     "isApprovedForAll(address,address)": FunctionFragment;
     "lastTokenId()": FunctionFragment;
@@ -67,6 +68,7 @@ export interface BoosterNFTInterface extends utils.Interface {
     "safeTransferFrom(address,address,uint256)": FunctionFragment;
     "safeTransferFrom(address,address,uint256,bytes)": FunctionFragment;
     "setApprovalForAll(address,bool)": FunctionFragment;
+    "setEvotures(address)": FunctionFragment;
     "supportsInterface(bytes4)": FunctionFragment;
     "symbol()": FunctionFragment;
     "tokenURI(uint256)": FunctionFragment;
@@ -82,6 +84,8 @@ export interface BoosterNFTInterface extends utils.Interface {
       | "balanceOf"
       | "boosterInfo"
       | "contractURI"
+      | "dev"
+      | "evotures"
       | "getApproved"
       | "isApprovedForAll"
       | "lastTokenId"
@@ -91,6 +95,7 @@ export interface BoosterNFTInterface extends utils.Interface {
       | "safeTransferFrom(address,address,uint256)"
       | "safeTransferFrom(address,address,uint256,bytes)"
       | "setApprovalForAll"
+      | "setEvotures"
       | "supportsInterface"
       | "symbol"
       | "tokenURI"
@@ -122,6 +127,8 @@ export interface BoosterNFTInterface extends utils.Interface {
     functionFragment: "contractURI",
     values?: undefined
   ): string;
+  encodeFunctionData(functionFragment: "dev", values?: undefined): string;
+  encodeFunctionData(functionFragment: "evotures", values?: undefined): string;
   encodeFunctionData(
     functionFragment: "getApproved",
     values: [PromiseOrValue<BigNumberish>]
@@ -165,6 +172,10 @@ export interface BoosterNFTInterface extends utils.Interface {
     values: [PromiseOrValue<string>, PromiseOrValue<boolean>]
   ): string;
   encodeFunctionData(
+    functionFragment: "setEvotures",
+    values: [PromiseOrValue<string>]
+  ): string;
+  encodeFunctionData(
     functionFragment: "supportsInterface",
     values: [PromiseOrValue<BytesLike>]
   ): string;
@@ -198,6 +209,8 @@ export interface BoosterNFTInterface extends utils.Interface {
     functionFragment: "contractURI",
     data: BytesLike
   ): Result;
+  decodeFunctionResult(functionFragment: "dev", data: BytesLike): Result;
+  decodeFunctionResult(functionFragment: "evotures", data: BytesLike): Result;
   decodeFunctionResult(
     functionFragment: "getApproved",
     data: BytesLike
@@ -223,6 +236,10 @@ export interface BoosterNFTInterface extends utils.Interface {
   ): Result;
   decodeFunctionResult(
     functionFragment: "setApprovalForAll",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
+    functionFragment: "setEvotures",
     data: BytesLike
   ): Result;
   decodeFunctionResult(
@@ -333,6 +350,10 @@ export interface BoosterNFT extends BaseContract {
 
     contractURI(overrides?: CallOverrides): Promise<[string]>;
 
+    dev(overrides?: CallOverrides): Promise<[string]>;
+
+    evotures(overrides?: CallOverrides): Promise<[string]>;
+
     getApproved(
       tokenId: PromiseOrValue<BigNumberish>,
       overrides?: CallOverrides
@@ -349,7 +370,7 @@ export interface BoosterNFT extends BaseContract {
     mint(
       _amount: PromiseOrValue<BigNumberish>,
       _to: PromiseOrValue<string>,
-      overrides?: PayableOverrides & { from?: PromiseOrValue<string> }
+      overrides?: Overrides & { from?: PromiseOrValue<string> }
     ): Promise<ContractTransaction>;
 
     name(overrides?: CallOverrides): Promise<[string]>;
@@ -377,6 +398,11 @@ export interface BoosterNFT extends BaseContract {
     setApprovalForAll(
       operator: PromiseOrValue<string>,
       approved: PromiseOrValue<boolean>,
+      overrides?: Overrides & { from?: PromiseOrValue<string> }
+    ): Promise<ContractTransaction>;
+
+    setEvotures(
+      _evotures: PromiseOrValue<string>,
       overrides?: Overrides & { from?: PromiseOrValue<string> }
     ): Promise<ContractTransaction>;
 
@@ -426,6 +452,10 @@ export interface BoosterNFT extends BaseContract {
 
   contractURI(overrides?: CallOverrides): Promise<string>;
 
+  dev(overrides?: CallOverrides): Promise<string>;
+
+  evotures(overrides?: CallOverrides): Promise<string>;
+
   getApproved(
     tokenId: PromiseOrValue<BigNumberish>,
     overrides?: CallOverrides
@@ -442,7 +472,7 @@ export interface BoosterNFT extends BaseContract {
   mint(
     _amount: PromiseOrValue<BigNumberish>,
     _to: PromiseOrValue<string>,
-    overrides?: PayableOverrides & { from?: PromiseOrValue<string> }
+    overrides?: Overrides & { from?: PromiseOrValue<string> }
   ): Promise<ContractTransaction>;
 
   name(overrides?: CallOverrides): Promise<string>;
@@ -470,6 +500,11 @@ export interface BoosterNFT extends BaseContract {
   setApprovalForAll(
     operator: PromiseOrValue<string>,
     approved: PromiseOrValue<boolean>,
+    overrides?: Overrides & { from?: PromiseOrValue<string> }
+  ): Promise<ContractTransaction>;
+
+  setEvotures(
+    _evotures: PromiseOrValue<string>,
     overrides?: Overrides & { from?: PromiseOrValue<string> }
   ): Promise<ContractTransaction>;
 
@@ -517,6 +552,10 @@ export interface BoosterNFT extends BaseContract {
 
     contractURI(overrides?: CallOverrides): Promise<string>;
 
+    dev(overrides?: CallOverrides): Promise<string>;
+
+    evotures(overrides?: CallOverrides): Promise<string>;
+
     getApproved(
       tokenId: PromiseOrValue<BigNumberish>,
       overrides?: CallOverrides
@@ -561,6 +600,11 @@ export interface BoosterNFT extends BaseContract {
     setApprovalForAll(
       operator: PromiseOrValue<string>,
       approved: PromiseOrValue<boolean>,
+      overrides?: CallOverrides
+    ): Promise<void>;
+
+    setEvotures(
+      _evotures: PromiseOrValue<string>,
       overrides?: CallOverrides
     ): Promise<void>;
 
@@ -646,6 +690,10 @@ export interface BoosterNFT extends BaseContract {
 
     contractURI(overrides?: CallOverrides): Promise<BigNumber>;
 
+    dev(overrides?: CallOverrides): Promise<BigNumber>;
+
+    evotures(overrides?: CallOverrides): Promise<BigNumber>;
+
     getApproved(
       tokenId: PromiseOrValue<BigNumberish>,
       overrides?: CallOverrides
@@ -662,7 +710,7 @@ export interface BoosterNFT extends BaseContract {
     mint(
       _amount: PromiseOrValue<BigNumberish>,
       _to: PromiseOrValue<string>,
-      overrides?: PayableOverrides & { from?: PromiseOrValue<string> }
+      overrides?: Overrides & { from?: PromiseOrValue<string> }
     ): Promise<BigNumber>;
 
     name(overrides?: CallOverrides): Promise<BigNumber>;
@@ -690,6 +738,11 @@ export interface BoosterNFT extends BaseContract {
     setApprovalForAll(
       operator: PromiseOrValue<string>,
       approved: PromiseOrValue<boolean>,
+      overrides?: Overrides & { from?: PromiseOrValue<string> }
+    ): Promise<BigNumber>;
+
+    setEvotures(
+      _evotures: PromiseOrValue<string>,
       overrides?: Overrides & { from?: PromiseOrValue<string> }
     ): Promise<BigNumber>;
 
@@ -738,6 +791,10 @@ export interface BoosterNFT extends BaseContract {
 
     contractURI(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
+    dev(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+
+    evotures(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+
     getApproved(
       tokenId: PromiseOrValue<BigNumberish>,
       overrides?: CallOverrides
@@ -754,7 +811,7 @@ export interface BoosterNFT extends BaseContract {
     mint(
       _amount: PromiseOrValue<BigNumberish>,
       _to: PromiseOrValue<string>,
-      overrides?: PayableOverrides & { from?: PromiseOrValue<string> }
+      overrides?: Overrides & { from?: PromiseOrValue<string> }
     ): Promise<PopulatedTransaction>;
 
     name(overrides?: CallOverrides): Promise<PopulatedTransaction>;
@@ -782,6 +839,11 @@ export interface BoosterNFT extends BaseContract {
     setApprovalForAll(
       operator: PromiseOrValue<string>,
       approved: PromiseOrValue<boolean>,
+      overrides?: Overrides & { from?: PromiseOrValue<string> }
+    ): Promise<PopulatedTransaction>;
+
+    setEvotures(
+      _evotures: PromiseOrValue<string>,
       overrides?: Overrides & { from?: PromiseOrValue<string> }
     ): Promise<PopulatedTransaction>;
 
