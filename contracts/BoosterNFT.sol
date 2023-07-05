@@ -52,7 +52,8 @@ contract BoosterNFT is ERC721("Evotures NFTs","EVOTURES"), IBoosterNFT {
 
         for (uint8 i = 0; i < _amount; i++) {
             // Fetch random id and mint
-            uint8 no = _unminted[_pseudoRand()].no;
+            uint16 rand = _pseudoRand();
+            uint8 no = _unminted[rand].no;
             lastTokenId++;
 
             _safeMint(_to, lastTokenId);
@@ -60,10 +61,10 @@ contract BoosterNFT is ERC721("Evotures NFTs","EVOTURES"), IBoosterNFT {
             _boosterInfo[lastTokenId].multiplier = _multiplier(no);
             _boosterInfo[lastTokenId].no = no;
 
-            // Reduce no.exist of minted id, if 0 pop it out from unminted array
-            _unminted[no].unminted--;
-            if (_unminted[no].unminted == 0) {
-                _unminted[no] = _unminted[_unminted.length - 1];
+            // Reduce no.unminted of minted id, if 0 pop it out from unminted array
+            _unminted[rand].unminted--;
+            if (_unminted[rand].unminted == 0) {
+                _unminted[rand] = _unminted[_unminted.length - 1];
                 _unminted.pop();
             }
         }
