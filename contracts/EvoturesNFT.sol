@@ -5,11 +5,15 @@ pragma solidity ^0.8.14;
 import "@openzeppelin/contracts/token/ERC721/ERC721.sol";
 import "@openzeppelin/contracts/token/ERC721/IERC721Receiver.sol";
 
-import {BoosterNFT} from "./BoosterNFT.sol";
+import {VRFv2Consumer} from "./VRFv2Consumer.sol";
 
 import {IEvoturesNFT} from "./interface/IEvoturesNFT.sol";
 import {IBoosterNFT} from "./interface/IBoosterNFT.sol";
 import {ILootboxTicket} from "./interface/ILootboxTicket.sol";
+
+interface IVRFv2Consumer {
+    function requestRandomWords(uint8 evotures, uint8 boosters) external returns (uint256 requestId);
+}
 
 contract EvoturesNFT is ERC721("Evotures NFTs","EVOTURES"), IEvoturesNFT, IERC721Receiver {
     using Address for address;
@@ -17,6 +21,7 @@ contract EvoturesNFT is ERC721("Evotures NFTs","EVOTURES"), IEvoturesNFT, IERC72
 
     address public immutable dev;
     IBoosterNFT public boosterContract;
+    IVRFv2Consumer public vrfConsumer;
 
     uint16 public totalMinted;
     uint56 public EVOTURES_PRICE = 0.04 ether;
@@ -27,6 +32,15 @@ contract EvoturesNFT is ERC721("Evotures NFTs","EVOTURES"), IEvoturesNFT, IERC72
     mapping(uint16 => uint16[]) private _boosters;
 
     constructor(uint16[] memory unminted_, IBoosterNFT _boosterContract) {
+        // Deploy consumer contract
+        bytes memory bytecode = type(VRFv2Consumer).creationCode;
+        bytes32 salt = keccak256(abi.encodePacked(address(this)));
+        address _vrfConsumer;
+        assembly {
+            _vrfConsumer := create2(0, add(bytecode, 32), mload(bytecode), salt)
+        }
+        vrfConsumer = IVRFv2Consumer(_vrfConsumer);
+
         // Set Dev, unminted and booster contract
         dev = msg.sender;
         _unminted = unminted_;
@@ -43,15 +57,21 @@ contract EvoturesNFT is ERC721("Evotures NFTs","EVOTURES"), IEvoturesNFT, IERC72
         require(_evotures <= (3 - _userMinted[msg.sender].length) && boosters_ <= 5, "EvoturesNFT::mint: FORBIDDEN");
         require(msg.value >= (_evotures*EVOTURES_PRICE + _evotures*boosters_*BOOSTER_PRICE), "EvoturesNFT::mint: INSUFFICIENT_ETH");
 
+        vrfConsumer.requestRandomWords(_evotures, boosters_);
+    }
+
+    function chainlinkMint(uint256[] memory _randomWords, uint8 _evotures, uint8 boosters_) public {
+        require(msg.sender == address(vrfConsumer), "EvoturesNFT::chainlinkMint: CALLER_NOT_CONSUMER");
+
         for (uint8 i = 0; i < _evotures; i++) {
-            // Fetch random id and mint
-            uint16 id = _pseudoRand();
+            // Mint
+            uint16 id = uint16(_randomWords[i * boosters_ + i] % _unminted.length);
             _safeMint(msg.sender, _unminted[id]);
             totalMinted++;
             _userMinted[msg.sender].push(_unminted[id]);
 
             // Mint boosters and map them to the minted evoture tokenId
-            _boosters[_unminted[id]] = boosterContract.mint(boosters_, address(this));
+            _boosters[_unminted[id]] = boosterContract.mint(boosters_, i, _randomWords, address(this));
 
             // Pop out minted id from unminted array
             _unminted[id] = _unminted[_unminted.length - 1];
@@ -111,31 +131,6 @@ contract EvoturesNFT is ERC721("Evotures NFTs","EVOTURES"), IEvoturesNFT, IERC72
                 mult += 200;
             }
         }
-    }
-
-    function _pseudoRand() private view returns(uint16) {
-        uint256 seed = uint256(
-            keccak256(
-                abi.encodePacked(
-                    block.timestamp +
-                    block.difficulty +
-                    gasleft() +
-                    ((
-                        uint256(keccak256(abi.encodePacked(block.coinbase)))
-                    ) / (block.timestamp)) +
-                    block.gaslimit +
-                    ((uint256(keccak256(abi.encodePacked(tx.origin)))) /
-                        (block.timestamp)) +
-                    block.number +
-                    ((uint256(keccak256(abi.encodePacked(address(this))))) /
-                        (block.timestamp)) +
-                    ((uint256(keccak256(abi.encodePacked(msg.sender)))) /
-                        (block.timestamp))
-                )
-            )
-        );
-
-        return uint16(seed % _unminted.length);
     }
 
     function tokenURI(uint256 tokenId) public view override returns (string memory) {

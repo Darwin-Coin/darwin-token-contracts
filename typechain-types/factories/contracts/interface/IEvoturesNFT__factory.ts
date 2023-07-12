@@ -24,6 +24,29 @@ const _abi = [
     type: "function",
   },
   {
+    inputs: [
+      {
+        internalType: "uint256[]",
+        name: "_randomWords",
+        type: "uint256[]",
+      },
+      {
+        internalType: "uint8",
+        name: "_evotures",
+        type: "uint8",
+      },
+      {
+        internalType: "uint8",
+        name: "boosters_",
+        type: "uint8",
+      },
+    ],
+    name: "chainlinkMint",
+    outputs: [],
+    stateMutability: "nonpayable",
+    type: "function",
+  },
+  {
     inputs: [],
     name: "dev",
     outputs: [

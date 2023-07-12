@@ -49,6 +49,16 @@ const _abi = [
         type: "uint8",
       },
       {
+        internalType: "uint8",
+        name: "_index",
+        type: "uint8",
+      },
+      {
+        internalType: "uint256[]",
+        name: "_randomWords",
+        type: "uint256[]",
+      },
+      {
         internalType: "address",
         name: "_to",
         type: "address",

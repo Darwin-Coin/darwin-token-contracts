@@ -165,6 +165,10 @@ declare module "hardhat/types/runtime" {
       signerOrOptions?: ethers.Signer | FactoryOptions
     ): Promise<Contracts.EvoturesNFT__factory>;
     getContractFactory(
+      name: "IVRFv2Consumer",
+      signerOrOptions?: ethers.Signer | FactoryOptions
+    ): Promise<Contracts.IVRFv2Consumer__factory>;
+    getContractFactory(
       name: "IBoosterNFT",
       signerOrOptions?: ethers.Signer | FactoryOptions
     ): Promise<Contracts.IBoosterNFT__factory>;
@@ -232,6 +236,22 @@ declare module "hardhat/types/runtime" {
       name: "StakedDarwin",
       signerOrOptions?: ethers.Signer | FactoryOptions
     ): Promise<Contracts.StakedDarwin__factory>;
+    getContractFactory(
+      name: "ConfirmedOwner",
+      signerOrOptions?: ethers.Signer | FactoryOptions
+    ): Promise<Contracts.ConfirmedOwner__factory>;
+    getContractFactory(
+      name: "VRFConsumerBaseV2",
+      signerOrOptions?: ethers.Signer | FactoryOptions
+    ): Promise<Contracts.VRFConsumerBaseV2__factory>;
+    getContractFactory(
+      name: "VRFCoordinatorV2Interface",
+      signerOrOptions?: ethers.Signer | FactoryOptions
+    ): Promise<Contracts.VRFCoordinatorV2Interface__factory>;
+    getContractFactory(
+      name: "VRFv2Consumer",
+      signerOrOptions?: ethers.Signer | FactoryOptions
+    ): Promise<Contracts.VRFv2Consumer__factory>;
 
     getContractAt(
       name: "AccessControlUpgradeable",
@@ -424,6 +444,11 @@ declare module "hardhat/types/runtime" {
       signer?: ethers.Signer
     ): Promise<Contracts.EvoturesNFT>;
     getContractAt(
+      name: "IVRFv2Consumer",
+      address: string,
+      signer?: ethers.Signer
+    ): Promise<Contracts.IVRFv2Consumer>;
+    getContractAt(
       name: "IBoosterNFT",
       address: string,
       signer?: ethers.Signer
@@ -508,6 +533,26 @@ declare module "hardhat/types/runtime" {
       address: string,
       signer?: ethers.Signer
     ): Promise<Contracts.StakedDarwin>;
+    getContractAt(
+      name: "ConfirmedOwner",
+      address: string,
+      signer?: ethers.Signer
+    ): Promise<Contracts.ConfirmedOwner>;
+    getContractAt(
+      name: "VRFConsumerBaseV2",
+      address: string,
+      signer?: ethers.Signer
+    ): Promise<Contracts.VRFConsumerBaseV2>;
+    getContractAt(
+      name: "VRFCoordinatorV2Interface",
+      address: string,
+      signer?: ethers.Signer
+    ): Promise<Contracts.VRFCoordinatorV2Interface>;
+    getContractAt(
+      name: "VRFv2Consumer",
+      address: string,
+      signer?: ethers.Signer
+    ): Promise<Contracts.VRFv2Consumer>;
 
     // default types
     getContractFactory(

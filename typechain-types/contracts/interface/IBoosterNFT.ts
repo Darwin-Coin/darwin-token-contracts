@@ -38,7 +38,7 @@ export declare namespace IBoosterNFT {
 export interface IBoosterNFTInterface extends utils.Interface {
   functions: {
     "boosterInfo(uint16)": FunctionFragment;
-    "mint(uint8,address)": FunctionFragment;
+    "mint(uint8,uint8,uint256[],address)": FunctionFragment;
   };
 
   getFunction(nameOrSignatureOrTopic: "boosterInfo" | "mint"): FunctionFragment;
@@ -49,7 +49,12 @@ export interface IBoosterNFTInterface extends utils.Interface {
   ): string;
   encodeFunctionData(
     functionFragment: "mint",
-    values: [PromiseOrValue<BigNumberish>, PromiseOrValue<string>]
+    values: [
+      PromiseOrValue<BigNumberish>,
+      PromiseOrValue<BigNumberish>,
+      PromiseOrValue<BigNumberish>[],
+      PromiseOrValue<string>
+    ]
   ): string;
 
   decodeFunctionResult(
@@ -95,6 +100,8 @@ export interface IBoosterNFT extends BaseContract {
 
     mint(
       _amount: PromiseOrValue<BigNumberish>,
+      _index: PromiseOrValue<BigNumberish>,
+      _randomWords: PromiseOrValue<BigNumberish>[],
       _to: PromiseOrValue<string>,
       overrides?: Overrides & { from?: PromiseOrValue<string> }
     ): Promise<ContractTransaction>;
@@ -107,6 +114,8 @@ export interface IBoosterNFT extends BaseContract {
 
   mint(
     _amount: PromiseOrValue<BigNumberish>,
+    _index: PromiseOrValue<BigNumberish>,
+    _randomWords: PromiseOrValue<BigNumberish>[],
     _to: PromiseOrValue<string>,
     overrides?: Overrides & { from?: PromiseOrValue<string> }
   ): Promise<ContractTransaction>;
@@ -119,6 +128,8 @@ export interface IBoosterNFT extends BaseContract {
 
     mint(
       _amount: PromiseOrValue<BigNumberish>,
+      _index: PromiseOrValue<BigNumberish>,
+      _randomWords: PromiseOrValue<BigNumberish>[],
       _to: PromiseOrValue<string>,
       overrides?: CallOverrides
     ): Promise<number[]>;
@@ -134,6 +145,8 @@ export interface IBoosterNFT extends BaseContract {
 
     mint(
       _amount: PromiseOrValue<BigNumberish>,
+      _index: PromiseOrValue<BigNumberish>,
+      _randomWords: PromiseOrValue<BigNumberish>[],
       _to: PromiseOrValue<string>,
       overrides?: Overrides & { from?: PromiseOrValue<string> }
     ): Promise<BigNumber>;
@@ -147,6 +160,8 @@ export interface IBoosterNFT extends BaseContract {
 
     mint(
       _amount: PromiseOrValue<BigNumberish>,
+      _index: PromiseOrValue<BigNumberish>,
+      _randomWords: PromiseOrValue<BigNumberish>[],
       _to: PromiseOrValue<string>,
       overrides?: Overrides & { from?: PromiseOrValue<string> }
     ): Promise<PopulatedTransaction>;

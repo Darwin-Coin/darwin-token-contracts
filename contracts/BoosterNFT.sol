@@ -44,18 +44,20 @@ contract BoosterNFT is ERC721("Evotures NFTs","EVOTURES"), IBoosterNFT {
         evotures = _evotures;
     }
 
-    function mint(uint8 _amount, address _to) external returns(uint16[] memory) {
+    function mint(uint8 _amount, uint8 _index, uint256[] memory _randomWords, address _to) external returns(uint16[] memory) {
         require(msg.sender == evotures, "BoosterNFT::mint: CALLER_NOT_EVOTURES");
         require((MAX_SUPPLY - lastTokenId) >= _amount, "BoosterNFT::mint: MINT_EXCEEDED");
 
         uint16[] memory tokenIds = new uint16[](_amount);
+        uint8 startIndex = _index + 1;
 
-        for (uint8 i = 0; i < _amount; i++) {
-            // Fetch random id and mint
-            uint16 rand = _pseudoRand();
+        for (uint8 i = startIndex; i < (_amount + startIndex); i++) {
+            // Fetch random id
+            uint16 rand = uint16(_randomWords[i] % _unminted.length);
             uint8 no = _unminted[rand].no;
             lastTokenId++;
 
+            // Mint
             _safeMint(_to, lastTokenId);
             tokenIds[i] = lastTokenId;
             _boosterInfo[lastTokenId].multiplier = _multiplier(no);
@@ -86,31 +88,6 @@ contract BoosterNFT is ERC721("Evotures NFTs","EVOTURES"), IBoosterNFT {
         } else {
             mult = 5;
         }
-    }
-
-    function _pseudoRand() private view returns(uint16) {
-        uint256 seed = uint256(
-            keccak256(
-                abi.encodePacked(
-                    block.timestamp +
-                    block.difficulty +
-                    gasleft() +
-                    ((
-                        uint256(keccak256(abi.encodePacked(block.coinbase)))
-                    ) / (block.timestamp)) +
-                    block.gaslimit +
-                    ((uint256(keccak256(abi.encodePacked(tx.origin)))) /
-                        (block.timestamp)) +
-                    block.number +
-                    ((uint256(keccak256(abi.encodePacked(address(this))))) /
-                        (block.timestamp)) +
-                    ((uint256(keccak256(abi.encodePacked(msg.sender)))) /
-                        (block.timestamp))
-                )
-            )
-        );
-
-        return uint16(seed % _unminted.length);
     }
 
     function tokenURI(uint256 tokenId) public view override returns (string memory) {
