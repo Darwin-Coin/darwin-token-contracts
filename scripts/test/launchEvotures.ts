@@ -1,11 +1,13 @@
 import * as hardhat from "hardhat";
 import { ethers } from "hardhat";
-import { BoosterNFT, EvoturesNFT } from "../../typechain-types/contracts";
+import { BoosterNFT } from "../../typechain-types/contracts";
 import { IBoosterNFT } from "../../typechain-types/contracts/BoosterNFT";
+import { EvoturesNFT } from "../../typechain-types";
 
 
 async function main() {
   const VERIFY = false;
+  const VRF_SUBSCRIPTION_ID = 75; //TODO: SET ON CHANGING CHAIN
   const [owner] = await ethers.getSigners();
 
   const unminted: number[] = [];
@@ -55,7 +57,7 @@ async function main() {
   console.log("Balance: " + ethers.utils.formatEther(await owner.getBalance()));
 
   //! [DEPLOY] EVOTURES
-  const evotures = await evoturesFactory.deploy(unminted, boosters.address) as EvoturesNFT;
+  const evotures = await evoturesFactory.deploy(unminted, boosters.address, VRF_SUBSCRIPTION_ID) as EvoturesNFT;
   await evotures.deployed();
   console.log(`🔨 Deployed Evotures NFT at: ${evotures.address}`);
 

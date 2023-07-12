@@ -13,6 +13,7 @@ import {ILootboxTicket} from "./interface/ILootboxTicket.sol";
 
 interface IVRFv2Consumer {
     function requestRandomWords(uint8 evotures, uint8 boosters) external returns (uint256 requestId);
+    function initialize(uint64 subscriptionId) external;
 }
 
 contract EvoturesNFT is ERC721("Evotures NFTs","EVOTURES"), IEvoturesNFT, IERC721Receiver {
@@ -31,7 +32,7 @@ contract EvoturesNFT is ERC721("Evotures NFTs","EVOTURES"), IEvoturesNFT, IERC72
     mapping(address => uint16[]) private _userMinted;
     mapping(uint16 => uint16[]) private _boosters;
 
-    constructor(uint16[] memory unminted_, IBoosterNFT _boosterContract) {
+    constructor(uint16[] memory unminted_, IBoosterNFT _boosterContract, uint64 subscriptionId) {
         // Deploy consumer contract
         bytes memory bytecode = type(VRFv2Consumer).creationCode;
         bytes32 salt = keccak256(abi.encodePacked(address(this)));
@@ -40,6 +41,7 @@ contract EvoturesNFT is ERC721("Evotures NFTs","EVOTURES"), IEvoturesNFT, IERC72
             _vrfConsumer := create2(0, add(bytecode, 32), mload(bytecode), salt)
         }
         vrfConsumer = IVRFv2Consumer(_vrfConsumer);
+        vrfConsumer.initialize(subscriptionId);
 
         // Set Dev, unminted and booster contract
         dev = msg.sender;

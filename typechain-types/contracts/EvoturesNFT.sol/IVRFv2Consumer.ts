@@ -25,16 +25,24 @@ import type {
 
 export interface IVRFv2ConsumerInterface extends utils.Interface {
   functions: {
+    "initialize(uint64)": FunctionFragment;
     "requestRandomWords(uint8,uint8)": FunctionFragment;
   };
 
-  getFunction(nameOrSignatureOrTopic: "requestRandomWords"): FunctionFragment;
+  getFunction(
+    nameOrSignatureOrTopic: "initialize" | "requestRandomWords"
+  ): FunctionFragment;
 
+  encodeFunctionData(
+    functionFragment: "initialize",
+    values: [PromiseOrValue<BigNumberish>]
+  ): string;
   encodeFunctionData(
     functionFragment: "requestRandomWords",
     values: [PromiseOrValue<BigNumberish>, PromiseOrValue<BigNumberish>]
   ): string;
 
+  decodeFunctionResult(functionFragment: "initialize", data: BytesLike): Result;
   decodeFunctionResult(
     functionFragment: "requestRandomWords",
     data: BytesLike
@@ -70,12 +78,22 @@ export interface IVRFv2Consumer extends BaseContract {
   removeListener: OnEvent<this>;
 
   functions: {
+    initialize(
+      subscriptionId: PromiseOrValue<BigNumberish>,
+      overrides?: Overrides & { from?: PromiseOrValue<string> }
+    ): Promise<ContractTransaction>;
+
     requestRandomWords(
       evotures: PromiseOrValue<BigNumberish>,
       boosters: PromiseOrValue<BigNumberish>,
       overrides?: Overrides & { from?: PromiseOrValue<string> }
     ): Promise<ContractTransaction>;
   };
+
+  initialize(
+    subscriptionId: PromiseOrValue<BigNumberish>,
+    overrides?: Overrides & { from?: PromiseOrValue<string> }
+  ): Promise<ContractTransaction>;
 
   requestRandomWords(
     evotures: PromiseOrValue<BigNumberish>,
@@ -84,6 +102,11 @@ export interface IVRFv2Consumer extends BaseContract {
   ): Promise<ContractTransaction>;
 
   callStatic: {
+    initialize(
+      subscriptionId: PromiseOrValue<BigNumberish>,
+      overrides?: CallOverrides
+    ): Promise<void>;
+
     requestRandomWords(
       evotures: PromiseOrValue<BigNumberish>,
       boosters: PromiseOrValue<BigNumberish>,
@@ -94,6 +117,11 @@ export interface IVRFv2Consumer extends BaseContract {
   filters: {};
 
   estimateGas: {
+    initialize(
+      subscriptionId: PromiseOrValue<BigNumberish>,
+      overrides?: Overrides & { from?: PromiseOrValue<string> }
+    ): Promise<BigNumber>;
+
     requestRandomWords(
       evotures: PromiseOrValue<BigNumberish>,
       boosters: PromiseOrValue<BigNumberish>,
@@ -102,6 +130,11 @@ export interface IVRFv2Consumer extends BaseContract {
   };
 
   populateTransaction: {
+    initialize(
+      subscriptionId: PromiseOrValue<BigNumberish>,
+      overrides?: Overrides & { from?: PromiseOrValue<string> }
+    ): Promise<PopulatedTransaction>;
+
     requestRandomWords(
       evotures: PromiseOrValue<BigNumberish>,
       boosters: PromiseOrValue<BigNumberish>,
