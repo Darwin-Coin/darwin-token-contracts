@@ -2,7 +2,7 @@ pragma solidity ^0.8.14;
 
 // SPDX-License-Identifier: MIT
 
-import "@openzeppelin/contracts/token/ERC721/ERC721.sol";
+import {ERC721, Address, Strings} from "@openzeppelin/contracts/token/ERC721/ERC721.sol";
 
 import {LootboxTicket} from "./LootboxTicket.sol";
 
@@ -10,15 +10,13 @@ import {IBoosterNFT} from "./interface/IBoosterNFT.sol";
 import {IEvoturesNFT} from "./interface/IEvoturesNFT.sol";
 import {ILootboxTicket} from "./interface/ILootboxTicket.sol";
 
-contract BoosterNFT is ERC721("Evotures NFTs","EVOTURES"), IBoosterNFT {
-    using Address for address;
+contract BoosterNFT is ERC721("Evotures Booster NFTs","EVOBOOST"), IBoosterNFT {
     using Strings for uint8;
 
     address public immutable dev;
     address public evotures;
 
     uint16 public constant MAX_SUPPLY = 1800;
-    uint56 public constant BOOSTER_PRICE = 0.006 ether;
 
     uint16 public lastTokenId;
 
@@ -51,9 +49,9 @@ contract BoosterNFT is ERC721("Evotures NFTs","EVOTURES"), IBoosterNFT {
         uint16[] memory tokenIds = new uint16[](_amount);
         uint8 startIndex = _index + 1;
 
-        for (uint8 i = startIndex; i < (_amount + startIndex); i++) {
+        for (uint8 i = 0; i < _amount; i++) {
             // Fetch random id
-            uint16 rand = uint16(_randomWords[i] % _unminted.length);
+            uint16 rand = uint16(_randomWords[startIndex + i] % _unminted.length);
             uint8 no = _unminted[rand].no;
             lastTokenId++;
 

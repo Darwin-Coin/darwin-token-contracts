@@ -15,9 +15,9 @@ const _abi = [
     name: "BOOSTER_PRICE",
     outputs: [
       {
-        internalType: "uint56",
+        internalType: "uint64",
         name: "",
-        type: "uint56",
+        type: "uint64",
       },
     ],
     stateMutability: "view",
@@ -39,6 +39,11 @@ const _abi = [
         internalType: "uint8",
         name: "boosters_",
         type: "uint8",
+      },
+      {
+        internalType: "address",
+        name: "_minter",
+        type: "address",
       },
     ],
     name: "chainlinkMint",

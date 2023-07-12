@@ -2,18 +2,17 @@ pragma solidity ^0.8.14;
 
 // SPDX-License-Identifier: MIT
 
-import "@openzeppelin/contracts/token/ERC721/ERC721.sol";
-import "@openzeppelin/contracts/token/ERC721/IERC721Receiver.sol";
+import {ERC721, IERC721, Address, Strings} from "@openzeppelin/contracts/token/ERC721/ERC721.sol";
+import {IERC721Receiver} from "@openzeppelin/contracts/token/ERC721/IERC721Receiver.sol";
 
 import {IEvoturesNFT} from "./interface/IEvoturesNFT.sol";
 import {IBoosterNFT} from "./interface/IBoosterNFT.sol";
 
 interface IVRFv2Consumer {
-    function requestRandomWords(uint8 evotures, uint8 boosters) external returns (uint256 requestId);
+    function requestRandomWords(uint8 evotures, uint8 boosters, address minter) external returns (uint256 requestId);
 }
 
 contract EvoturesNFT is ERC721("Evotures NFTs","EVOTURES"), IEvoturesNFT, IERC721Receiver {
-    using Address for address;
     using Strings for uint256;
 
     address public immutable dev;
@@ -21,12 +20,12 @@ contract EvoturesNFT is ERC721("Evotures NFTs","EVOTURES"), IEvoturesNFT, IERC72
     IVRFv2Consumer public immutable vrfConsumer;
 
     uint16 public totalMinted;
-    uint56 public EVOTURES_PRICE = 0.04 ether;
-    uint56 public BOOSTER_PRICE = 0.006 ether;
+    uint64 public constant EVOTURES_PRICE = 0.04 ether;
+    uint64 public constant BOOSTER_PRICE = 0.006 ether;
 
     uint16[] private _unminted;
     mapping(address => uint16[]) private _userMinted;
-    mapping(uint16 => uint16[]) private _boosters;
+    mapping(uint16 => uint16[]) private _boostersApplied;
 
     constructor(uint16[] memory unminted_, IBoosterNFT _boosterContract, IVRFv2Consumer _vrfConsumer) {
         // Set Dev, unminted, booster and vrf consumer contracts
@@ -41,26 +40,26 @@ contract EvoturesNFT is ERC721("Evotures NFTs","EVOTURES"), IEvoturesNFT, IERC72
         totalMinted = 2;
     }
 
-    function mint(uint8 _evotures, uint8 boosters_) public payable {
+    function mint(uint8 _evotures, uint8 _boosters) public payable {
         require(_unminted.length >= _evotures, "EvoturesNFT::mint: MINT_EXCEEDED");
-        require(_evotures <= (3 - _userMinted[msg.sender].length) && boosters_ <= 5, "EvoturesNFT::mint: FORBIDDEN");
-        require(msg.value >= (_evotures*EVOTURES_PRICE + _evotures*boosters_*BOOSTER_PRICE), "EvoturesNFT::mint: INSUFFICIENT_ETH");
+        require(_evotures <= (3 - _userMinted[msg.sender].length) && _boosters <= 5, "EvoturesNFT::mint: FORBIDDEN");
+        require(msg.value >= (_evotures*EVOTURES_PRICE + _evotures*_boosters*BOOSTER_PRICE), "EvoturesNFT::mint: INSUFFICIENT_ETH");
 
-        vrfConsumer.requestRandomWords(_evotures, boosters_);
+        vrfConsumer.requestRandomWords(_evotures, _boosters, msg.sender);
     }
 
-    function chainlinkMint(uint256[] memory _randomWords, uint8 _evotures, uint8 boosters_) public {
+    function chainlinkMint(uint256[] memory _randomWords, uint8 _evotures, uint8 _boosters, address _minter) public {
         require(msg.sender == address(vrfConsumer), "EvoturesNFT::chainlinkMint: CALLER_NOT_CONSUMER");
 
         for (uint8 i = 0; i < _evotures; i++) {
             // Mint
-            uint16 id = uint16(_randomWords[i * boosters_ + i] % _unminted.length);
-            _safeMint(msg.sender, _unminted[id]);
+            uint16 id = uint16(_randomWords[i * _boosters + i] % _unminted.length);
+            _safeMint(_minter, _unminted[id]);
             totalMinted++;
-            _userMinted[msg.sender].push(_unminted[id]);
+            _userMinted[_minter].push(_unminted[id]);
 
             // Mint boosters and map them to the minted evoture tokenId
-            _boosters[_unminted[id]] = boosterContract.mint(boosters_, i, _randomWords, address(this));
+            _boostersApplied[_unminted[id]] = boosterContract.mint(_boosters, i, _randomWords, address(this));
 
             // Pop out minted id from unminted array
             _unminted[id] = _unminted[_unminted.length - 1];
@@ -70,19 +69,19 @@ contract EvoturesNFT is ERC721("Evotures NFTs","EVOTURES"), IEvoturesNFT, IERC72
 
     function addBooster(uint16 _tokenId, uint16 _boosterTokenId) external {
         require(ownerOf(_tokenId) == msg.sender, "EvoturesNFT::addBooster: CALLER_NOT_EVOTURE_OWNER");
-        require(_boosters[_tokenId].length < 5, "EvoturesNFT::addBooster: MAX_BOOSTERS_ADDED");
+        require(_boostersApplied[_tokenId].length < 5, "EvoturesNFT::addBooster: MAX_BOOSTERS_ADDED");
         IERC721(address(boosterContract)).safeTransferFrom(msg.sender, address(this), _boosterTokenId);
-        _boosters[_tokenId].push(_boosterTokenId);
+        _boostersApplied[_tokenId].push(_boosterTokenId);
     }
 
     function removeBooster(uint16 _tokenId, uint16 _boosterTokenId) external {
         require(ownerOf(_tokenId) == msg.sender, "EvoturesNFT::removeBooster: CALLER_NOT_EVOTURE_OWNER");
-        require(_boosters[_tokenId].length > 0, "EvoturesNFT::removeBooster: NO_BOOSTER_ADDED");
+        require(_boostersApplied[_tokenId].length > 0, "EvoturesNFT::removeBooster: NO_BOOSTER_ADDED");
         IERC721(address(boosterContract)).safeTransferFrom(address(this), msg.sender, _boosterTokenId);
-        for (uint8 i = 0; i < _boosters[_tokenId].length; i++) {
-            if (_boosters[_tokenId][i] == _boosterTokenId) {
-                _boosters[_tokenId][i] = _boosters[_tokenId][_boosters[_tokenId].length - 1];
-                _boosters[_tokenId].pop();
+        for (uint8 i = 0; i < _boostersApplied[_tokenId].length; i++) {
+            if (_boostersApplied[_tokenId][i] == _boosterTokenId) {
+                _boostersApplied[_tokenId][i] = _boostersApplied[_tokenId][_boostersApplied[_tokenId].length - 1];
+                _boostersApplied[_tokenId].pop();
                 break;
             }
         }
@@ -96,7 +95,7 @@ contract EvoturesNFT is ERC721("Evotures NFTs","EVOTURES"), IEvoturesNFT, IERC72
     }
 
     function multipliers(uint16 id) external view returns(uint16 mult) {
-        uint16[] memory boostersIds = _boosters[id];
+        uint16[] memory boostersIds = _boostersApplied[id];
         for (uint8 i = 0; i < boostersIds.length; i++) {
             mult += boosterContract.boosterInfo(boostersIds[i]).multiplier;
         }
@@ -147,7 +146,7 @@ contract EvoturesNFT is ERC721("Evotures NFTs","EVOTURES"), IEvoturesNFT, IERC72
     }
 
     function boosters(uint16 _tokenId) external view returns (uint16[] memory) {
-        return _boosters[_tokenId];
+        return _boostersApplied[_tokenId];
     }
 
     function onERC721Received(

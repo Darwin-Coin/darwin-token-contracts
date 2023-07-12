@@ -27,7 +27,7 @@ import type {
 export interface IEvoturesNFTInterface extends utils.Interface {
   functions: {
     "BOOSTER_PRICE()": FunctionFragment;
-    "chainlinkMint(uint256[],uint8,uint8)": FunctionFragment;
+    "chainlinkMint(uint256[],uint8,uint8,address)": FunctionFragment;
     "dev()": FunctionFragment;
     "mint(uint8,uint8)": FunctionFragment;
     "multipliers(uint16)": FunctionFragment;
@@ -51,7 +51,8 @@ export interface IEvoturesNFTInterface extends utils.Interface {
     values: [
       PromiseOrValue<BigNumberish>[],
       PromiseOrValue<BigNumberish>,
-      PromiseOrValue<BigNumberish>
+      PromiseOrValue<BigNumberish>,
+      PromiseOrValue<string>
     ]
   ): string;
   encodeFunctionData(functionFragment: "dev", values?: undefined): string;
@@ -115,6 +116,7 @@ export interface IEvoturesNFT extends BaseContract {
       _randomWords: PromiseOrValue<BigNumberish>[],
       _evotures: PromiseOrValue<BigNumberish>,
       boosters_: PromiseOrValue<BigNumberish>,
+      _minter: PromiseOrValue<string>,
       overrides?: Overrides & { from?: PromiseOrValue<string> }
     ): Promise<ContractTransaction>;
 
@@ -138,6 +140,7 @@ export interface IEvoturesNFT extends BaseContract {
     _randomWords: PromiseOrValue<BigNumberish>[],
     _evotures: PromiseOrValue<BigNumberish>,
     boosters_: PromiseOrValue<BigNumberish>,
+    _minter: PromiseOrValue<string>,
     overrides?: Overrides & { from?: PromiseOrValue<string> }
   ): Promise<ContractTransaction>;
 
@@ -161,6 +164,7 @@ export interface IEvoturesNFT extends BaseContract {
       _randomWords: PromiseOrValue<BigNumberish>[],
       _evotures: PromiseOrValue<BigNumberish>,
       boosters_: PromiseOrValue<BigNumberish>,
+      _minter: PromiseOrValue<string>,
       overrides?: CallOverrides
     ): Promise<void>;
 
@@ -187,6 +191,7 @@ export interface IEvoturesNFT extends BaseContract {
       _randomWords: PromiseOrValue<BigNumberish>[],
       _evotures: PromiseOrValue<BigNumberish>,
       boosters_: PromiseOrValue<BigNumberish>,
+      _minter: PromiseOrValue<string>,
       overrides?: Overrides & { from?: PromiseOrValue<string> }
     ): Promise<BigNumber>;
 
@@ -211,6 +216,7 @@ export interface IEvoturesNFT extends BaseContract {
       _randomWords: PromiseOrValue<BigNumberish>[],
       _evotures: PromiseOrValue<BigNumberish>,
       boosters_: PromiseOrValue<BigNumberish>,
+      _minter: PromiseOrValue<string>,
       overrides?: Overrides & { from?: PromiseOrValue<string> }
     ): Promise<PopulatedTransaction>;
 

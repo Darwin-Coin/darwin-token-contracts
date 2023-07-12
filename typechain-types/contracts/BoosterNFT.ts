@@ -51,7 +51,6 @@ export declare namespace IBoosterNFT {
 
 export interface BoosterNFTInterface extends utils.Interface {
   functions: {
-    "BOOSTER_PRICE()": FunctionFragment;
     "MAX_SUPPLY()": FunctionFragment;
     "approve(address,uint256)": FunctionFragment;
     "balanceOf(address)": FunctionFragment;
@@ -78,7 +77,6 @@ export interface BoosterNFTInterface extends utils.Interface {
 
   getFunction(
     nameOrSignatureOrTopic:
-      | "BOOSTER_PRICE"
       | "MAX_SUPPLY"
       | "approve"
       | "balanceOf"
@@ -103,10 +101,6 @@ export interface BoosterNFTInterface extends utils.Interface {
       | "unminted"
   ): FunctionFragment;
 
-  encodeFunctionData(
-    functionFragment: "BOOSTER_PRICE",
-    values?: undefined
-  ): string;
   encodeFunctionData(
     functionFragment: "MAX_SUPPLY",
     values?: undefined
@@ -199,10 +193,6 @@ export interface BoosterNFTInterface extends utils.Interface {
   ): string;
   encodeFunctionData(functionFragment: "unminted", values?: undefined): string;
 
-  decodeFunctionResult(
-    functionFragment: "BOOSTER_PRICE",
-    data: BytesLike
-  ): Result;
   decodeFunctionResult(functionFragment: "MAX_SUPPLY", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "approve", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "balanceOf", data: BytesLike): Result;
@@ -333,8 +323,6 @@ export interface BoosterNFT extends BaseContract {
   removeListener: OnEvent<this>;
 
   functions: {
-    BOOSTER_PRICE(overrides?: CallOverrides): Promise<[BigNumber]>;
-
     MAX_SUPPLY(overrides?: CallOverrides): Promise<[number]>;
 
     approve(
@@ -437,8 +425,6 @@ export interface BoosterNFT extends BaseContract {
     ): Promise<[IBoosterNFT.KindStructOutput[]]>;
   };
 
-  BOOSTER_PRICE(overrides?: CallOverrides): Promise<BigNumber>;
-
   MAX_SUPPLY(overrides?: CallOverrides): Promise<number>;
 
   approve(
@@ -539,8 +525,6 @@ export interface BoosterNFT extends BaseContract {
   unminted(overrides?: CallOverrides): Promise<IBoosterNFT.KindStructOutput[]>;
 
   callStatic: {
-    BOOSTER_PRICE(overrides?: CallOverrides): Promise<BigNumber>;
-
     MAX_SUPPLY(overrides?: CallOverrides): Promise<number>;
 
     approve(
@@ -679,8 +663,6 @@ export interface BoosterNFT extends BaseContract {
   };
 
   estimateGas: {
-    BOOSTER_PRICE(overrides?: CallOverrides): Promise<BigNumber>;
-
     MAX_SUPPLY(overrides?: CallOverrides): Promise<BigNumber>;
 
     approve(
@@ -782,8 +764,6 @@ export interface BoosterNFT extends BaseContract {
   };
 
   populateTransaction: {
-    BOOSTER_PRICE(overrides?: CallOverrides): Promise<PopulatedTransaction>;
-
     MAX_SUPPLY(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
     approve(

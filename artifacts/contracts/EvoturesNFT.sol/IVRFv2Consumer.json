@@ -14,6 +14,11 @@
           "internalType": "uint8",
           "name": "boosters",
           "type": "uint8"
+        },
+        {
+          "internalType": "address",
+          "name": "minter",
+          "type": "address"
         }
       ],
       "name": "requestRandomWords",

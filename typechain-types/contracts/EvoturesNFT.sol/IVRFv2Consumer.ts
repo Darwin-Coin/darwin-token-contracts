@@ -25,14 +25,18 @@ import type {
 
 export interface IVRFv2ConsumerInterface extends utils.Interface {
   functions: {
-    "requestRandomWords(uint8,uint8)": FunctionFragment;
+    "requestRandomWords(uint8,uint8,address)": FunctionFragment;
   };
 
   getFunction(nameOrSignatureOrTopic: "requestRandomWords"): FunctionFragment;
 
   encodeFunctionData(
     functionFragment: "requestRandomWords",
-    values: [PromiseOrValue<BigNumberish>, PromiseOrValue<BigNumberish>]
+    values: [
+      PromiseOrValue<BigNumberish>,
+      PromiseOrValue<BigNumberish>,
+      PromiseOrValue<string>
+    ]
   ): string;
 
   decodeFunctionResult(
@@ -73,6 +77,7 @@ export interface IVRFv2Consumer extends BaseContract {
     requestRandomWords(
       evotures: PromiseOrValue<BigNumberish>,
       boosters: PromiseOrValue<BigNumberish>,
+      minter: PromiseOrValue<string>,
       overrides?: Overrides & { from?: PromiseOrValue<string> }
     ): Promise<ContractTransaction>;
   };
@@ -80,6 +85,7 @@ export interface IVRFv2Consumer extends BaseContract {
   requestRandomWords(
     evotures: PromiseOrValue<BigNumberish>,
     boosters: PromiseOrValue<BigNumberish>,
+    minter: PromiseOrValue<string>,
     overrides?: Overrides & { from?: PromiseOrValue<string> }
   ): Promise<ContractTransaction>;
 
@@ -87,6 +93,7 @@ export interface IVRFv2Consumer extends BaseContract {
     requestRandomWords(
       evotures: PromiseOrValue<BigNumberish>,
       boosters: PromiseOrValue<BigNumberish>,
+      minter: PromiseOrValue<string>,
       overrides?: CallOverrides
     ): Promise<BigNumber>;
   };
@@ -97,6 +104,7 @@ export interface IVRFv2Consumer extends BaseContract {
     requestRandomWords(
       evotures: PromiseOrValue<BigNumberish>,
       boosters: PromiseOrValue<BigNumberish>,
+      minter: PromiseOrValue<string>,
       overrides?: Overrides & { from?: PromiseOrValue<string> }
     ): Promise<BigNumber>;
   };
@@ -105,6 +113,7 @@ export interface IVRFv2Consumer extends BaseContract {
     requestRandomWords(
       evotures: PromiseOrValue<BigNumberish>,
       boosters: PromiseOrValue<BigNumberish>,
+      minter: PromiseOrValue<string>,
       overrides?: Overrides & { from?: PromiseOrValue<string> }
     ): Promise<PopulatedTransaction>;
   };

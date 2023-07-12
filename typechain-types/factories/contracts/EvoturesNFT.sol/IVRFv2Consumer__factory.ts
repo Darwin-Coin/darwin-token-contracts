@@ -22,6 +22,11 @@ const _abi = [
         name: "boosters",
         type: "uint8",
       },
+      {
+        internalType: "address",
+        name: "minter",
+        type: "address",
+      },
     ],
     name: "requestRandomWords",
     outputs: [
