@@ -13,19 +13,6 @@ const _abi = [
   {
     inputs: [
       {
-        internalType: "uint64",
-        name: "subscriptionId",
-        type: "uint64",
-      },
-    ],
-    name: "initialize",
-    outputs: [],
-    stateMutability: "nonpayable",
-    type: "function",
-  },
-  {
-    inputs: [
-      {
         internalType: "uint8",
         name: "evotures",
         type: "uint8",

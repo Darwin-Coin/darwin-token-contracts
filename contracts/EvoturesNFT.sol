@@ -5,15 +5,11 @@ pragma solidity ^0.8.14;
 import "@openzeppelin/contracts/token/ERC721/ERC721.sol";
 import "@openzeppelin/contracts/token/ERC721/IERC721Receiver.sol";
 
-import {VRFv2Consumer} from "./VRFv2Consumer.sol";
-
 import {IEvoturesNFT} from "./interface/IEvoturesNFT.sol";
 import {IBoosterNFT} from "./interface/IBoosterNFT.sol";
-import {ILootboxTicket} from "./interface/ILootboxTicket.sol";
 
 interface IVRFv2Consumer {
     function requestRandomWords(uint8 evotures, uint8 boosters) external returns (uint256 requestId);
-    function initialize(uint64 subscriptionId) external;
 }
 
 contract EvoturesNFT is ERC721("Evotures NFTs","EVOTURES"), IEvoturesNFT, IERC721Receiver {
@@ -21,8 +17,8 @@ contract EvoturesNFT is ERC721("Evotures NFTs","EVOTURES"), IEvoturesNFT, IERC72
     using Strings for uint256;
 
     address public immutable dev;
-    IBoosterNFT public boosterContract;
-    IVRFv2Consumer public vrfConsumer;
+    IBoosterNFT public immutable boosterContract;
+    IVRFv2Consumer public immutable vrfConsumer;
 
     uint16 public totalMinted;
     uint56 public EVOTURES_PRICE = 0.04 ether;
@@ -32,21 +28,12 @@ contract EvoturesNFT is ERC721("Evotures NFTs","EVOTURES"), IEvoturesNFT, IERC72
     mapping(address => uint16[]) private _userMinted;
     mapping(uint16 => uint16[]) private _boosters;
 
-    constructor(uint16[] memory unminted_, IBoosterNFT _boosterContract, uint64 subscriptionId) {
-        // Deploy consumer contract
-        bytes memory bytecode = type(VRFv2Consumer).creationCode;
-        bytes32 salt = keccak256(abi.encodePacked(address(this)));
-        address _vrfConsumer;
-        assembly {
-            _vrfConsumer := create2(0, add(bytecode, 32), mload(bytecode), salt)
-        }
-        vrfConsumer = IVRFv2Consumer(_vrfConsumer);
-        vrfConsumer.initialize(subscriptionId);
-
-        // Set Dev, unminted and booster contract
+    constructor(uint16[] memory unminted_, IBoosterNFT _boosterContract, IVRFv2Consumer _vrfConsumer) {
+        // Set Dev, unminted, booster and vrf consumer contracts
         dev = msg.sender;
         _unminted = unminted_;
         boosterContract = _boosterContract;
+        vrfConsumer = _vrfConsumer;
 
         // Mint mythical evotures
         _safeMint(msg.sender, 2061);

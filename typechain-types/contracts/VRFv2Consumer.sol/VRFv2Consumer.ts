@@ -29,12 +29,15 @@ import type {
 
 export interface VRFv2ConsumerInterface extends utils.Interface {
   functions: {
+    "evoturesContract()": FunctionFragment;
     "getRequest(uint256)": FunctionFragment;
     "getRequestStatus(uint256)": FunctionFragment;
-    "initialize(uint64)": FunctionFragment;
+    "initialize(address)": FunctionFragment;
+    "keyHash()": FunctionFragment;
     "lastRequestId()": FunctionFragment;
     "owner()": FunctionFragment;
     "rawFulfillRandomWords(uint256,uint256[])": FunctionFragment;
+    "requestConfirmations()": FunctionFragment;
     "requestIds(uint256)": FunctionFragment;
     "requestRandomWords(uint8,uint8)": FunctionFragment;
     "s_requests(uint256)": FunctionFragment;
@@ -43,18 +46,25 @@ export interface VRFv2ConsumerInterface extends utils.Interface {
 
   getFunction(
     nameOrSignatureOrTopic:
+      | "evoturesContract"
       | "getRequest"
       | "getRequestStatus"
       | "initialize"
+      | "keyHash"
       | "lastRequestId"
       | "owner"
       | "rawFulfillRandomWords"
+      | "requestConfirmations"
       | "requestIds"
       | "requestRandomWords"
       | "s_requests"
       | "transferOwnership"
   ): FunctionFragment;
 
+  encodeFunctionData(
+    functionFragment: "evoturesContract",
+    values?: undefined
+  ): string;
   encodeFunctionData(
     functionFragment: "getRequest",
     values: [PromiseOrValue<BigNumberish>]
@@ -65,8 +75,9 @@ export interface VRFv2ConsumerInterface extends utils.Interface {
   ): string;
   encodeFunctionData(
     functionFragment: "initialize",
-    values: [PromiseOrValue<BigNumberish>]
+    values: [PromiseOrValue<string>]
   ): string;
+  encodeFunctionData(functionFragment: "keyHash", values?: undefined): string;
   encodeFunctionData(
     functionFragment: "lastRequestId",
     values?: undefined
@@ -75,6 +86,10 @@ export interface VRFv2ConsumerInterface extends utils.Interface {
   encodeFunctionData(
     functionFragment: "rawFulfillRandomWords",
     values: [PromiseOrValue<BigNumberish>, PromiseOrValue<BigNumberish>[]]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "requestConfirmations",
+    values?: undefined
   ): string;
   encodeFunctionData(
     functionFragment: "requestIds",
@@ -93,12 +108,17 @@ export interface VRFv2ConsumerInterface extends utils.Interface {
     values: [PromiseOrValue<string>]
   ): string;
 
+  decodeFunctionResult(
+    functionFragment: "evoturesContract",
+    data: BytesLike
+  ): Result;
   decodeFunctionResult(functionFragment: "getRequest", data: BytesLike): Result;
   decodeFunctionResult(
     functionFragment: "getRequestStatus",
     data: BytesLike
   ): Result;
   decodeFunctionResult(functionFragment: "initialize", data: BytesLike): Result;
+  decodeFunctionResult(functionFragment: "keyHash", data: BytesLike): Result;
   decodeFunctionResult(
     functionFragment: "lastRequestId",
     data: BytesLike
@@ -106,6 +126,10 @@ export interface VRFv2ConsumerInterface extends utils.Interface {
   decodeFunctionResult(functionFragment: "owner", data: BytesLike): Result;
   decodeFunctionResult(
     functionFragment: "rawFulfillRandomWords",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
+    functionFragment: "requestConfirmations",
     data: BytesLike
   ): Result;
   decodeFunctionResult(functionFragment: "requestIds", data: BytesLike): Result;
@@ -192,6 +216,8 @@ export interface VRFv2Consumer extends BaseContract {
   removeListener: OnEvent<this>;
 
   functions: {
+    evoturesContract(overrides?: CallOverrides): Promise<[string]>;
+
     getRequest(
       _requestId: PromiseOrValue<BigNumberish>,
       overrides?: CallOverrides
@@ -205,9 +231,11 @@ export interface VRFv2Consumer extends BaseContract {
     >;
 
     initialize(
-      subscriptionId: PromiseOrValue<BigNumberish>,
+      _evotures: PromiseOrValue<string>,
       overrides?: Overrides & { from?: PromiseOrValue<string> }
     ): Promise<ContractTransaction>;
+
+    keyHash(overrides?: CallOverrides): Promise<[string]>;
 
     lastRequestId(overrides?: CallOverrides): Promise<[BigNumber]>;
 
@@ -218,6 +246,8 @@ export interface VRFv2Consumer extends BaseContract {
       randomWords: PromiseOrValue<BigNumberish>[],
       overrides?: Overrides & { from?: PromiseOrValue<string> }
     ): Promise<ContractTransaction>;
+
+    requestConfirmations(overrides?: CallOverrides): Promise<[number]>;
 
     requestIds(
       arg0: PromiseOrValue<BigNumberish>,
@@ -248,6 +278,8 @@ export interface VRFv2Consumer extends BaseContract {
     ): Promise<ContractTransaction>;
   };
 
+  evoturesContract(overrides?: CallOverrides): Promise<string>;
+
   getRequest(
     _requestId: PromiseOrValue<BigNumberish>,
     overrides?: CallOverrides
@@ -261,9 +293,11 @@ export interface VRFv2Consumer extends BaseContract {
   >;
 
   initialize(
-    subscriptionId: PromiseOrValue<BigNumberish>,
+    _evotures: PromiseOrValue<string>,
     overrides?: Overrides & { from?: PromiseOrValue<string> }
   ): Promise<ContractTransaction>;
+
+  keyHash(overrides?: CallOverrides): Promise<string>;
 
   lastRequestId(overrides?: CallOverrides): Promise<BigNumber>;
 
@@ -274,6 +308,8 @@ export interface VRFv2Consumer extends BaseContract {
     randomWords: PromiseOrValue<BigNumberish>[],
     overrides?: Overrides & { from?: PromiseOrValue<string> }
   ): Promise<ContractTransaction>;
+
+  requestConfirmations(overrides?: CallOverrides): Promise<number>;
 
   requestIds(
     arg0: PromiseOrValue<BigNumberish>,
@@ -304,6 +340,8 @@ export interface VRFv2Consumer extends BaseContract {
   ): Promise<ContractTransaction>;
 
   callStatic: {
+    evoturesContract(overrides?: CallOverrides): Promise<string>;
+
     getRequest(
       _requestId: PromiseOrValue<BigNumberish>,
       overrides?: CallOverrides
@@ -317,9 +355,11 @@ export interface VRFv2Consumer extends BaseContract {
     >;
 
     initialize(
-      subscriptionId: PromiseOrValue<BigNumberish>,
+      _evotures: PromiseOrValue<string>,
       overrides?: CallOverrides
     ): Promise<void>;
+
+    keyHash(overrides?: CallOverrides): Promise<string>;
 
     lastRequestId(overrides?: CallOverrides): Promise<BigNumber>;
 
@@ -330,6 +370,8 @@ export interface VRFv2Consumer extends BaseContract {
       randomWords: PromiseOrValue<BigNumberish>[],
       overrides?: CallOverrides
     ): Promise<void>;
+
+    requestConfirmations(overrides?: CallOverrides): Promise<number>;
 
     requestIds(
       arg0: PromiseOrValue<BigNumberish>,
@@ -387,6 +429,8 @@ export interface VRFv2Consumer extends BaseContract {
   };
 
   estimateGas: {
+    evoturesContract(overrides?: CallOverrides): Promise<BigNumber>;
+
     getRequest(
       _requestId: PromiseOrValue<BigNumberish>,
       overrides?: CallOverrides
@@ -398,9 +442,11 @@ export interface VRFv2Consumer extends BaseContract {
     ): Promise<BigNumber>;
 
     initialize(
-      subscriptionId: PromiseOrValue<BigNumberish>,
+      _evotures: PromiseOrValue<string>,
       overrides?: Overrides & { from?: PromiseOrValue<string> }
     ): Promise<BigNumber>;
+
+    keyHash(overrides?: CallOverrides): Promise<BigNumber>;
 
     lastRequestId(overrides?: CallOverrides): Promise<BigNumber>;
 
@@ -411,6 +457,8 @@ export interface VRFv2Consumer extends BaseContract {
       randomWords: PromiseOrValue<BigNumberish>[],
       overrides?: Overrides & { from?: PromiseOrValue<string> }
     ): Promise<BigNumber>;
+
+    requestConfirmations(overrides?: CallOverrides): Promise<BigNumber>;
 
     requestIds(
       arg0: PromiseOrValue<BigNumberish>,
@@ -435,6 +483,8 @@ export interface VRFv2Consumer extends BaseContract {
   };
 
   populateTransaction: {
+    evoturesContract(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+
     getRequest(
       _requestId: PromiseOrValue<BigNumberish>,
       overrides?: CallOverrides
@@ -446,9 +496,11 @@ export interface VRFv2Consumer extends BaseContract {
     ): Promise<PopulatedTransaction>;
 
     initialize(
-      subscriptionId: PromiseOrValue<BigNumberish>,
+      _evotures: PromiseOrValue<string>,
       overrides?: Overrides & { from?: PromiseOrValue<string> }
     ): Promise<PopulatedTransaction>;
+
+    keyHash(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
     lastRequestId(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
@@ -458,6 +510,10 @@ export interface VRFv2Consumer extends BaseContract {
       requestId: PromiseOrValue<BigNumberish>,
       randomWords: PromiseOrValue<BigNumberish>[],
       overrides?: Overrides & { from?: PromiseOrValue<string> }
+    ): Promise<PopulatedTransaction>;
+
+    requestConfirmations(
+      overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 
     requestIds(

@@ -327,8 +327,10 @@ contract VRFv2Consumer is VRFConsumerBaseV2, ConfirmedOwner {
     }
     mapping(uint256 => RequestStatus) public s_requests; /* requestId --> requestStatus */
     VRFCoordinatorV2Interface COORDINATOR;
+    IEvoturesNFT public evoturesContract;
 
-    IEvoturesNFT immutable evoturesContract;
+    uint16 public immutable requestConfirmations;
+    bytes32 public immutable keyHash;
 
     // Your subscription ID.
     uint64 s_subscriptionId;
@@ -337,48 +339,18 @@ contract VRFv2Consumer is VRFConsumerBaseV2, ConfirmedOwner {
     uint256[] public requestIds;
     uint256 public lastRequestId;
 
-    /**
-     * Coordinators:
-     *
-     * BSC: 0xc587d9053cd1118f25F645F9E08BB98c9712A4EE
-     * Avalanche C-Chain: 0xd5D517aBE5cF79B7e95eC98dB0f0277788aFF634
-     * Avalanche Fuji: 0x2eD832Ba664535e5886b75D64C46EB9a228C2610
-     * Arbitrum One: 0x41034678D6C633D8a95c75e1138A360a28bA15d1
-     * Arbitrum Goerli: 0x6D80646bEAdd07cE68cab36c27c626790bBcf17f
-     */
-    // NOTE: Hard Coded (Change this based on network)
-    address coordinator = 0x6D80646bEAdd07cE68cab36c27c626790bBcf17f;
-
-    /**
-     * The gas lane to use, which specifies the maximum gas price to bump to.
-     * For a list of available gas lanes on each network,
-     * see https://docs.chain.link/docs/vrf/v2/subscription/supported-networks/#configurations
-     * BSC: 0x114f3da0a805b6a67d6e9cd2ec746f7028f1b7376365af575cfea3550dd1aa04
-     * AVALANCHE: 0x83250c5584ffa93feb6ee082981c5ebe484c865196750b39835ad4f13780435d
-     * FUJI: 0x354d2f95da55398f44b7cff77da56283d9c6c829a4bdf1bbcaf2ad6a4d081f61
-     * ARBITRUM ONE: 0x08ba8f62ff6c40a58877a106147661db43bc58dabfb814793847a839aa03367f
-     * ARBITRUM GOERLI: 0x83d1b6e3388bed3d76426974512bb0d270e9542a765cd667242ea26c0cc0b730
-     */
-    // NOTE: Hard Coded (Change this based on network)
-    bytes32 keyHash = 0x83d1b6e3388bed3d76426974512bb0d270e9542a765cd667242ea26c0cc0b730;
-
-    // Depends on the number of requested values that you want sent to the
-    // fulfillRandomWords() function. Storing each word costs about 20,000 gas.
-    uint32 callbackGasLimit = 100000;
-
-    // Request 1 network confirmation.
-    uint16 requestConfirmations = 1;
-
-    constructor()
-        VRFConsumerBaseV2(coordinator)
+    constructor(address _coordinator, bytes32 _keyHash, uint64 subscriptionId, uint16 _confirmations)
+        VRFConsumerBaseV2(_coordinator)
         ConfirmedOwner(msg.sender)
     {
-        evoturesContract = IEvoturesNFT(msg.sender);
-        COORDINATOR = VRFCoordinatorV2Interface(coordinator);
+        requestConfirmations = _confirmations;
+        s_subscriptionId = subscriptionId;
+        keyHash = _keyHash;
+        COORDINATOR = VRFCoordinatorV2Interface(_coordinator);
     }
 
-    function initialize(uint64 subscriptionId) external onlyOwner {
-        s_subscriptionId = subscriptionId;
+    function initialize(address _evotures) external onlyOwner {
+        evoturesContract = IEvoturesNFT(_evotures);
     }
 
     // Assumes the subscription is funded sufficiently.
@@ -390,7 +362,7 @@ contract VRFv2Consumer is VRFConsumerBaseV2, ConfirmedOwner {
             keyHash,
             s_subscriptionId,
             requestConfirmations,
-            callbackGasLimit,
+            (20_000 * numWords) + 80_000,
             numWords
         );
         s_requests[requestId] = RequestStatus({randomWords: new uint256[](0), exists: true, fulfilled: false, evotures: _evotures, boosters: _boosters});
