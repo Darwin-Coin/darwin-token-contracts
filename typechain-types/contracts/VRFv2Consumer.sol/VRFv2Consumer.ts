@@ -30,7 +30,6 @@ import type {
 export interface VRFv2ConsumerInterface extends utils.Interface {
   functions: {
     "evoturesContract()": FunctionFragment;
-    "gasLimit()": FunctionFragment;
     "getRequest(uint256)": FunctionFragment;
     "getRequestStatus(uint256)": FunctionFragment;
     "initialize(address)": FunctionFragment;
@@ -42,14 +41,12 @@ export interface VRFv2ConsumerInterface extends utils.Interface {
     "requestIds(uint256)": FunctionFragment;
     "requestRandomWords(uint8,uint8,address)": FunctionFragment;
     "s_requests(uint256)": FunctionFragment;
-    "setGasLimit(uint32)": FunctionFragment;
     "transferOwnership(address)": FunctionFragment;
   };
 
   getFunction(
     nameOrSignatureOrTopic:
       | "evoturesContract"
-      | "gasLimit"
       | "getRequest"
       | "getRequestStatus"
       | "initialize"
@@ -61,7 +58,6 @@ export interface VRFv2ConsumerInterface extends utils.Interface {
       | "requestIds"
       | "requestRandomWords"
       | "s_requests"
-      | "setGasLimit"
       | "transferOwnership"
   ): FunctionFragment;
 
@@ -69,7 +65,6 @@ export interface VRFv2ConsumerInterface extends utils.Interface {
     functionFragment: "evoturesContract",
     values?: undefined
   ): string;
-  encodeFunctionData(functionFragment: "gasLimit", values?: undefined): string;
   encodeFunctionData(
     functionFragment: "getRequest",
     values: [PromiseOrValue<BigNumberish>]
@@ -113,10 +108,6 @@ export interface VRFv2ConsumerInterface extends utils.Interface {
     values: [PromiseOrValue<BigNumberish>]
   ): string;
   encodeFunctionData(
-    functionFragment: "setGasLimit",
-    values: [PromiseOrValue<BigNumberish>]
-  ): string;
-  encodeFunctionData(
     functionFragment: "transferOwnership",
     values: [PromiseOrValue<string>]
   ): string;
@@ -125,7 +116,6 @@ export interface VRFv2ConsumerInterface extends utils.Interface {
     functionFragment: "evoturesContract",
     data: BytesLike
   ): Result;
-  decodeFunctionResult(functionFragment: "gasLimit", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "getRequest", data: BytesLike): Result;
   decodeFunctionResult(
     functionFragment: "getRequestStatus",
@@ -152,10 +142,6 @@ export interface VRFv2ConsumerInterface extends utils.Interface {
     data: BytesLike
   ): Result;
   decodeFunctionResult(functionFragment: "s_requests", data: BytesLike): Result;
-  decodeFunctionResult(
-    functionFragment: "setGasLimit",
-    data: BytesLike
-  ): Result;
   decodeFunctionResult(
     functionFragment: "transferOwnership",
     data: BytesLike
@@ -236,8 +222,6 @@ export interface VRFv2Consumer extends BaseContract {
   functions: {
     evoturesContract(overrides?: CallOverrides): Promise<[string]>;
 
-    gasLimit(overrides?: CallOverrides): Promise<[number]>;
-
     getRequest(
       _requestId: PromiseOrValue<BigNumberish>,
       overrides?: CallOverrides
@@ -294,11 +278,6 @@ export interface VRFv2Consumer extends BaseContract {
       }
     >;
 
-    setGasLimit(
-      _gasLimit: PromiseOrValue<BigNumberish>,
-      overrides?: Overrides & { from?: PromiseOrValue<string> }
-    ): Promise<ContractTransaction>;
-
     transferOwnership(
       to: PromiseOrValue<string>,
       overrides?: Overrides & { from?: PromiseOrValue<string> }
@@ -306,8 +285,6 @@ export interface VRFv2Consumer extends BaseContract {
   };
 
   evoturesContract(overrides?: CallOverrides): Promise<string>;
-
-  gasLimit(overrides?: CallOverrides): Promise<number>;
 
   getRequest(
     _requestId: PromiseOrValue<BigNumberish>,
@@ -365,11 +342,6 @@ export interface VRFv2Consumer extends BaseContract {
     }
   >;
 
-  setGasLimit(
-    _gasLimit: PromiseOrValue<BigNumberish>,
-    overrides?: Overrides & { from?: PromiseOrValue<string> }
-  ): Promise<ContractTransaction>;
-
   transferOwnership(
     to: PromiseOrValue<string>,
     overrides?: Overrides & { from?: PromiseOrValue<string> }
@@ -377,8 +349,6 @@ export interface VRFv2Consumer extends BaseContract {
 
   callStatic: {
     evoturesContract(overrides?: CallOverrides): Promise<string>;
-
-    gasLimit(overrides?: CallOverrides): Promise<number>;
 
     getRequest(
       _requestId: PromiseOrValue<BigNumberish>,
@@ -436,11 +406,6 @@ export interface VRFv2Consumer extends BaseContract {
       }
     >;
 
-    setGasLimit(
-      _gasLimit: PromiseOrValue<BigNumberish>,
-      overrides?: CallOverrides
-    ): Promise<void>;
-
     transferOwnership(
       to: PromiseOrValue<string>,
       overrides?: CallOverrides
@@ -475,8 +440,6 @@ export interface VRFv2Consumer extends BaseContract {
 
   estimateGas: {
     evoturesContract(overrides?: CallOverrides): Promise<BigNumber>;
-
-    gasLimit(overrides?: CallOverrides): Promise<BigNumber>;
 
     getRequest(
       _requestId: PromiseOrValue<BigNumberish>,
@@ -524,11 +487,6 @@ export interface VRFv2Consumer extends BaseContract {
       overrides?: CallOverrides
     ): Promise<BigNumber>;
 
-    setGasLimit(
-      _gasLimit: PromiseOrValue<BigNumberish>,
-      overrides?: Overrides & { from?: PromiseOrValue<string> }
-    ): Promise<BigNumber>;
-
     transferOwnership(
       to: PromiseOrValue<string>,
       overrides?: Overrides & { from?: PromiseOrValue<string> }
@@ -537,8 +495,6 @@ export interface VRFv2Consumer extends BaseContract {
 
   populateTransaction: {
     evoturesContract(overrides?: CallOverrides): Promise<PopulatedTransaction>;
-
-    gasLimit(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
     getRequest(
       _requestId: PromiseOrValue<BigNumberish>,
@@ -586,11 +542,6 @@ export interface VRFv2Consumer extends BaseContract {
     s_requests(
       arg0: PromiseOrValue<BigNumberish>,
       overrides?: CallOverrides
-    ): Promise<PopulatedTransaction>;
-
-    setGasLimit(
-      _gasLimit: PromiseOrValue<BigNumberish>,
-      overrides?: Overrides & { from?: PromiseOrValue<string> }
     ): Promise<PopulatedTransaction>;
 
     transferOwnership(

@@ -330,7 +330,6 @@ contract VRFv2Consumer is VRFConsumerBaseV2, ConfirmedOwner {
     VRFCoordinatorV2Interface COORDINATOR;
     IEvoturesNFT public evoturesContract;
 
-    uint32 public gasLimit = 138_000;
     uint16 public immutable requestConfirmations;
     bytes32 public immutable keyHash;
 
@@ -355,25 +354,17 @@ contract VRFv2Consumer is VRFConsumerBaseV2, ConfirmedOwner {
         evoturesContract = IEvoturesNFT(_evotures);
     }
 
-    function setGasLimit(uint32 _gasLimit) external onlyOwner {
-        gasLimit = _gasLimit;
-    }
-
     // Assumes the subscription is funded sufficiently.
     function requestRandomWords(uint8 _evotures, uint8 _boosters, address _minter) external returns (uint256 requestId) {
         require(msg.sender == address(evoturesContract), "VRFv2Consumer::requestRandomWords: CALLER_NOT_EVOTURES");
         uint8 numWords = _evotures + _evotures * _boosters;
-        uint32 callbackGasLimit = gasLimit * numWords + 40_000;
-        if (callbackGasLimit > 2_500_000) {
-            callbackGasLimit = 2_500_000;
-        }
 
         // Will revert if subscription is not set and funded.
         requestId = COORDINATOR.requestRandomWords(
             keyHash,
             s_subscriptionId,
             requestConfirmations,
-            callbackGasLimit,
+            2_500_000,
             numWords
         );
         s_requests[requestId] = RequestStatus({randomWords: new uint256[](0), exists: true, fulfilled: false, evotures: _evotures, boosters: _boosters, minter: _minter});

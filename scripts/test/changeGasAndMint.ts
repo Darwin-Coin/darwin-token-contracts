@@ -9,7 +9,6 @@ async function main() {
   const [owner] = await ethers.getSigners();
   const CONSUMER = "0x6dDEa1F1D21F78Fc3b30456070384DB7E60E0b8b";
   const EVOTURES = "0xA4AC1C7f44a2BB6fa03f4603a9DAeE0AE5809CeF";
-  const GASLIMIT = 138_000;
 
   const evoturesFactory = await ethers.getContractFactory("EvoturesNFT");
   const consumerFactory = await ethers.getContractFactory("VRFv2Consumer");
@@ -23,13 +22,6 @@ async function main() {
   const consumer = consumerFactory.attach(CONSUMER) as VRFv2Consumer;
   await consumer.deployed();
   console.log(`🔨 Deployed Chainlink Consumer at: ${consumer.address}`);
-
-  const gasLimit = await consumer.gasLimit();
-  if (gasLimit !== GASLIMIT) {
-    const setGas = await consumer.setGasLimit(GASLIMIT);
-    await setGas.wait(3);
-    console.log("Gas limit changed to "+ GASLIMIT);
-  }
 
   const mint = await evotures.mint(3, 5, {value: ethers.utils.parseEther("0.21")});
   await mint.wait();
