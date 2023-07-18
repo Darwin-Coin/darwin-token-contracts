@@ -21,6 +21,7 @@ export type { DarwinStaking } from "./DarwinStaking";
 export type { DarwinVester5 } from "./DarwinVester5";
 export type { DarwinVester7 } from "./DarwinVester7";
 export type { LootboxTicket } from "./LootboxTicket";
+export type { MainnetNFTCounter } from "./MainnetNFTCounter";
 export type { MultiplierNFT } from "./MultiplierNFT";
 export type { OldVester } from "./OldVester";
 export type { StakedDarwin } from "./StakedDarwin";

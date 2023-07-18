@@ -40,15 +40,15 @@ contract EvoturesNFT is ERC721("Evotures NFTs","EVOTURES"), IEvoturesNFT, IERC72
         totalMinted = 2;
     }
 
-    function mint(uint8 _evotures, uint8 _boosters) public payable {
+    function mint(uint8 _evotures, uint8 _boosters, address to) external payable {
         require(_unminted.length >= _evotures, "EvoturesNFT::mint: MINT_EXCEEDED");
-        require(_evotures <= (3 - _userMinted[msg.sender].length) && _boosters <= 5, "EvoturesNFT::mint: FORBIDDEN");
+        require(_evotures <= (3 - _userMinted[to].length) && _boosters <= 5, "EvoturesNFT::mint: FORBIDDEN");
         require(msg.value >= (_evotures*EVOTURES_PRICE + _evotures*_boosters*BOOSTER_PRICE), "EvoturesNFT::mint: INSUFFICIENT_ETH");
 
-        vrfConsumer.requestRandomWords(_evotures, _boosters, msg.sender);
+        vrfConsumer.requestRandomWords(_evotures, _boosters, to);
     }
 
-    function chainlinkMint(uint256[] memory _randomWords, uint8 _evotures, uint8 _boosters, address _minter) public {
+    function chainlinkMint(uint256[] memory _randomWords, uint8 _evotures, uint8 _boosters, address _minter) external {
         require(msg.sender == address(vrfConsumer), "EvoturesNFT::chainlinkMint: CALLER_NOT_CONSUMER");
 
         for (uint8 i = 0; i < _evotures; i++) {

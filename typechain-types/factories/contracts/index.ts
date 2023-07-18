@@ -15,6 +15,7 @@ export { DarwinStaking__factory } from "./DarwinStaking__factory";
 export { DarwinVester5__factory } from "./DarwinVester5__factory";
 export { DarwinVester7__factory } from "./DarwinVester7__factory";
 export { LootboxTicket__factory } from "./LootboxTicket__factory";
+export { MainnetNFTCounter__factory } from "./MainnetNFTCounter__factory";
 export { MultiplierNFT__factory } from "./MultiplierNFT__factory";
 export { OldVester__factory } from "./OldVester__factory";
 export { StakedDarwin__factory } from "./StakedDarwin__factory";

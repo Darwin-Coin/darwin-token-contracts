@@ -42,7 +42,7 @@ export interface EvoturesNFTInterface extends utils.Interface {
     "dev()": FunctionFragment;
     "getApproved(uint256)": FunctionFragment;
     "isApprovedForAll(address,address)": FunctionFragment;
-    "mint(uint8,uint8)": FunctionFragment;
+    "mint(uint8,uint8,address)": FunctionFragment;
     "multipliers(uint16)": FunctionFragment;
     "name()": FunctionFragment;
     "onERC721Received(address,address,uint256,bytes)": FunctionFragment;
@@ -148,7 +148,11 @@ export interface EvoturesNFTInterface extends utils.Interface {
   ): string;
   encodeFunctionData(
     functionFragment: "mint",
-    values: [PromiseOrValue<BigNumberish>, PromiseOrValue<BigNumberish>]
+    values: [
+      PromiseOrValue<BigNumberish>,
+      PromiseOrValue<BigNumberish>,
+      PromiseOrValue<string>
+    ]
   ): string;
   encodeFunctionData(
     functionFragment: "multipliers",
@@ -441,6 +445,7 @@ export interface EvoturesNFT extends BaseContract {
     mint(
       _evotures: PromiseOrValue<BigNumberish>,
       _boosters: PromiseOrValue<BigNumberish>,
+      to: PromiseOrValue<string>,
       overrides?: PayableOverrides & { from?: PromiseOrValue<string> }
     ): Promise<ContractTransaction>;
 
@@ -580,6 +585,7 @@ export interface EvoturesNFT extends BaseContract {
   mint(
     _evotures: PromiseOrValue<BigNumberish>,
     _boosters: PromiseOrValue<BigNumberish>,
+    to: PromiseOrValue<string>,
     overrides?: PayableOverrides & { from?: PromiseOrValue<string> }
   ): Promise<ContractTransaction>;
 
@@ -719,6 +725,7 @@ export interface EvoturesNFT extends BaseContract {
     mint(
       _evotures: PromiseOrValue<BigNumberish>,
       _boosters: PromiseOrValue<BigNumberish>,
+      to: PromiseOrValue<string>,
       overrides?: CallOverrides
     ): Promise<void>;
 
@@ -892,6 +899,7 @@ export interface EvoturesNFT extends BaseContract {
     mint(
       _evotures: PromiseOrValue<BigNumberish>,
       _boosters: PromiseOrValue<BigNumberish>,
+      to: PromiseOrValue<string>,
       overrides?: PayableOverrides & { from?: PromiseOrValue<string> }
     ): Promise<BigNumber>;
 
@@ -1032,6 +1040,7 @@ export interface EvoturesNFT extends BaseContract {
     mint(
       _evotures: PromiseOrValue<BigNumberish>,
       _boosters: PromiseOrValue<BigNumberish>,
+      to: PromiseOrValue<string>,
       overrides?: PayableOverrides & { from?: PromiseOrValue<string> }
     ): Promise<PopulatedTransaction>;
 

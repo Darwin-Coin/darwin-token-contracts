@@ -76,6 +76,11 @@ const _abi = [
         name: "_boosters",
         type: "uint8",
       },
+      {
+        internalType: "address",
+        name: "to",
+        type: "address",
+      },
     ],
     name: "mint",
     outputs: [],

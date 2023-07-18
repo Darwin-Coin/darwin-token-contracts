@@ -4,7 +4,7 @@ pragma solidity ^0.8.14;
 
 interface IEvoturesNFT {
 
-    function mint(uint8 _evotures, uint8 _boosters) external payable;
+    function mint(uint8 _evotures, uint8 _boosters, address to) external payable;
     function chainlinkMint(uint256[] memory _randomWords, uint8 _evotures, uint8 boosters_, address _minter) external;
 
     function BOOSTER_PRICE() external view returns(uint64);

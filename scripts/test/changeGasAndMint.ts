@@ -23,7 +23,7 @@ async function main() {
   await consumer.deployed();
   console.log(`🔨 Deployed Chainlink Consumer at: ${consumer.address}`);
 
-  const mint = await evotures.mint(3, 5, {value: ethers.utils.parseEther("0.21")});
+  const mint = await evotures.mint(3, 5, owner.address, {value: ethers.utils.parseEther("0.21")});
   await mint.wait();
   console.log("Mint transaction sent");
 
