@@ -41,6 +41,7 @@ export interface EvoturesNFTInterface extends utils.Interface {
     "contractURI()": FunctionFragment;
     "dev()": FunctionFragment;
     "getApproved(uint256)": FunctionFragment;
+    "hardMint(uint8,uint8,address)": FunctionFragment;
     "isApprovedForAll(address,address)": FunctionFragment;
     "mint(uint8,uint8,address)": FunctionFragment;
     "multipliers(uint16)": FunctionFragment;
@@ -75,6 +76,7 @@ export interface EvoturesNFTInterface extends utils.Interface {
       | "contractURI"
       | "dev"
       | "getApproved"
+      | "hardMint"
       | "isApprovedForAll"
       | "mint"
       | "multipliers"
@@ -141,6 +143,14 @@ export interface EvoturesNFTInterface extends utils.Interface {
   encodeFunctionData(
     functionFragment: "getApproved",
     values: [PromiseOrValue<BigNumberish>]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "hardMint",
+    values: [
+      PromiseOrValue<BigNumberish>,
+      PromiseOrValue<BigNumberish>,
+      PromiseOrValue<string>
+    ]
   ): string;
   encodeFunctionData(
     functionFragment: "isApprovedForAll",
@@ -261,6 +271,7 @@ export interface EvoturesNFTInterface extends utils.Interface {
     functionFragment: "getApproved",
     data: BytesLike
   ): Result;
+  decodeFunctionResult(functionFragment: "hardMint", data: BytesLike): Result;
   decodeFunctionResult(
     functionFragment: "isApprovedForAll",
     data: BytesLike
@@ -436,6 +447,13 @@ export interface EvoturesNFT extends BaseContract {
       overrides?: CallOverrides
     ): Promise<[string]>;
 
+    hardMint(
+      _evotures: PromiseOrValue<BigNumberish>,
+      _boosters: PromiseOrValue<BigNumberish>,
+      to: PromiseOrValue<string>,
+      overrides?: Overrides & { from?: PromiseOrValue<string> }
+    ): Promise<ContractTransaction>;
+
     isApprovedForAll(
       owner: PromiseOrValue<string>,
       operator: PromiseOrValue<string>,
@@ -576,6 +594,13 @@ export interface EvoturesNFT extends BaseContract {
     overrides?: CallOverrides
   ): Promise<string>;
 
+  hardMint(
+    _evotures: PromiseOrValue<BigNumberish>,
+    _boosters: PromiseOrValue<BigNumberish>,
+    to: PromiseOrValue<string>,
+    overrides?: Overrides & { from?: PromiseOrValue<string> }
+  ): Promise<ContractTransaction>;
+
   isApprovedForAll(
     owner: PromiseOrValue<string>,
     operator: PromiseOrValue<string>,
@@ -715,6 +740,13 @@ export interface EvoturesNFT extends BaseContract {
       tokenId: PromiseOrValue<BigNumberish>,
       overrides?: CallOverrides
     ): Promise<string>;
+
+    hardMint(
+      _evotures: PromiseOrValue<BigNumberish>,
+      _boosters: PromiseOrValue<BigNumberish>,
+      to: PromiseOrValue<string>,
+      overrides?: CallOverrides
+    ): Promise<void>;
 
     isApprovedForAll(
       owner: PromiseOrValue<string>,
@@ -890,6 +922,13 @@ export interface EvoturesNFT extends BaseContract {
       overrides?: CallOverrides
     ): Promise<BigNumber>;
 
+    hardMint(
+      _evotures: PromiseOrValue<BigNumberish>,
+      _boosters: PromiseOrValue<BigNumberish>,
+      to: PromiseOrValue<string>,
+      overrides?: Overrides & { from?: PromiseOrValue<string> }
+    ): Promise<BigNumber>;
+
     isApprovedForAll(
       owner: PromiseOrValue<string>,
       operator: PromiseOrValue<string>,
@@ -1029,6 +1068,13 @@ export interface EvoturesNFT extends BaseContract {
     getApproved(
       tokenId: PromiseOrValue<BigNumberish>,
       overrides?: CallOverrides
+    ): Promise<PopulatedTransaction>;
+
+    hardMint(
+      _evotures: PromiseOrValue<BigNumberish>,
+      _boosters: PromiseOrValue<BigNumberish>,
+      to: PromiseOrValue<string>,
+      overrides?: Overrides & { from?: PromiseOrValue<string> }
     ): Promise<PopulatedTransaction>;
 
     isApprovedForAll(

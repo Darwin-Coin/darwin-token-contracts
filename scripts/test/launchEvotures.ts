@@ -1,6 +1,6 @@
 import * as hardhat from "hardhat";
 import { ethers } from "hardhat";
-import { BoosterNFT } from "../../typechain-types/contracts";
+import { BoosterNFT, MainnetNFTCounter } from "../../typechain-types/contracts";
 import { IBoosterNFT } from "../../typechain-types/contracts/BoosterNFT";
 import { EvoturesNFT, VRFv2Consumer } from "../../typechain-types";
 
@@ -24,7 +24,7 @@ function consumerArgs(chainId: number) {
       return {
         coordinator: "0x6D80646bEAdd07cE68cab36c27c626790bBcf17f",
         keyHash: "0x83d1b6e3388bed3d76426974512bb0d270e9542a765cd667242ea26c0cc0b730",
-        subscriptionId: 75,
+        subscriptionId: 79,
         confirmations: 1
       }
     default:
@@ -39,8 +39,48 @@ function consumerArgs(chainId: number) {
 
 async function main() {
 
+
+
+
   const VERIFY = false;
-  const [owner] = await ethers.getSigners();
+  let [owner] = await ethers.getSigners();
+
+  if (hardhat.network.name === "arbitrumGoerli") {
+    hardhat.changeNetwork("goerli");
+    console.log(`⛓️ Chain: Goerli`);
+  } else if (hardhat.network.name === "arbitrum") {
+    hardhat.changeNetwork("mainnet");
+    console.log(`⛓️ Chain: Mainnet`);
+  }
+
+  // DECLARE MAINNET FACTORIES
+  const counterFactory = await ethers.getContractFactory("MainnetNFTCounter");
+
+  //! [DEPLOY] COUNTER
+  const counter = await counterFactory.deploy() as MainnetNFTCounter;
+  await counter.deployed();
+  console.log(`🔨 Deployed Mainnet NFT Counter at: ${counter.address}`);
+
+  if (VERIFY) {
+    //? [VERIFY] COUNTER
+    await hardhat.run("verify:verify", {
+      address: counter.address,
+      constructorArguments: []
+    });
+  }
+
+
+
+
+  if (hardhat.network.name === "goerli") {
+    hardhat.changeNetwork("arbitrumGoerli");
+    console.log(`⛓️ Chain: Arbitrum Goerli`);
+  } else if (hardhat.network.name === "mainnet") {
+    hardhat.changeNetwork("arbitrum");
+    console.log(`⛓️ Chain: Arbitrum ONE`);
+  }
+
+  [owner] = await ethers.getSigners();
   const chainId = await owner.getChainId();
   const { coordinator, keyHash, subscriptionId, confirmations } = consumerArgs(chainId);
 

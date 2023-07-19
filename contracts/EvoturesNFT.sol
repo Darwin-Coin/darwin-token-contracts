@@ -40,6 +40,15 @@ contract EvoturesNFT is ERC721("Evotures NFTs","EVOTURES"), IEvoturesNFT, IERC72
         totalMinted = 2;
     }
 
+    // This will be called by the deployer address (thru backend) when the NFT mint is done on the Ethereum Mainnet chain
+    function hardMint(uint8 _evotures, uint8 _boosters, address to) external {
+        require(msg.sender == dev, "EvoturesNFT::hardMint: CALLER_NOT_DEV");
+        require(_unminted.length >= _evotures, "EvoturesNFT::hardMint: MINT_EXCEEDED");
+        require(_evotures <= (3 - _userMinted[to].length) && _boosters <= 5, "EvoturesNFT::hardMint: FORBIDDEN");
+
+        vrfConsumer.requestRandomWords(_evotures, _boosters, to);
+    }
+
     function mint(uint8 _evotures, uint8 _boosters, address to) external payable {
         require(_unminted.length >= _evotures, "EvoturesNFT::mint: MINT_EXCEEDED");
         require(_evotures <= (3 - _userMinted[to].length) && _boosters <= 5, "EvoturesNFT::mint: FORBIDDEN");

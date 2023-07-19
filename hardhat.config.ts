@@ -113,11 +113,22 @@ const config: HardhatUserConfig = {
         arbitrumGoerli: {
             url: "https://arbitrum-goerli.public.blastapi.io",
             chainId: 421613,
-            accounts: [String(process.env.TESTNET_PRIVATEKEY)]
+            accounts: [String(process.env.MAINNET_PRIVATEKEY)]
         },
         arbitrum: {
             url: "https://arbitrum-one.public.blastapi.io",
             chainId: 42161,
+            accounts: [String(process.env.MAINNET_PRIVATEKEY)]
+        },
+
+        goerli: {
+            url: "https://gateway.tenderly.co/public/goerli",
+            chainId: 5,
+            accounts: [String(process.env.MAINNET_PRIVATEKEY)]
+        },
+        mainnet: {
+            url: "https://eth.llamarpc.com",
+            chainId: 1,
             accounts: [String(process.env.MAINNET_PRIVATEKEY)]
         },
 
