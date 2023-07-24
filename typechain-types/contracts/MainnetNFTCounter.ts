@@ -30,6 +30,7 @@ export interface MainnetNFTCounterInterface extends utils.Interface {
     "EVOTURES_PRICE()": FunctionFragment;
     "buy(uint8,uint8)": FunctionFragment;
     "dev()": FunctionFragment;
+    "userInfo(address)": FunctionFragment;
     "withdrawETH()": FunctionFragment;
   };
 
@@ -39,6 +40,7 @@ export interface MainnetNFTCounterInterface extends utils.Interface {
       | "EVOTURES_PRICE"
       | "buy"
       | "dev"
+      | "userInfo"
       | "withdrawETH"
   ): FunctionFragment;
 
@@ -56,6 +58,10 @@ export interface MainnetNFTCounterInterface extends utils.Interface {
   ): string;
   encodeFunctionData(functionFragment: "dev", values?: undefined): string;
   encodeFunctionData(
+    functionFragment: "userInfo",
+    values: [PromiseOrValue<string>]
+  ): string;
+  encodeFunctionData(
     functionFragment: "withdrawETH",
     values?: undefined
   ): string;
@@ -70,6 +76,7 @@ export interface MainnetNFTCounterInterface extends utils.Interface {
   ): Result;
   decodeFunctionResult(functionFragment: "buy", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "dev", data: BytesLike): Result;
+  decodeFunctionResult(functionFragment: "userInfo", data: BytesLike): Result;
   decodeFunctionResult(
     functionFragment: "withdrawETH",
     data: BytesLike
@@ -117,6 +124,11 @@ export interface MainnetNFTCounter extends BaseContract {
 
     dev(overrides?: CallOverrides): Promise<[string]>;
 
+    userInfo(
+      arg0: PromiseOrValue<string>,
+      overrides?: CallOverrides
+    ): Promise<[number, number] & { boosters: number; evotures: number }>;
+
     withdrawETH(
       overrides?: Overrides & { from?: PromiseOrValue<string> }
     ): Promise<ContractTransaction>;
@@ -134,6 +146,11 @@ export interface MainnetNFTCounter extends BaseContract {
 
   dev(overrides?: CallOverrides): Promise<string>;
 
+  userInfo(
+    arg0: PromiseOrValue<string>,
+    overrides?: CallOverrides
+  ): Promise<[number, number] & { boosters: number; evotures: number }>;
+
   withdrawETH(
     overrides?: Overrides & { from?: PromiseOrValue<string> }
   ): Promise<ContractTransaction>;
@@ -150,6 +167,11 @@ export interface MainnetNFTCounter extends BaseContract {
     ): Promise<void>;
 
     dev(overrides?: CallOverrides): Promise<string>;
+
+    userInfo(
+      arg0: PromiseOrValue<string>,
+      overrides?: CallOverrides
+    ): Promise<[number, number] & { boosters: number; evotures: number }>;
 
     withdrawETH(overrides?: CallOverrides): Promise<void>;
   };
@@ -169,6 +191,11 @@ export interface MainnetNFTCounter extends BaseContract {
 
     dev(overrides?: CallOverrides): Promise<BigNumber>;
 
+    userInfo(
+      arg0: PromiseOrValue<string>,
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
+
     withdrawETH(
       overrides?: Overrides & { from?: PromiseOrValue<string> }
     ): Promise<BigNumber>;
@@ -186,6 +213,11 @@ export interface MainnetNFTCounter extends BaseContract {
     ): Promise<PopulatedTransaction>;
 
     dev(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+
+    userInfo(
+      arg0: PromiseOrValue<string>,
+      overrides?: CallOverrides
+    ): Promise<PopulatedTransaction>;
 
     withdrawETH(
       overrides?: Overrides & { from?: PromiseOrValue<string> }

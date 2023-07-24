@@ -138,8 +138,7 @@ contract EvoturesNFT is ERC721("Evotures NFTs","EVOTURES"), IEvoturesNFT, IERC72
     }
 
     function _baseURI() internal pure override returns (string memory) {
-        //TODO: SET EVOTURES URI
-        return "ipfs://bafybeiegbgy7a2g22pnoxgxkxjztgzz5xnw3naobpfbnb4vl6tsguppcpi/";
+        return "ipfs://bafybeicrhiw7aaa32azbtmhlppz7xzopmyvhvidwz3ys27a6u4s6ai6gai/";
     }
 
     function contractURI() public pure returns (string memory) {
