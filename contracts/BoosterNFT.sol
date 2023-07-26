@@ -96,8 +96,7 @@ contract BoosterNFT is ERC721("Evotures Booster NFTs","EVOBOOST"), IBoosterNFT {
     }
 
     function _baseURI() internal pure override returns (string memory) {
-        // TODO: SET BOOSTERS URI
-        return "ipfs://bafybeiegbgy7a2g22pnoxgxkxjztgzz5xnw3naobpfbnb4vl6tsguppcpi/";
+        return "ipfs://bafybeiboj36pnkuxkla7fmt7xvpx4v5juvgkdqcmdmrnd4nioqkq5fvjca/";
     }
 
     function contractURI() public pure returns (string memory) {
