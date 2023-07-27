@@ -20,6 +20,13 @@ function consumerArgs(chainId: number) {
         subscriptionId: 3047,
         confirmations: 3
       }
+    case 42161:
+      return {
+        coordinator: "0x41034678D6C633D8a95c75e1138A360a28bA15d1",
+        keyHash: "0x72d2b016bb5b62912afea355ebf33b91319f828738b111b723b78696b9847b63",
+        subscriptionId: 74,
+        confirmations: 1
+      }
     case 421613:
       return {
         coordinator: "0x6D80646bEAdd07cE68cab36c27c626790bBcf17f",

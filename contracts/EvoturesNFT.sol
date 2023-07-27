@@ -76,6 +76,12 @@ contract EvoturesNFT is ERC721("Evotures NFTs","EVOTURES"), IEvoturesNFT, IERC72
         }
     }
 
+    function burn(uint256 tokenId) external {
+        address owner = ownerOf(tokenId);
+        require(msg.sender == owner, "EvoturesNFT::burn: CALLER_NOT_OWNER");
+        _burn(tokenId);
+    }
+
     function addBooster(uint16 _tokenId, uint16 _boosterTokenId) external {
         require(ownerOf(_tokenId) == msg.sender, "EvoturesNFT::addBooster: CALLER_NOT_EVOTURE_OWNER");
         require(_boostersApplied[_tokenId].length < 5, "EvoturesNFT::addBooster: MAX_BOOSTERS_ADDED");
