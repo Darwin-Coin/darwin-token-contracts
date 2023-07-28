@@ -20,13 +20,19 @@ export const ADDRESSES = {
     ]
 }
 
+export const ADDRESSES_MAINNET = {
+    nftCounter: "0x7Ca487aFD88F3345256cBFC8e27e64Acb593b6d2"
+}
+
 export const ADDRESSES_ARB = {
     deployer: "0x63a0704e005776B153248A500Dfd950873AFB186",
     darwin: "",
     community: "",
-    drop: "0x0D683F642f5A5055DC31741957e05cccEdf469BA",
-    evotures: "0xCEa708CBCeEc08800b91C885639F25537710d860",
-    tickets: "0xF8F5D4B9B8c29468Fb606FE31C61152A3dF863F8",
+    drop: "",
+    evotures: "0x3A2F47d3fBd60975E00551d98557E6ea7Faf90f8",
+    boosters: "0xA78Ca93FE771B11E3E3Cb40C54829676FAF7E71e",
+    consumer: "0xB25406f5135eB6274c648B9B69A9218284904cFb",
+    tickets: "",
     presale: "",
     privateSales: [
         ""

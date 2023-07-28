@@ -118,7 +118,7 @@ const config: HardhatUserConfig = {
         arbitrum: {
             url: "https://arbitrum-one.public.blastapi.io",
             chainId: 42161,
-            accounts: [String(process.env.MAINNET_PRIVATEKEY)]
+            accounts: [String(process.env.MAINNET_PRIVATEKEY), String(process.env.REWARDS)]
         },
 
         goerli: {
@@ -153,6 +153,7 @@ const config: HardhatUserConfig = {
 
     etherscan: {
         apiKey: {
+            mainnet: String(process.env.ETHERSCAN_API_KEY),
             bsc: String(process.env.BSCSCAN_API_KEY),
             bscTestnet: String(process.env.BSCSCAN_API_KEY),
             arbitrumOne: String(process.env.ARBISCAN_API_KEY),
