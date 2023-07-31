@@ -39,8 +39,6 @@ contract DarwinCommunity is IDarwinCommunity, AccessControl, ReentrancyGuard {
     mapping(uint256 => Proposal) private _proposals;
     /// @notice Restricted proposal actions, only owner can create proposals with these signature
     mapping(uint256 => bool) private _restrictedProposalActionSignature;
-    /// @notice Only for backend purposes
-    string[] private _initialFundProposalStrings;
 
     uint public constant VOTE_LOCK_PERIOD = 365 days;
     uint public constant CALLS_TO_EXECUTE = 2;
@@ -92,12 +90,11 @@ contract DarwinCommunity is IDarwinCommunity, AccessControl, ReentrancyGuard {
     function init(address _darwin, address[] memory fundAddress, string[] memory initialFundProposalStrings, string[] memory restrictedProposalSignatures) external onlyRole(OWNER) {
         require(address(_darwin) != address(0), "DC::init: ZERO_ADDRESS");
         require(address(darwin) == address(0), "DC::init: already initialized");
+        require(fundAddress.length == initialFundProposalStrings.length, "DC::init: invalid lengths");
 
         darwin = IDarwin(_darwin);
         stakedDarwin = darwin.stakedDarwin();
         staking = IDarwinStaking(stakedDarwin.darwinStaking());
-
-        _initialFundProposalStrings = initialFundProposalStrings;
 
         proposalMaxOperations = 1;
         minVotingDelay = 24 hours;
@@ -113,7 +110,7 @@ contract DarwinCommunity is IDarwinCommunity, AccessControl, ReentrancyGuard {
             _restrictedProposalActionSignature[signature] = true;
         }
 
-        for (uint256 i = 0; i < _initialFundProposalStrings.length; i++) {
+        for (uint256 i = 0; i < initialFundProposalStrings.length; i++) {
             uint256 id = lastCommunityFundCandidateId + 1;
 
             _communityFundCandidates[id] = CommunityFundCandidate({
@@ -122,16 +119,10 @@ contract DarwinCommunity is IDarwinCommunity, AccessControl, ReentrancyGuard {
                 isActive: true
             });
 
+            emit NewFundCandidate(id, fundAddress[i], initialFundProposalStrings[i]);
+
             _activeCommunityFundCandidateIds.push(id);
             lastCommunityFundCandidateId = id;
-        }
-    }
-
-    // This is only for backend purposes
-    function emitInitialFundsEvents() external onlyRole(OWNER) {
-        for (uint256 i = 0; i < _initialFundProposalStrings.length; i++) {
-            uint id = i + 1;
-            emit NewFundCandidate(id, _communityFundCandidates[id].valueAddress, _initialFundProposalStrings[i]);
         }
     }
 

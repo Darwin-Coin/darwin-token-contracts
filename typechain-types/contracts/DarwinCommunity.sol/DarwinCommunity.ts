@@ -114,7 +114,6 @@ export interface DarwinCommunityInterface extends utils.Interface {
     "darwin()": FunctionFragment;
     "deactivateFundCandidate(uint256)": FunctionFragment;
     "distributeCommunityFund(uint256,uint256[],uint256[],uint256,uint256)": FunctionFragment;
-    "emitInitialFundsEvents()": FunctionFragment;
     "execute(uint256)": FunctionFragment;
     "getActiveFundCandidates()": FunctionFragment;
     "getActiveFundDandidateIds()": FunctionFragment;
@@ -169,7 +168,6 @@ export interface DarwinCommunityInterface extends utils.Interface {
       | "darwin"
       | "deactivateFundCandidate"
       | "distributeCommunityFund"
-      | "emitInitialFundsEvents"
       | "execute"
       | "getActiveFundCandidates"
       | "getActiveFundDandidateIds"
@@ -251,10 +249,6 @@ export interface DarwinCommunityInterface extends utils.Interface {
       PromiseOrValue<BigNumberish>,
       PromiseOrValue<BigNumberish>
     ]
-  ): string;
-  encodeFunctionData(
-    functionFragment: "emitInitialFundsEvents",
-    values?: undefined
   ): string;
   encodeFunctionData(
     functionFragment: "execute",
@@ -448,10 +442,6 @@ export interface DarwinCommunityInterface extends utils.Interface {
   ): Result;
   decodeFunctionResult(
     functionFragment: "distributeCommunityFund",
-    data: BytesLike
-  ): Result;
-  decodeFunctionResult(
-    functionFragment: "emitInitialFundsEvents",
     data: BytesLike
   ): Result;
   decodeFunctionResult(functionFragment: "execute", data: BytesLike): Result;
@@ -864,10 +854,6 @@ export interface DarwinCommunity extends BaseContract {
       overrides?: Overrides & { from?: PromiseOrValue<string> }
     ): Promise<ContractTransaction>;
 
-    emitInitialFundsEvents(
-      overrides?: Overrides & { from?: PromiseOrValue<string> }
-    ): Promise<ContractTransaction>;
-
     execute(
       proposalId: PromiseOrValue<BigNumberish>,
       overrides?: PayableOverrides & { from?: PromiseOrValue<string> }
@@ -1088,10 +1074,6 @@ export interface DarwinCommunity extends BaseContract {
     overrides?: Overrides & { from?: PromiseOrValue<string> }
   ): Promise<ContractTransaction>;
 
-  emitInitialFundsEvents(
-    overrides?: Overrides & { from?: PromiseOrValue<string> }
-  ): Promise<ContractTransaction>;
-
   execute(
     proposalId: PromiseOrValue<BigNumberish>,
     overrides?: PayableOverrides & { from?: PromiseOrValue<string> }
@@ -1305,8 +1287,6 @@ export interface DarwinCommunity extends BaseContract {
       tokensToDistribute: PromiseOrValue<BigNumberish>,
       overrides?: CallOverrides
     ): Promise<void>;
-
-    emitInitialFundsEvents(overrides?: CallOverrides): Promise<void>;
 
     execute(
       proposalId: PromiseOrValue<BigNumberish>,
@@ -1680,10 +1660,6 @@ export interface DarwinCommunity extends BaseContract {
       overrides?: Overrides & { from?: PromiseOrValue<string> }
     ): Promise<BigNumber>;
 
-    emitInitialFundsEvents(
-      overrides?: Overrides & { from?: PromiseOrValue<string> }
-    ): Promise<BigNumber>;
-
     execute(
       proposalId: PromiseOrValue<BigNumberish>,
       overrides?: PayableOverrides & { from?: PromiseOrValue<string> }
@@ -1898,10 +1874,6 @@ export interface DarwinCommunity extends BaseContract {
       votes: PromiseOrValue<BigNumberish>[],
       totalVoteCount: PromiseOrValue<BigNumberish>,
       tokensToDistribute: PromiseOrValue<BigNumberish>,
-      overrides?: Overrides & { from?: PromiseOrValue<string> }
-    ): Promise<PopulatedTransaction>;
-
-    emitInitialFundsEvents(
       overrides?: Overrides & { from?: PromiseOrValue<string> }
     ): Promise<PopulatedTransaction>;
 
