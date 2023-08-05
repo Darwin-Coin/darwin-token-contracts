@@ -37,7 +37,7 @@ contract DarwinCommunity is IDarwinCommunity, AccessControl, ReentrancyGuard {
     mapping(uint256 => mapping(address => Receipt)) private _voteReceipts;
     /// @notice The official record of all proposals ever proposed
     mapping(uint256 => Proposal) private _proposals;
-    /// @notice Restricted proposal actions, only owner can create proposals with these signature
+    /// @notice Restricted proposal actions, only senior proposers can create proposals with these signature
     mapping(uint256 => bool) private _restrictedProposalActionSignature;
 
     uint public constant VOTE_LOCK_PERIOD = 365 days;
@@ -60,7 +60,6 @@ contract DarwinCommunity is IDarwinCommunity, AccessControl, ReentrancyGuard {
     constructor(address _kieran) {
         _grantRole(OWNER, msg.sender);
         _grantRole(OWNER, _kieran); // Team Lead
-        _grantRole(OWNER, 0x745309f30deB0a8271F5f521925222F5E1280641); // Tech Lead
     }
 
     modifier isProposalIdValid(uint256 _id) {
