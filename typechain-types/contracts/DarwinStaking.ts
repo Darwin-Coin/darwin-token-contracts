@@ -30,6 +30,7 @@ import type {
 export declare namespace IDarwinStaking {
   export type UserInfoStruct = {
     lastClaimTimestamp: PromiseOrValue<BigNumberish>;
+    lockStart: PromiseOrValue<BigNumberish>;
     lockEnd: PromiseOrValue<BigNumberish>;
     boost: PromiseOrValue<BigNumberish>;
     nft: PromiseOrValue<string>;
@@ -40,10 +41,12 @@ export declare namespace IDarwinStaking {
     BigNumber,
     BigNumber,
     BigNumber,
+    BigNumber,
     string,
     BigNumber
   ] & {
     lastClaimTimestamp: BigNumber;
+    lockStart: BigNumber;
     lockEnd: BigNumber;
     boost: BigNumber;
     nft: string;
@@ -56,6 +59,7 @@ export interface DarwinStakingInterface extends utils.Interface {
     "BASE_APR()": FunctionFragment;
     "LOCK_BONUS_APR()": FunctionFragment;
     "addSupportedNFT(address)": FunctionFragment;
+    "bonusAPR(address)": FunctionFragment;
     "claimableDarwin(address)": FunctionFragment;
     "darwin()": FunctionFragment;
     "dev()": FunctionFragment;
@@ -76,6 +80,7 @@ export interface DarwinStakingInterface extends utils.Interface {
       | "BASE_APR"
       | "LOCK_BONUS_APR"
       | "addSupportedNFT"
+      | "bonusAPR"
       | "claimableDarwin"
       | "darwin"
       | "dev"
@@ -98,6 +103,10 @@ export interface DarwinStakingInterface extends utils.Interface {
   ): string;
   encodeFunctionData(
     functionFragment: "addSupportedNFT",
+    values: [PromiseOrValue<string>]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "bonusAPR",
     values: [PromiseOrValue<string>]
   ): string;
   encodeFunctionData(
@@ -161,6 +170,7 @@ export interface DarwinStakingInterface extends utils.Interface {
     functionFragment: "addSupportedNFT",
     data: BytesLike
   ): Result;
+  decodeFunctionResult(functionFragment: "bonusAPR", data: BytesLike): Result;
   decodeFunctionResult(
     functionFragment: "claimableDarwin",
     data: BytesLike
@@ -291,6 +301,11 @@ export interface DarwinStaking extends BaseContract {
       overrides?: Overrides & { from?: PromiseOrValue<string> }
     ): Promise<ContractTransaction>;
 
+    bonusAPR(
+      _user: PromiseOrValue<string>,
+      overrides?: CallOverrides
+    ): Promise<[BigNumber] & { bonus: BigNumber }>;
+
     claimableDarwin(
       _user: PromiseOrValue<string>,
       overrides?: CallOverrides
@@ -341,8 +356,9 @@ export interface DarwinStaking extends BaseContract {
       arg0: PromiseOrValue<string>,
       overrides?: CallOverrides
     ): Promise<
-      [BigNumber, BigNumber, BigNumber, string, BigNumber] & {
+      [BigNumber, BigNumber, BigNumber, BigNumber, string, BigNumber] & {
         lastClaimTimestamp: BigNumber;
+        lockStart: BigNumber;
         lockEnd: BigNumber;
         boost: BigNumber;
         nft: string;
@@ -368,6 +384,11 @@ export interface DarwinStaking extends BaseContract {
     _nft: PromiseOrValue<string>,
     overrides?: Overrides & { from?: PromiseOrValue<string> }
   ): Promise<ContractTransaction>;
+
+  bonusAPR(
+    _user: PromiseOrValue<string>,
+    overrides?: CallOverrides
+  ): Promise<BigNumber>;
 
   claimableDarwin(
     _user: PromiseOrValue<string>,
@@ -419,8 +440,9 @@ export interface DarwinStaking extends BaseContract {
     arg0: PromiseOrValue<string>,
     overrides?: CallOverrides
   ): Promise<
-    [BigNumber, BigNumber, BigNumber, string, BigNumber] & {
+    [BigNumber, BigNumber, BigNumber, BigNumber, string, BigNumber] & {
       lastClaimTimestamp: BigNumber;
+      lockStart: BigNumber;
       lockEnd: BigNumber;
       boost: BigNumber;
       nft: string;
@@ -446,6 +468,11 @@ export interface DarwinStaking extends BaseContract {
       _nft: PromiseOrValue<string>,
       overrides?: CallOverrides
     ): Promise<void>;
+
+    bonusAPR(
+      _user: PromiseOrValue<string>,
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
 
     claimableDarwin(
       _user: PromiseOrValue<string>,
@@ -497,8 +524,9 @@ export interface DarwinStaking extends BaseContract {
       arg0: PromiseOrValue<string>,
       overrides?: CallOverrides
     ): Promise<
-      [BigNumber, BigNumber, BigNumber, string, BigNumber] & {
+      [BigNumber, BigNumber, BigNumber, BigNumber, string, BigNumber] & {
         lastClaimTimestamp: BigNumber;
+        lockStart: BigNumber;
         lockEnd: BigNumber;
         boost: BigNumber;
         nft: string;
@@ -564,6 +592,11 @@ export interface DarwinStaking extends BaseContract {
     addSupportedNFT(
       _nft: PromiseOrValue<string>,
       overrides?: Overrides & { from?: PromiseOrValue<string> }
+    ): Promise<BigNumber>;
+
+    bonusAPR(
+      _user: PromiseOrValue<string>,
+      overrides?: CallOverrides
     ): Promise<BigNumber>;
 
     claimableDarwin(
@@ -635,6 +668,11 @@ export interface DarwinStaking extends BaseContract {
     addSupportedNFT(
       _nft: PromiseOrValue<string>,
       overrides?: Overrides & { from?: PromiseOrValue<string> }
+    ): Promise<PopulatedTransaction>;
+
+    bonusAPR(
+      _user: PromiseOrValue<string>,
+      overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 
     claimableDarwin(

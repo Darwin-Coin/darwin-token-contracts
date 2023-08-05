@@ -28,6 +28,7 @@ import type {
 export declare namespace IDarwinStaking {
   export type UserInfoStruct = {
     lastClaimTimestamp: PromiseOrValue<BigNumberish>;
+    lockStart: PromiseOrValue<BigNumberish>;
     lockEnd: PromiseOrValue<BigNumberish>;
     boost: PromiseOrValue<BigNumberish>;
     nft: PromiseOrValue<string>;
@@ -38,10 +39,12 @@ export declare namespace IDarwinStaking {
     BigNumber,
     BigNumber,
     BigNumber,
+    BigNumber,
     string,
     BigNumber
   ] & {
     lastClaimTimestamp: BigNumber;
+    lockStart: BigNumber;
     lockEnd: BigNumber;
     boost: BigNumber;
     nft: string;

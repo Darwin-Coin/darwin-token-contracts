@@ -15,7 +15,7 @@ contract DarwinStaking is IDarwinStaking, ReentrancyGuard, IERC721Receiver {
     address public dev;
 
     uint public constant BASE_APR = 5e18; // 5%
-    uint public constant LOCK_BONUS_APR = 2e18; // 2% more if locked
+    uint public constant LOCK_BONUS_APR = 2e18; // 2% more if locked for 1 year
     uint private constant _SECONDS_IN_YEAR = 31_536_000;
 
     mapping(address => bool) public supportedNFT;
@@ -35,6 +35,7 @@ contract DarwinStaking is IDarwinStaking, ReentrancyGuard, IERC721Receiver {
 
         _claim();
         if (userInfo[msg.sender].lockEnd <= block.timestamp) {
+            userInfo[msg.sender].lockStart = block.timestamp;
             userInfo[msg.sender].lockEnd = block.timestamp + _lockPeriod;
         } else {
             userInfo[msg.sender].lockEnd += _lockPeriod;
@@ -64,6 +65,15 @@ contract DarwinStaking is IDarwinStaking, ReentrancyGuard, IERC721Receiver {
         }
     }
 
+    function bonusAPR(address _user) public view returns(uint256 bonus) {
+        uint lockPeriod = userInfo[_user].lockEnd - userInfo[_user].lockStart;
+        if (lockPeriod >= _SECONDS_IN_YEAR) {
+            return LOCK_BONUS_APR;
+        } else {
+            return (lockPeriod * 2e18) / _SECONDS_IN_YEAR;
+        }
+    }
+
     function claimableDarwin(address _user) public view returns(uint256 claimable) {
         uint staked = stakedDarwin.balanceOf(_user);
         if (staked == 0) {
@@ -78,7 +88,7 @@ contract DarwinStaking is IDarwinStaking, ReentrancyGuard, IERC721Receiver {
         uint bonusClaimable;
         if (claim < lockEnd) {
             uint timePassedUntilLockEndOrNow = ((lockEnd > block.timestamp ? block.timestamp : lockEnd) - claim);
-            bonusClaimable = (staked * LOCK_BONUS_APR * timePassedUntilLockEndOrNow) / (100e18 * _SECONDS_IN_YEAR);
+            bonusClaimable = (staked * bonusAPR(_user) * timePassedUntilLockEndOrNow) / (100e18 * _SECONDS_IN_YEAR);
         }
 
         claimable = (staked * BASE_APR * timePassedFromLastClaim) / (100e18 * _SECONDS_IN_YEAR) + bonusClaimable;

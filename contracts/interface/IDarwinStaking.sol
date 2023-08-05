@@ -4,6 +4,7 @@ interface IDarwinStaking {
 
     struct UserInfo {
         uint lastClaimTimestamp;
+        uint lockStart;
         uint lockEnd;
         uint boost; // (1, 5, 10, 25, 50)
         address nft;
