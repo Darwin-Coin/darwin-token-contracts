@@ -70,7 +70,7 @@ contract DarwinStaking is IDarwinStaking, ReentrancyGuard, IERC721Receiver {
         if (lockPeriod >= _SECONDS_IN_YEAR) {
             return LOCK_BONUS_APR;
         } else {
-            return (lockPeriod * 2e18) / _SECONDS_IN_YEAR;
+            return (lockPeriod * LOCK_BONUS_APR) / _SECONDS_IN_YEAR;
         }
     }
 
