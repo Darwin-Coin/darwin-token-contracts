@@ -25,7 +25,7 @@ contract Darwin is IDarwin, ERC20Upgradeable, OwnableUpgradeable, AccessControlU
 
     // Constants
     uint256 private constant _MULTIPLIER = 2**160;
-    uint256 public constant INITIAL_SUPPLY = 67e6 ether; // initial supply: 80m
+    uint256 public constant INITIAL_SUPPLY = 8e7 ether; // initial supply: 80m
     uint256 public constant MAX_SUPPLY = 75e7 ether; // max supply: 750m
 
     // Reflections
@@ -117,7 +117,8 @@ contract Darwin is IDarwin, ERC20Upgradeable, OwnableUpgradeable, AccessControlU
         _setExcludedFromRewards(_vester);
 
         // mint
-        _mint(msg.sender, INITIAL_SUPPLY);
+        _mint(msg.sender, INITIAL_SUPPLY - (13e6 ether));
+        _mint(_vester, 13e6 ether);
 
         // grant roles
         _grantRole(DEFAULT_ADMIN_ROLE, msg.sender);

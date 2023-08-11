@@ -20,6 +20,7 @@ contract DarwinVester is IDarwinVester, ReentrancyGuard, Ownable {
 
     mapping(address => UserInfo) public userInfo;
     address[] users;
+    uint[] atLaunch;
 
     /// @notice The Darwin token
     IERC20 public darwin;
@@ -43,12 +44,13 @@ contract DarwinVester is IDarwinVester, ReentrancyGuard, Ownable {
         _;
     }
 
-    constructor(address[] memory _users, uint[] memory _due, address[] memory _supportedNFTs) {
-        require(_users.length == _users.length, "Vester: Invalid _userInfo");
+    constructor(address[] memory _users, uint[] memory _atLaunch, uint[] memory _due, address[] memory _supportedNFTs) {
+        require(_users.length == _due.length && _due.length == _atLaunch.length, "Vester: Invalid _userInfo");
         for (uint i = 0; i < _users.length; i++) {
-            userInfo[_users[i]].vested = _due[i];
+            userInfo[_users[i]].vested = _due[i] - _atLaunch[i];
         }
         users = _users;
+        atLaunch = _atLaunch;
         deployer = msg.sender;
         for (uint i = 0; i < _supportedNFTs.length; i++) {
             supportedNFT[_supportedNFTs[i]] = true;
@@ -67,9 +69,7 @@ contract DarwinVester is IDarwinVester, ReentrancyGuard, Ownable {
         for (uint i = 0; i < users.length; i++) {
             emit Vest(users[i], userInfo[users[i]].vested);
 
-            uint launchPercent = (userInfo[users[i]].vested * 25) / 100;
-            IDarwin(address(darwin)).mint(users[i], launchPercent);
-            userInfo[users[i]].vested -= launchPercent;
+            IERC20(address(darwin)).transfer(users[i], atLaunch[i]);
             userInfo[users[i]].claimed = 0;
             userInfo[users[i]].withdrawn = 0;
             userInfo[users[i]].vestTimestamp = block.timestamp;
