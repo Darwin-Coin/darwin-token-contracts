@@ -32,16 +32,13 @@ export interface DarwinInterface extends utils.Interface {
   functions: {
     "COMMUNITY_ROLE()": FunctionFragment;
     "DEFAULT_ADMIN_ROLE()": FunctionFragment;
-    "DEPLOYER_PERCENTAGE()": FunctionFragment;
     "FACTORY_ROLE()": FunctionFragment;
     "INITIAL_SUPPLY()": FunctionFragment;
-    "KIERAN_PERCENTAGE()": FunctionFragment;
     "MAINTENANCE_ROLE()": FunctionFragment;
     "MAX_SUPPLY()": FunctionFragment;
     "MINTER_ROLE()": FunctionFragment;
     "SECURITY_ROLE()": FunctionFragment;
     "UPGRADER_ROLE()": FunctionFragment;
-    "WALLET1_PECENTAGE()": FunctionFragment;
     "allowance(address,address)": FunctionFragment;
     "approve(address,uint256)": FunctionFragment;
     "balanceOf(address)": FunctionFragment;
@@ -60,7 +57,7 @@ export interface DarwinInterface extends utils.Interface {
     "grantRole(bytes32,address)": FunctionFragment;
     "hasRole(bytes32,address)": FunctionFragment;
     "increaseAllowance(address,uint256)": FunctionFragment;
-    "initialize(address,address,address,address,address,address,address,address,uint256)": FunctionFragment;
+    "initialize(address,address,address,address,address,address,address)": FunctionFragment;
     "isPaused()": FunctionFragment;
     "masterChef()": FunctionFragment;
     "mint(address,uint256)": FunctionFragment;
@@ -96,16 +93,13 @@ export interface DarwinInterface extends utils.Interface {
     nameOrSignatureOrTopic:
       | "COMMUNITY_ROLE"
       | "DEFAULT_ADMIN_ROLE"
-      | "DEPLOYER_PERCENTAGE"
       | "FACTORY_ROLE"
       | "INITIAL_SUPPLY"
-      | "KIERAN_PERCENTAGE"
       | "MAINTENANCE_ROLE"
       | "MAX_SUPPLY"
       | "MINTER_ROLE"
       | "SECURITY_ROLE"
       | "UPGRADER_ROLE"
-      | "WALLET1_PECENTAGE"
       | "allowance"
       | "approve"
       | "balanceOf"
@@ -165,19 +159,11 @@ export interface DarwinInterface extends utils.Interface {
     values?: undefined
   ): string;
   encodeFunctionData(
-    functionFragment: "DEPLOYER_PERCENTAGE",
-    values?: undefined
-  ): string;
-  encodeFunctionData(
     functionFragment: "FACTORY_ROLE",
     values?: undefined
   ): string;
   encodeFunctionData(
     functionFragment: "INITIAL_SUPPLY",
-    values?: undefined
-  ): string;
-  encodeFunctionData(
-    functionFragment: "KIERAN_PERCENTAGE",
     values?: undefined
   ): string;
   encodeFunctionData(
@@ -198,10 +184,6 @@ export interface DarwinInterface extends utils.Interface {
   ): string;
   encodeFunctionData(
     functionFragment: "UPGRADER_ROLE",
-    values?: undefined
-  ): string;
-  encodeFunctionData(
-    functionFragment: "WALLET1_PECENTAGE",
     values?: undefined
   ): string;
   encodeFunctionData(
@@ -282,9 +264,7 @@ export interface DarwinInterface extends utils.Interface {
       PromiseOrValue<string>,
       PromiseOrValue<string>,
       PromiseOrValue<string>,
-      PromiseOrValue<string>,
-      PromiseOrValue<string>,
-      PromiseOrValue<BigNumberish>
+      PromiseOrValue<string>
     ]
   ): string;
   encodeFunctionData(functionFragment: "isPaused", values?: undefined): string;
@@ -405,19 +385,11 @@ export interface DarwinInterface extends utils.Interface {
     data: BytesLike
   ): Result;
   decodeFunctionResult(
-    functionFragment: "DEPLOYER_PERCENTAGE",
-    data: BytesLike
-  ): Result;
-  decodeFunctionResult(
     functionFragment: "FACTORY_ROLE",
     data: BytesLike
   ): Result;
   decodeFunctionResult(
     functionFragment: "INITIAL_SUPPLY",
-    data: BytesLike
-  ): Result;
-  decodeFunctionResult(
-    functionFragment: "KIERAN_PERCENTAGE",
     data: BytesLike
   ): Result;
   decodeFunctionResult(
@@ -435,10 +407,6 @@ export interface DarwinInterface extends utils.Interface {
   ): Result;
   decodeFunctionResult(
     functionFragment: "UPGRADER_ROLE",
-    data: BytesLike
-  ): Result;
-  decodeFunctionResult(
-    functionFragment: "WALLET1_PECENTAGE",
     data: BytesLike
   ): Result;
   decodeFunctionResult(functionFragment: "allowance", data: BytesLike): Result;
@@ -773,13 +741,9 @@ export interface Darwin extends BaseContract {
 
     DEFAULT_ADMIN_ROLE(overrides?: CallOverrides): Promise<[string]>;
 
-    DEPLOYER_PERCENTAGE(overrides?: CallOverrides): Promise<[BigNumber]>;
-
     FACTORY_ROLE(overrides?: CallOverrides): Promise<[string]>;
 
     INITIAL_SUPPLY(overrides?: CallOverrides): Promise<[BigNumber]>;
-
-    KIERAN_PERCENTAGE(overrides?: CallOverrides): Promise<[BigNumber]>;
 
     MAINTENANCE_ROLE(overrides?: CallOverrides): Promise<[string]>;
 
@@ -790,8 +754,6 @@ export interface Darwin extends BaseContract {
     SECURITY_ROLE(overrides?: CallOverrides): Promise<[string]>;
 
     UPGRADER_ROLE(overrides?: CallOverrides): Promise<[string]>;
-
-    WALLET1_PECENTAGE(overrides?: CallOverrides): Promise<[BigNumber]>;
 
     allowance(
       owner: PromiseOrValue<string>,
@@ -880,12 +842,10 @@ export interface Darwin extends BaseContract {
       _darwinCommunity: PromiseOrValue<string>,
       _vester: PromiseOrValue<string>,
       _wallet1: PromiseOrValue<string>,
-      _kieran: PromiseOrValue<string>,
       _charity: PromiseOrValue<string>,
       _giveaway: PromiseOrValue<string>,
       _bounties: PromiseOrValue<string>,
       _darwinDrop: PromiseOrValue<string>,
-      _darwinSoldInPresale: PromiseOrValue<BigNumberish>,
       overrides?: Overrides & { from?: PromiseOrValue<string> }
     ): Promise<ContractTransaction>;
 
@@ -1020,13 +980,9 @@ export interface Darwin extends BaseContract {
 
   DEFAULT_ADMIN_ROLE(overrides?: CallOverrides): Promise<string>;
 
-  DEPLOYER_PERCENTAGE(overrides?: CallOverrides): Promise<BigNumber>;
-
   FACTORY_ROLE(overrides?: CallOverrides): Promise<string>;
 
   INITIAL_SUPPLY(overrides?: CallOverrides): Promise<BigNumber>;
-
-  KIERAN_PERCENTAGE(overrides?: CallOverrides): Promise<BigNumber>;
 
   MAINTENANCE_ROLE(overrides?: CallOverrides): Promise<string>;
 
@@ -1037,8 +993,6 @@ export interface Darwin extends BaseContract {
   SECURITY_ROLE(overrides?: CallOverrides): Promise<string>;
 
   UPGRADER_ROLE(overrides?: CallOverrides): Promise<string>;
-
-  WALLET1_PECENTAGE(overrides?: CallOverrides): Promise<BigNumber>;
 
   allowance(
     owner: PromiseOrValue<string>,
@@ -1127,12 +1081,10 @@ export interface Darwin extends BaseContract {
     _darwinCommunity: PromiseOrValue<string>,
     _vester: PromiseOrValue<string>,
     _wallet1: PromiseOrValue<string>,
-    _kieran: PromiseOrValue<string>,
     _charity: PromiseOrValue<string>,
     _giveaway: PromiseOrValue<string>,
     _bounties: PromiseOrValue<string>,
     _darwinDrop: PromiseOrValue<string>,
-    _darwinSoldInPresale: PromiseOrValue<BigNumberish>,
     overrides?: Overrides & { from?: PromiseOrValue<string> }
   ): Promise<ContractTransaction>;
 
@@ -1267,13 +1219,9 @@ export interface Darwin extends BaseContract {
 
     DEFAULT_ADMIN_ROLE(overrides?: CallOverrides): Promise<string>;
 
-    DEPLOYER_PERCENTAGE(overrides?: CallOverrides): Promise<BigNumber>;
-
     FACTORY_ROLE(overrides?: CallOverrides): Promise<string>;
 
     INITIAL_SUPPLY(overrides?: CallOverrides): Promise<BigNumber>;
-
-    KIERAN_PERCENTAGE(overrides?: CallOverrides): Promise<BigNumber>;
 
     MAINTENANCE_ROLE(overrides?: CallOverrides): Promise<string>;
 
@@ -1284,8 +1232,6 @@ export interface Darwin extends BaseContract {
     SECURITY_ROLE(overrides?: CallOverrides): Promise<string>;
 
     UPGRADER_ROLE(overrides?: CallOverrides): Promise<string>;
-
-    WALLET1_PECENTAGE(overrides?: CallOverrides): Promise<BigNumber>;
 
     allowance(
       owner: PromiseOrValue<string>,
@@ -1370,12 +1316,10 @@ export interface Darwin extends BaseContract {
       _darwinCommunity: PromiseOrValue<string>,
       _vester: PromiseOrValue<string>,
       _wallet1: PromiseOrValue<string>,
-      _kieran: PromiseOrValue<string>,
       _charity: PromiseOrValue<string>,
       _giveaway: PromiseOrValue<string>,
       _bounties: PromiseOrValue<string>,
       _darwinDrop: PromiseOrValue<string>,
-      _darwinSoldInPresale: PromiseOrValue<BigNumberish>,
       overrides?: CallOverrides
     ): Promise<void>;
 
@@ -1616,13 +1560,9 @@ export interface Darwin extends BaseContract {
 
     DEFAULT_ADMIN_ROLE(overrides?: CallOverrides): Promise<BigNumber>;
 
-    DEPLOYER_PERCENTAGE(overrides?: CallOverrides): Promise<BigNumber>;
-
     FACTORY_ROLE(overrides?: CallOverrides): Promise<BigNumber>;
 
     INITIAL_SUPPLY(overrides?: CallOverrides): Promise<BigNumber>;
-
-    KIERAN_PERCENTAGE(overrides?: CallOverrides): Promise<BigNumber>;
 
     MAINTENANCE_ROLE(overrides?: CallOverrides): Promise<BigNumber>;
 
@@ -1633,8 +1573,6 @@ export interface Darwin extends BaseContract {
     SECURITY_ROLE(overrides?: CallOverrides): Promise<BigNumber>;
 
     UPGRADER_ROLE(overrides?: CallOverrides): Promise<BigNumber>;
-
-    WALLET1_PECENTAGE(overrides?: CallOverrides): Promise<BigNumber>;
 
     allowance(
       owner: PromiseOrValue<string>,
@@ -1723,12 +1661,10 @@ export interface Darwin extends BaseContract {
       _darwinCommunity: PromiseOrValue<string>,
       _vester: PromiseOrValue<string>,
       _wallet1: PromiseOrValue<string>,
-      _kieran: PromiseOrValue<string>,
       _charity: PromiseOrValue<string>,
       _giveaway: PromiseOrValue<string>,
       _bounties: PromiseOrValue<string>,
       _darwinDrop: PromiseOrValue<string>,
-      _darwinSoldInPresale: PromiseOrValue<BigNumberish>,
       overrides?: Overrides & { from?: PromiseOrValue<string> }
     ): Promise<BigNumber>;
 
@@ -1866,15 +1802,9 @@ export interface Darwin extends BaseContract {
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 
-    DEPLOYER_PERCENTAGE(
-      overrides?: CallOverrides
-    ): Promise<PopulatedTransaction>;
-
     FACTORY_ROLE(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
     INITIAL_SUPPLY(overrides?: CallOverrides): Promise<PopulatedTransaction>;
-
-    KIERAN_PERCENTAGE(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
     MAINTENANCE_ROLE(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
@@ -1885,8 +1815,6 @@ export interface Darwin extends BaseContract {
     SECURITY_ROLE(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
     UPGRADER_ROLE(overrides?: CallOverrides): Promise<PopulatedTransaction>;
-
-    WALLET1_PECENTAGE(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
     allowance(
       owner: PromiseOrValue<string>,
@@ -1977,12 +1905,10 @@ export interface Darwin extends BaseContract {
       _darwinCommunity: PromiseOrValue<string>,
       _vester: PromiseOrValue<string>,
       _wallet1: PromiseOrValue<string>,
-      _kieran: PromiseOrValue<string>,
       _charity: PromiseOrValue<string>,
       _giveaway: PromiseOrValue<string>,
       _bounties: PromiseOrValue<string>,
       _darwinDrop: PromiseOrValue<string>,
-      _darwinSoldInPresale: PromiseOrValue<BigNumberish>,
       overrides?: Overrides & { from?: PromiseOrValue<string> }
     ): Promise<PopulatedTransaction>;
 

@@ -10,5 +10,4 @@ export type { IDarwinVester } from "./IDarwinVester";
 export type { IERC20 } from "./IERC20";
 export type { IEvoturesNFT } from "./IEvoturesNFT";
 export type { IMultiplierNFT } from "./IMultiplierNFT";
-export type { IOldVester } from "./IOldVester";
 export type { IStakedDarwin } from "./IStakedDarwin";

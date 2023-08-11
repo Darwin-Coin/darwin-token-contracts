@@ -10,5 +10,4 @@ export { IDarwinVester__factory } from "./IDarwinVester__factory";
 export { IERC20__factory } from "./IERC20__factory";
 export { IEvoturesNFT__factory } from "./IEvoturesNFT__factory";
 export { IMultiplierNFT__factory } from "./IMultiplierNFT__factory";
-export { IOldVester__factory } from "./IOldVester__factory";
 export { IStakedDarwin__factory } from "./IStakedDarwin__factory";

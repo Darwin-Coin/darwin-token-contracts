@@ -25,9 +25,6 @@ contract Darwin is IDarwin, ERC20Upgradeable, OwnableUpgradeable, AccessControlU
 
     // Constants
     uint256 private constant _MULTIPLIER = 2**160;
-    uint256 public constant DEPLOYER_PERCENTAGE = 6000; // 60%
-    uint256 public constant KIERAN_PERCENTAGE = 20; // 0.20%
-    uint256 public constant WALLET1_PECENTAGE = 1000; // 10%
     uint256 public constant INITIAL_SUPPLY = 67e6 ether; // initial supply: 80m
     uint256 public constant MAX_SUPPLY = 75e7 ether; // max supply: 750m
 
@@ -66,12 +63,10 @@ contract Darwin is IDarwin, ERC20Upgradeable, OwnableUpgradeable, AccessControlU
         address _darwinCommunity,
         address _vester,
         address _wallet1,
-        address _kieran,
         address _charity,
         address _giveaway,
         address _bounties,
-        address _darwinDrop,
-        uint _darwinSoldInPresale
+        address _darwinDrop
     ) external initializer {
         __Context_init_unchained();
         __Ownable_init_unchained();
@@ -79,12 +74,10 @@ contract Darwin is IDarwin, ERC20Upgradeable, OwnableUpgradeable, AccessControlU
             _darwinCommunity,
             _vester,
             _wallet1,
-            _kieran,
             _charity,
             _giveaway,
             _bounties,
-            _darwinDrop,
-            _darwinSoldInPresale
+            _darwinDrop
         );
         __UUPSUpgradeable_init();
         __ERC20_init_unchained("Darwin Protocol", "DARWIN");
@@ -94,12 +87,10 @@ contract Darwin is IDarwin, ERC20Upgradeable, OwnableUpgradeable, AccessControlU
         address _darwinCommunity,
         address _vester,
         address _wallet1,
-        address _kieran,
         address _charity,
         address _giveaway,
         address _bounties,
-        address _darwinDrop,
-        uint _darwinSoldInPresale
+        address _darwinDrop
     ) private onlyInitializing {
         { // scope to avoid stack too deep errors
         // Create StakedDarwin contract
@@ -125,17 +116,8 @@ contract Darwin is IDarwin, ERC20Upgradeable, OwnableUpgradeable, AccessControlU
         _setExcludedFromRewards(rewardsWallet);
         _setExcludedFromRewards(_vester);
 
-        { // scope to avoid stack too deep errors
-        // calculate mint allocations
-        uint kieranMint = (INITIAL_SUPPLY * KIERAN_PERCENTAGE) / 10000;
-        uint wallet1Mint = (INITIAL_SUPPLY * WALLET1_PECENTAGE) / 10000;
-        uint deployerMint = ((INITIAL_SUPPLY * DEPLOYER_PERCENTAGE) / 10000) + ((_darwinSoldInPresale * 25) / 100);
-
         // mint
-        _mint(_kieran, kieranMint);
-        _mint(_wallet1, wallet1Mint);
-        _mint(msg.sender, deployerMint);
-        }
+        _mint(msg.sender, INITIAL_SUPPLY);
 
         // grant roles
         _grantRole(DEFAULT_ADMIN_ROLE, msg.sender);

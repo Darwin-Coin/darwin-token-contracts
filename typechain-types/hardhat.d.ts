@@ -157,14 +157,6 @@ declare module "hardhat/types/runtime" {
       signerOrOptions?: ethers.Signer | FactoryOptions
     ): Promise<Contracts.DarwinVester__factory>;
     getContractFactory(
-      name: "DarwinVester5",
-      signerOrOptions?: ethers.Signer | FactoryOptions
-    ): Promise<Contracts.DarwinVester5__factory>;
-    getContractFactory(
-      name: "DarwinVester7",
-      signerOrOptions?: ethers.Signer | FactoryOptions
-    ): Promise<Contracts.DarwinVester7__factory>;
-    getContractFactory(
       name: "EvoturesNFT",
       signerOrOptions?: ethers.Signer | FactoryOptions
     ): Promise<Contracts.EvoturesNFT__factory>;
@@ -209,10 +201,6 @@ declare module "hardhat/types/runtime" {
       signerOrOptions?: ethers.Signer | FactoryOptions
     ): Promise<Contracts.IMultiplierNFT__factory>;
     getContractFactory(
-      name: "IOldVester",
-      signerOrOptions?: ethers.Signer | FactoryOptions
-    ): Promise<Contracts.IOldVester__factory>;
-    getContractFactory(
       name: "IStakedDarwin",
       signerOrOptions?: ethers.Signer | FactoryOptions
     ): Promise<Contracts.IStakedDarwin__factory>;
@@ -228,10 +216,6 @@ declare module "hardhat/types/runtime" {
       name: "MultiplierNFT",
       signerOrOptions?: ethers.Signer | FactoryOptions
     ): Promise<Contracts.MultiplierNFT__factory>;
-    getContractFactory(
-      name: "OldVester",
-      signerOrOptions?: ethers.Signer | FactoryOptions
-    ): Promise<Contracts.OldVester__factory>;
     getContractFactory(
       name: "ERC20Upgradeable",
       signerOrOptions?: ethers.Signer | FactoryOptions
@@ -438,16 +422,6 @@ declare module "hardhat/types/runtime" {
       signer?: ethers.Signer
     ): Promise<Contracts.DarwinVester>;
     getContractAt(
-      name: "DarwinVester5",
-      address: string,
-      signer?: ethers.Signer
-    ): Promise<Contracts.DarwinVester5>;
-    getContractAt(
-      name: "DarwinVester7",
-      address: string,
-      signer?: ethers.Signer
-    ): Promise<Contracts.DarwinVester7>;
-    getContractAt(
       name: "EvoturesNFT",
       address: string,
       signer?: ethers.Signer
@@ -503,11 +477,6 @@ declare module "hardhat/types/runtime" {
       signer?: ethers.Signer
     ): Promise<Contracts.IMultiplierNFT>;
     getContractAt(
-      name: "IOldVester",
-      address: string,
-      signer?: ethers.Signer
-    ): Promise<Contracts.IOldVester>;
-    getContractAt(
       name: "IStakedDarwin",
       address: string,
       signer?: ethers.Signer
@@ -527,11 +496,6 @@ declare module "hardhat/types/runtime" {
       address: string,
       signer?: ethers.Signer
     ): Promise<Contracts.MultiplierNFT>;
-    getContractAt(
-      name: "OldVester",
-      address: string,
-      signer?: ethers.Signer
-    ): Promise<Contracts.OldVester>;
     getContractAt(
       name: "ERC20Upgradeable",
       address: string,
