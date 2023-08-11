@@ -60,7 +60,7 @@ export interface DarwinInterface extends utils.Interface {
     "grantRole(bytes32,address)": FunctionFragment;
     "hasRole(bytes32,address)": FunctionFragment;
     "increaseAllowance(address,uint256)": FunctionFragment;
-    "initialize(address,address,address,address,address,address,address,address,address,uint256)": FunctionFragment;
+    "initialize(address,address,address,address,address,address,address,address,uint256)": FunctionFragment;
     "isPaused()": FunctionFragment;
     "masterChef()": FunctionFragment;
     "mint(address,uint256)": FunctionFragment;
@@ -276,7 +276,6 @@ export interface DarwinInterface extends utils.Interface {
   encodeFunctionData(
     functionFragment: "initialize",
     values: [
-      PromiseOrValue<string>,
       PromiseOrValue<string>,
       PromiseOrValue<string>,
       PromiseOrValue<string>,
@@ -879,8 +878,7 @@ export interface Darwin extends BaseContract {
 
     initialize(
       _darwinCommunity: PromiseOrValue<string>,
-      _vester5: PromiseOrValue<string>,
-      _vester7: PromiseOrValue<string>,
+      _vester: PromiseOrValue<string>,
       _wallet1: PromiseOrValue<string>,
       _kieran: PromiseOrValue<string>,
       _charity: PromiseOrValue<string>,
@@ -1127,8 +1125,7 @@ export interface Darwin extends BaseContract {
 
   initialize(
     _darwinCommunity: PromiseOrValue<string>,
-    _vester5: PromiseOrValue<string>,
-    _vester7: PromiseOrValue<string>,
+    _vester: PromiseOrValue<string>,
     _wallet1: PromiseOrValue<string>,
     _kieran: PromiseOrValue<string>,
     _charity: PromiseOrValue<string>,
@@ -1371,8 +1368,7 @@ export interface Darwin extends BaseContract {
 
     initialize(
       _darwinCommunity: PromiseOrValue<string>,
-      _vester5: PromiseOrValue<string>,
-      _vester7: PromiseOrValue<string>,
+      _vester: PromiseOrValue<string>,
       _wallet1: PromiseOrValue<string>,
       _kieran: PromiseOrValue<string>,
       _charity: PromiseOrValue<string>,
@@ -1725,8 +1721,7 @@ export interface Darwin extends BaseContract {
 
     initialize(
       _darwinCommunity: PromiseOrValue<string>,
-      _vester5: PromiseOrValue<string>,
-      _vester7: PromiseOrValue<string>,
+      _vester: PromiseOrValue<string>,
       _wallet1: PromiseOrValue<string>,
       _kieran: PromiseOrValue<string>,
       _charity: PromiseOrValue<string>,
@@ -1980,8 +1975,7 @@ export interface Darwin extends BaseContract {
 
     initialize(
       _darwinCommunity: PromiseOrValue<string>,
-      _vester5: PromiseOrValue<string>,
-      _vester7: PromiseOrValue<string>,
+      _vester: PromiseOrValue<string>,
       _wallet1: PromiseOrValue<string>,
       _kieran: PromiseOrValue<string>,
       _charity: PromiseOrValue<string>,

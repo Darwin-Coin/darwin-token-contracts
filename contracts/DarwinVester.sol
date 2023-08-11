@@ -5,71 +5,79 @@ import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/security/ReentrancyGuard.sol";
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 
-import {IOldVester} from "./interface/IOldVester.sol";
+import {IDarwinVester} from "./interface/IDarwinVester.sol";
 import {IDarwin} from "./interface/IDarwin.sol";
 
-/// @title OLD Darwin Vester
-contract OldVester is IOldVester, ReentrancyGuard, Ownable {
+/// @title Darwin Vester
+contract DarwinVester is IDarwinVester, ReentrancyGuard, Ownable {
 
-    /// @notice Percentage of monthly interest (0.583%)
-    uint256 public constant INTEREST = 583;
-    /// @notice Number of months thru which interest is active
+    /// @notice Percentage of monthly interest (0.625%, 7.5% in a year)
+    uint256 public constant INTEREST = 625;
+    /// @notice Number of months thru which vested darwin will be fully withdrawable
     uint256 public constant MONTHS = 12;
-    /// @notice Time thru which interest is active (in seconds)
+    /// @notice Above in seconds
     uint256 public constant VESTING_TIME = MONTHS * (30 days);
 
     mapping(address => UserInfo) public userInfo;
+    address[] users;
 
     /// @notice The Darwin token
     IERC20 public darwin;
-    /// @notice The private sale contract address
-    address public privateSale;
+    /// @notice Vest user address
+    address public deployer;
+    mapping(address => bool) public supportedNFT;
 
     bool private _isInitialized;
 
-    modifier isInitialized() {
+    modifier onlyInitialized() {
         if (!_isInitialized) {
             revert NotInitialized();
         }
         _;
     }
 
-    modifier onlyPrivateSale() {
-        if (msg.sender != privateSale) {
-            revert NotPrivateSale();
+    modifier onlyVestUser() {
+        if (userInfo[msg.sender].vested > 0) {
+            revert NotVestUser();
         }
         _;
     }
 
-    constructor(address _darwin) {
-        if (_darwin == address(0)) revert ZeroAddress();
+    constructor(address[] memory _users, uint[] memory _due, address[] memory _supportedNFTs) {
+        require(_users.length == _users.length, "Vester: Invalid _userInfo");
+        for (uint i = 0; i < _users.length; i++) {
+            userInfo[_users[i]].vested = _due[i];
+        }
+        users = _users;
+        deployer = msg.sender;
+        for (uint i = 0; i < _supportedNFTs.length; i++) {
+            supportedNFT[_supportedNFTs[i]] = true;
+        }
+    }
+
+    function init(address _darwin) external {
+        require (msg.sender == deployer, "Vester: Caller not Deployer");
+        require (address(darwin) == address(0), "Vester: Darwin already set");
         darwin = IERC20(_darwin);
     }
 
-    /// @dev Initializes the private sale address
-    /// @param _privateSale The private sale address
-    function init(
-        address _privateSale
-    ) external onlyOwner {
-        if (_isInitialized) revert AlreadyInitialized();
+    function startVesting() external {
+        require(!_isInitialized, "Vester: Already initialized");
         _isInitialized = true;
-        privateSale = _privateSale;
-    }
+        for (uint i = 0; i < users.length; i++) {
+            emit Vest(users[i], userInfo[users[i]].vested);
 
-    function deposit(address _user, uint _amount) external isInitialized onlyPrivateSale {
-        if (!darwin.transferFrom(msg.sender, address(this), _amount)) {
-            revert TransferFailed();
+            uint launchPercent = (userInfo[users[i]].vested * 25) / 100;
+            IDarwin(address(darwin)).mint(users[i], launchPercent);
+            userInfo[users[i]].vested -= launchPercent;
+            userInfo[users[i]].claimed = 0;
+            userInfo[users[i]].withdrawn = 0;
+            userInfo[users[i]].vestTimestamp = block.timestamp;
         }
-        _withdraw(_user, withdrawableDarwin(_user));
-        userInfo[_user].vested += _amount;
-        userInfo[_user].claimed = 0;
-        userInfo[_user].withdrawn = 0;
-        userInfo[_user].vestTimestamp = block.timestamp;
-        emit Vest(_user, _amount);
     }
 
     // Withdraws darwin from contract and also claims any minted darwin. If _amount == 0, does not withdraw but just claim.
-    function withdraw(uint _amount) external nonReentrant {
+    function withdraw(uint _amount) external onlyInitialized onlyVestUser nonReentrant {
         _withdraw(msg.sender, _amount);
     }
 
@@ -123,9 +131,6 @@ contract OldVester is IOldVester, ReentrancyGuard, Ownable {
         uint claimed = userInfo[_user].claimed;
         uint start = userInfo[_user].vestTimestamp;
         uint passedMonthsFromStart = (block.timestamp - start) / (30 days);
-        if (passedMonthsFromStart > MONTHS) {
-            passedMonthsFromStart = MONTHS;
-        }
         claimable = (((vested * INTEREST) / 100000) * passedMonthsFromStart) - claimed;
     }
 }

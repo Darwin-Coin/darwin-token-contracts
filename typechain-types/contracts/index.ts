@@ -18,6 +18,7 @@ export type { Darwin } from "./Darwin";
 export type { DarwinPresale } from "./DarwinPresale";
 export type { DarwinPrivateSale } from "./DarwinPrivateSale";
 export type { DarwinStaking } from "./DarwinStaking";
+export type { DarwinVester } from "./DarwinVester";
 export type { DarwinVester5 } from "./DarwinVester5";
 export type { DarwinVester7 } from "./DarwinVester7";
 export type { LootboxTicket } from "./LootboxTicket";

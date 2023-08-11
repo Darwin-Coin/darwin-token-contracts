@@ -28,7 +28,7 @@ contract Darwin is IDarwin, ERC20Upgradeable, OwnableUpgradeable, AccessControlU
     uint256 public constant DEPLOYER_PERCENTAGE = 6000; // 60%
     uint256 public constant KIERAN_PERCENTAGE = 20; // 0.20%
     uint256 public constant WALLET1_PECENTAGE = 1000; // 10%
-    uint256 public constant INITIAL_SUPPLY = 8e7 ether; // initial supply: 80m
+    uint256 public constant INITIAL_SUPPLY = 67e6 ether; // initial supply: 80m
     uint256 public constant MAX_SUPPLY = 75e7 ether; // max supply: 750m
 
     // Reflections
@@ -64,8 +64,7 @@ contract Darwin is IDarwin, ERC20Upgradeable, OwnableUpgradeable, AccessControlU
 
     function initialize(
         address _darwinCommunity,
-        address _vester5,
-        address _vester7,
+        address _vester,
         address _wallet1,
         address _kieran,
         address _charity,
@@ -78,8 +77,7 @@ contract Darwin is IDarwin, ERC20Upgradeable, OwnableUpgradeable, AccessControlU
         __Ownable_init_unchained();
         __darwin_init_unchained(
             _darwinCommunity,
-            _vester5,
-            _vester7,
+            _vester,
             _wallet1,
             _kieran,
             _charity,
@@ -94,8 +92,7 @@ contract Darwin is IDarwin, ERC20Upgradeable, OwnableUpgradeable, AccessControlU
 
     function __darwin_init_unchained(
         address _darwinCommunity,
-        address _vester5,
-        address _vester7,
+        address _vester,
         address _wallet1,
         address _kieran,
         address _charity,
@@ -126,23 +123,18 @@ contract Darwin is IDarwin, ERC20Upgradeable, OwnableUpgradeable, AccessControlU
         _setExcludedFromRewards(_wallet1);
         _setExcludedFromRewards(_darwinDrop);
         _setExcludedFromRewards(rewardsWallet);
-        _setExcludedFromRewards(_vester5);
-        _setExcludedFromRewards(_vester7);
+        _setExcludedFromRewards(_vester);
 
         { // scope to avoid stack too deep errors
         // calculate mint allocations
         uint kieranMint = (INITIAL_SUPPLY * KIERAN_PERCENTAGE) / 10000;
         uint wallet1Mint = (INITIAL_SUPPLY * WALLET1_PECENTAGE) / 10000;
         uint deployerMint = ((INITIAL_SUPPLY * DEPLOYER_PERCENTAGE) / 10000) + ((_darwinSoldInPresale * 25) / 100);
-        uint vester7Mint = (_darwinSoldInPresale * 75) / 100;
-        uint vester5Mint = INITIAL_SUPPLY - (kieranMint + wallet1Mint + deployerMint + vester7Mint);
 
         // mint
         _mint(_kieran, kieranMint);
         _mint(_wallet1, wallet1Mint);
         _mint(msg.sender, deployerMint);
-        _mint(_vester7, vester7Mint);
-        _mint(_vester5, vester5Mint);
         }
 
         // grant roles
@@ -151,8 +143,7 @@ contract Darwin is IDarwin, ERC20Upgradeable, OwnableUpgradeable, AccessControlU
         _grantRole(SECURITY_ROLE, msg.sender);
         _grantRole(COMMUNITY_ROLE, _darwinCommunity);
         _grantRole(UPGRADER_ROLE, _darwinCommunity);
-        _grantRole(MINTER_ROLE, _vester5);
-        _grantRole(MINTER_ROLE, _vester7);
+        _grantRole(MINTER_ROLE, _vester);
 
         isPaused = false;
     }

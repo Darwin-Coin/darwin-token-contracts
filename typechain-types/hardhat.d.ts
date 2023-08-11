@@ -153,6 +153,10 @@ declare module "hardhat/types/runtime" {
       signerOrOptions?: ethers.Signer | FactoryOptions
     ): Promise<Contracts.DarwinStaking__factory>;
     getContractFactory(
+      name: "DarwinVester",
+      signerOrOptions?: ethers.Signer | FactoryOptions
+    ): Promise<Contracts.DarwinVester__factory>;
+    getContractFactory(
       name: "DarwinVester5",
       signerOrOptions?: ethers.Signer | FactoryOptions
     ): Promise<Contracts.DarwinVester5__factory>;
@@ -428,6 +432,11 @@ declare module "hardhat/types/runtime" {
       address: string,
       signer?: ethers.Signer
     ): Promise<Contracts.DarwinStaking>;
+    getContractAt(
+      name: "DarwinVester",
+      address: string,
+      signer?: ethers.Signer
+    ): Promise<Contracts.DarwinVester>;
     getContractAt(
       name: "DarwinVester5",
       address: string,

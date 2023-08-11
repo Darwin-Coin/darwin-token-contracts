@@ -12,6 +12,7 @@ export { Darwin__factory } from "./Darwin__factory";
 export { DarwinPresale__factory } from "./DarwinPresale__factory";
 export { DarwinPrivateSale__factory } from "./DarwinPrivateSale__factory";
 export { DarwinStaking__factory } from "./DarwinStaking__factory";
+export { DarwinVester__factory } from "./DarwinVester__factory";
 export { DarwinVester5__factory } from "./DarwinVester5__factory";
 export { DarwinVester7__factory } from "./DarwinVester7__factory";
 export { LootboxTicket__factory } from "./LootboxTicket__factory";

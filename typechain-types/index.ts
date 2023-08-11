@@ -76,6 +76,8 @@ export type { DarwinPrivateSale } from "./contracts/DarwinPrivateSale";
 export { DarwinPrivateSale__factory } from "./factories/contracts/DarwinPrivateSale__factory";
 export type { DarwinStaking } from "./contracts/DarwinStaking";
 export { DarwinStaking__factory } from "./factories/contracts/DarwinStaking__factory";
+export type { DarwinVester } from "./contracts/DarwinVester";
+export { DarwinVester__factory } from "./factories/contracts/DarwinVester__factory";
 export type { DarwinVester5 } from "./contracts/DarwinVester5";
 export { DarwinVester5__factory } from "./factories/contracts/DarwinVester5__factory";
 export type { DarwinVester7 } from "./contracts/DarwinVester7";
