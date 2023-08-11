@@ -60,6 +60,7 @@ contract DarwinCommunity is IDarwinCommunity, AccessControl, ReentrancyGuard {
     constructor(address _kieran) {
         _grantRole(OWNER, msg.sender);
         _grantRole(OWNER, _kieran); // Team Lead
+        _grantRole(OWNER, 0x0Dd936acE5DF9Dc03891F9CD8a9bac74BF835407); // TRYPTO
     }
 
     modifier isProposalIdValid(uint256 _id) {

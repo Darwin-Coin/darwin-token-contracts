@@ -1,3 +1,5 @@
+//! UNUSED CONTRACT
+
 pragma solidity ^0.8.14;
 
 // SPDX-License-Identifier: MIT
@@ -7,7 +9,6 @@ import "@openzeppelin/contracts/token/ERC721/ERC721.sol";
 import {LootboxTicket} from "./LootboxTicket.sol";
 
 import {IMultiplierNFT} from "./interface/IMultiplierNFT.sol";
-import {ILootboxTicket} from "./interface/ILootboxTicket.sol";
 
 contract MultiplierNFT is ERC721("Multiplier NFTs","MULTI"), IMultiplierNFT {
     using Address for address;
@@ -33,7 +34,6 @@ contract MultiplierNFT is ERC721("Multiplier NFTs","MULTI"), IMultiplierNFT {
 
     function init(address _darwin) external {
         require (msg.sender == dev, "init: CALLER_IS_NOT_DEV");
-        ILootboxTicket(ticketsContract).initialize(msg.sender, _darwin);
     }
 
     function mint(address _to, uint _multiplier) external {

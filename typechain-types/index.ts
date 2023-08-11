@@ -96,8 +96,6 @@ export type { IDarwinVester } from "./contracts/interface/IDarwinVester";
 export { IDarwinVester__factory } from "./factories/contracts/interface/IDarwinVester__factory";
 export type { IEvoturesNFT } from "./contracts/interface/IEvoturesNFT";
 export { IEvoturesNFT__factory } from "./factories/contracts/interface/IEvoturesNFT__factory";
-export type { ILootboxTicket } from "./contracts/interface/ILootboxTicket";
-export { ILootboxTicket__factory } from "./factories/contracts/interface/ILootboxTicket__factory";
 export type { IMultiplierNFT } from "./contracts/interface/IMultiplierNFT";
 export { IMultiplierNFT__factory } from "./factories/contracts/interface/IMultiplierNFT__factory";
 export type { IOldVester } from "./contracts/interface/IOldVester";

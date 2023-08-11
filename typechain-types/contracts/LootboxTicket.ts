@@ -34,11 +34,9 @@ export interface LootboxTicketInterface extends utils.Interface {
     "darwin()": FunctionFragment;
     "dev()": FunctionFragment;
     "getApproved(uint256)": FunctionFragment;
-    "initialize(address,address)": FunctionFragment;
     "isApprovedForAll(address,address)": FunctionFragment;
     "lastTicketId()": FunctionFragment;
     "mint(address)": FunctionFragment;
-    "multiplierNFT()": FunctionFragment;
     "name()": FunctionFragment;
     "openLootBox(uint256)": FunctionFragment;
     "ownerOf(uint256)": FunctionFragment;
@@ -58,11 +56,9 @@ export interface LootboxTicketInterface extends utils.Interface {
       | "darwin"
       | "dev"
       | "getApproved"
-      | "initialize"
       | "isApprovedForAll"
       | "lastTicketId"
       | "mint"
-      | "multiplierNFT"
       | "name"
       | "openLootBox"
       | "ownerOf"
@@ -90,10 +86,6 @@ export interface LootboxTicketInterface extends utils.Interface {
     values: [PromiseOrValue<BigNumberish>]
   ): string;
   encodeFunctionData(
-    functionFragment: "initialize",
-    values: [PromiseOrValue<string>, PromiseOrValue<string>]
-  ): string;
-  encodeFunctionData(
     functionFragment: "isApprovedForAll",
     values: [PromiseOrValue<string>, PromiseOrValue<string>]
   ): string;
@@ -104,10 +96,6 @@ export interface LootboxTicketInterface extends utils.Interface {
   encodeFunctionData(
     functionFragment: "mint",
     values: [PromiseOrValue<string>]
-  ): string;
-  encodeFunctionData(
-    functionFragment: "multiplierNFT",
-    values?: undefined
   ): string;
   encodeFunctionData(functionFragment: "name", values?: undefined): string;
   encodeFunctionData(
@@ -165,7 +153,6 @@ export interface LootboxTicketInterface extends utils.Interface {
     functionFragment: "getApproved",
     data: BytesLike
   ): Result;
-  decodeFunctionResult(functionFragment: "initialize", data: BytesLike): Result;
   decodeFunctionResult(
     functionFragment: "isApprovedForAll",
     data: BytesLike
@@ -175,10 +162,6 @@ export interface LootboxTicketInterface extends utils.Interface {
     data: BytesLike
   ): Result;
   decodeFunctionResult(functionFragment: "mint", data: BytesLike): Result;
-  decodeFunctionResult(
-    functionFragment: "multiplierNFT",
-    data: BytesLike
-  ): Result;
   decodeFunctionResult(functionFragment: "name", data: BytesLike): Result;
   decodeFunctionResult(
     functionFragment: "openLootBox",
@@ -302,12 +285,6 @@ export interface LootboxTicket extends BaseContract {
       overrides?: CallOverrides
     ): Promise<[string]>;
 
-    initialize(
-      _dev: PromiseOrValue<string>,
-      _darwin: PromiseOrValue<string>,
-      overrides?: Overrides & { from?: PromiseOrValue<string> }
-    ): Promise<ContractTransaction>;
-
     isApprovedForAll(
       owner: PromiseOrValue<string>,
       operator: PromiseOrValue<string>,
@@ -320,8 +297,6 @@ export interface LootboxTicket extends BaseContract {
       _to: PromiseOrValue<string>,
       overrides?: Overrides & { from?: PromiseOrValue<string> }
     ): Promise<ContractTransaction>;
-
-    multiplierNFT(overrides?: CallOverrides): Promise<[string]>;
 
     name(overrides?: CallOverrides): Promise<[string]>;
 
@@ -396,12 +371,6 @@ export interface LootboxTicket extends BaseContract {
     overrides?: CallOverrides
   ): Promise<string>;
 
-  initialize(
-    _dev: PromiseOrValue<string>,
-    _darwin: PromiseOrValue<string>,
-    overrides?: Overrides & { from?: PromiseOrValue<string> }
-  ): Promise<ContractTransaction>;
-
   isApprovedForAll(
     owner: PromiseOrValue<string>,
     operator: PromiseOrValue<string>,
@@ -414,8 +383,6 @@ export interface LootboxTicket extends BaseContract {
     _to: PromiseOrValue<string>,
     overrides?: Overrides & { from?: PromiseOrValue<string> }
   ): Promise<ContractTransaction>;
-
-  multiplierNFT(overrides?: CallOverrides): Promise<string>;
 
   name(overrides?: CallOverrides): Promise<string>;
 
@@ -490,12 +457,6 @@ export interface LootboxTicket extends BaseContract {
       overrides?: CallOverrides
     ): Promise<string>;
 
-    initialize(
-      _dev: PromiseOrValue<string>,
-      _darwin: PromiseOrValue<string>,
-      overrides?: CallOverrides
-    ): Promise<void>;
-
     isApprovedForAll(
       owner: PromiseOrValue<string>,
       operator: PromiseOrValue<string>,
@@ -505,8 +466,6 @@ export interface LootboxTicket extends BaseContract {
     lastTicketId(overrides?: CallOverrides): Promise<BigNumber>;
 
     mint(_to: PromiseOrValue<string>, overrides?: CallOverrides): Promise<void>;
-
-    multiplierNFT(overrides?: CallOverrides): Promise<string>;
 
     name(overrides?: CallOverrides): Promise<string>;
 
@@ -617,12 +576,6 @@ export interface LootboxTicket extends BaseContract {
       overrides?: CallOverrides
     ): Promise<BigNumber>;
 
-    initialize(
-      _dev: PromiseOrValue<string>,
-      _darwin: PromiseOrValue<string>,
-      overrides?: Overrides & { from?: PromiseOrValue<string> }
-    ): Promise<BigNumber>;
-
     isApprovedForAll(
       owner: PromiseOrValue<string>,
       operator: PromiseOrValue<string>,
@@ -635,8 +588,6 @@ export interface LootboxTicket extends BaseContract {
       _to: PromiseOrValue<string>,
       overrides?: Overrides & { from?: PromiseOrValue<string> }
     ): Promise<BigNumber>;
-
-    multiplierNFT(overrides?: CallOverrides): Promise<BigNumber>;
 
     name(overrides?: CallOverrides): Promise<BigNumber>;
 
@@ -712,12 +663,6 @@ export interface LootboxTicket extends BaseContract {
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 
-    initialize(
-      _dev: PromiseOrValue<string>,
-      _darwin: PromiseOrValue<string>,
-      overrides?: Overrides & { from?: PromiseOrValue<string> }
-    ): Promise<PopulatedTransaction>;
-
     isApprovedForAll(
       owner: PromiseOrValue<string>,
       operator: PromiseOrValue<string>,
@@ -730,8 +675,6 @@ export interface LootboxTicket extends BaseContract {
       _to: PromiseOrValue<string>,
       overrides?: Overrides & { from?: PromiseOrValue<string> }
     ): Promise<PopulatedTransaction>;
-
-    multiplierNFT(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
     name(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 

@@ -8,7 +8,6 @@ import {LootboxTicket} from "./LootboxTicket.sol";
 
 import {IBoosterNFT} from "./interface/IBoosterNFT.sol";
 import {IEvoturesNFT} from "./interface/IEvoturesNFT.sol";
-import {ILootboxTicket} from "./interface/ILootboxTicket.sol";
 
 contract BoosterNFT is ERC721("Evotures Booster NFTs","EVOBOOST"), IBoosterNFT {
     using Strings for uint8;

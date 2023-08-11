@@ -201,10 +201,6 @@ declare module "hardhat/types/runtime" {
       signerOrOptions?: ethers.Signer | FactoryOptions
     ): Promise<Contracts.IEvoturesNFT__factory>;
     getContractFactory(
-      name: "ILootboxTicket",
-      signerOrOptions?: ethers.Signer | FactoryOptions
-    ): Promise<Contracts.ILootboxTicket__factory>;
-    getContractFactory(
       name: "IMultiplierNFT",
       signerOrOptions?: ethers.Signer | FactoryOptions
     ): Promise<Contracts.IMultiplierNFT__factory>;
@@ -492,11 +488,6 @@ declare module "hardhat/types/runtime" {
       address: string,
       signer?: ethers.Signer
     ): Promise<Contracts.IEvoturesNFT>;
-    getContractAt(
-      name: "ILootboxTicket",
-      address: string,
-      signer?: ethers.Signer
-    ): Promise<Contracts.ILootboxTicket>;
     getContractAt(
       name: "IMultiplierNFT",
       address: string,
