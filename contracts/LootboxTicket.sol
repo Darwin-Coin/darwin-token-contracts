@@ -12,10 +12,9 @@ contract LootboxTicket is ERC721("Lootbox Tickets","TICKETS") {
     address public dev;
     uint public lastTicketId;
 
-    constructor(address _dev, address _darwin) {
-        require(dev == address(0) && darwin == address(0), "LootboxTicket: ALREADY_INITIALIZED");
-        require(_dev != address(0) && _darwin != address(0), "LootboxTicket: ZERO_ADDRESS");
-        dev = _dev;
+    constructor(address _darwin) {
+        require(_darwin != address(0), "LootboxTicket: ZERO_ADDRESS");
+        dev = msg.sender;
         darwin = _darwin;
     }
 
