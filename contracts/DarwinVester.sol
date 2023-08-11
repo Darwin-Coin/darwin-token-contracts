@@ -69,10 +69,10 @@ contract DarwinVester is IDarwinVester, ReentrancyGuard, Ownable {
         for (uint i = 0; i < users.length; i++) {
             emit Vest(users[i], userInfo[users[i]].vested);
 
-            IERC20(address(darwin)).transfer(users[i], atLaunch[i]);
             userInfo[users[i]].claimed = 0;
             userInfo[users[i]].withdrawn = 0;
             userInfo[users[i]].vestTimestamp = block.timestamp;
+            IERC20(address(darwin)).transfer(users[i], atLaunch[i]);
         }
     }
 
