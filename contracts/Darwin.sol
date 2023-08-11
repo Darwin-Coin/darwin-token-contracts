@@ -28,8 +28,8 @@ contract Darwin is IDarwin, ERC20Upgradeable, OwnableUpgradeable, AccessControlU
     uint256 public constant DEPLOYER_PERCENTAGE = 6000; // 60%
     uint256 public constant KIERAN_PERCENTAGE = 20; // 0.20%
     uint256 public constant WALLET1_PECENTAGE = 1000; // 10%
-    uint256 public constant INITIAL_SUPPLY = 1e8 ether; // initial supply: 100m
-    uint256 public constant MAX_SUPPLY = 1e9 ether; // max supply: 1b
+    uint256 public constant INITIAL_SUPPLY = 8e7 ether; // initial supply: 80m
+    uint256 public constant MAX_SUPPLY = 75e7 ether; // max supply: 750m
 
     // Reflections
     uint256 public culmulativeRewardPerToken;
@@ -310,8 +310,9 @@ contract Darwin is IDarwin, ERC20Upgradeable, OwnableUpgradeable, AccessControlU
 
     function balanceOf(address account) public view override returns (uint256 balance) {
         balance = super.balanceOf(account);
+        uint256 sBalance = stakedDarwin.balanceOf(account);
         if (!_isExcludedFromRewards[account]) {
-            balance += _getRewardsOwed(culmulativeRewardPerToken, _lastCulmulativeRewards[account], balance);
+            balance += _getRewardsOwed(culmulativeRewardPerToken, _lastCulmulativeRewards[account], balance + sBalance);
         }
     }
 
