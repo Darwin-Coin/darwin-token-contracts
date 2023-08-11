@@ -6,19 +6,9 @@ import {IStakedDarwin} from "./IStakedDarwin.sol";
 
 interface IDarwin {
 
-    /// @notice Accumulatively log sold tokens
-    struct TokenSellLog {
-        uint40 lastSale;
-        uint216 amount;
-    }
-
     event ExcludedFromReflection(address account, bool isExcluded);
-    event ExcludedFromSellLimit(address account, bool isExcluded);
-    event SetLive(uint timestamp);
     event SetPaused(uint timestamp);
     event SetUnpaused(uint timestamp);
-    event SetPauseWhitelist(address account, bool isWhitelisted);
-    event SetPresaleAddress(address account);
 
     // PUBLIC
     function distributeRewards(uint256 amount) external;
@@ -40,13 +30,8 @@ interface IDarwin {
 
     // MAINTENANCE
     function setDarwinSwapFactory(address _darwinSwapFactory) external;
-    function setPauseWhitelist(address _addr, bool value) external;
-    function setPresaleAddress(address _addr) external;
-    function setLive() external;
-
-    // SECURITY
-    function emergencyPause() external;
-    function emergencyUnPause() external;
+    function setDarwinStaking(address _darwinStaking) external;
+    function setMasterChef(address _masterChef) external;
 
     // MINTER
     function mint(address account, uint256 amount) external;
@@ -56,6 +41,7 @@ interface IDarwin {
     function stakedDarwin() external view returns(IStakedDarwin);
     function MAX_SUPPLY() external pure returns(uint256);
 
+    // BURN
     function burn(uint256 amount) external;
 
     /// TransferFrom amount is greater than allowance

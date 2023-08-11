@@ -39,8 +39,6 @@ contract Darwin is IDarwin, ERC20Upgradeable, OwnableUpgradeable, AccessControlU
 
     // Pausing
     bool public isPaused;
-    bool public isLive;
-    mapping(address => bool) private _pauseWhitelist;
 
     // The rewards wallet
     address public rewardsWallet;
@@ -57,7 +55,7 @@ contract Darwin is IDarwin, ERC20Upgradeable, OwnableUpgradeable, AccessControlU
 
     modifier notPaused() {
         if(isPaused && !hasRole(COMMUNITY_ROLE, msg.sender)) {
-            if(isLive || _pauseWhitelist[msg.sender] == false) revert Paused();
+            revert Paused();
         }
         _;
     }
@@ -119,15 +117,6 @@ contract Darwin is IDarwin, ERC20Upgradeable, OwnableUpgradeable, AccessControlU
 
         rewardsWallet = 0x3Cc90773ebB2714180b424815f390D937974109B;
 
-        // allow addresses to trade during the pre-launch pause
-        _pauseWhitelist[_msgSender()] = true;
-        _pauseWhitelist[_wallet1] = true;
-        _pauseWhitelist[_kieran] = true;
-        _pauseWhitelist[_darwinDrop] = true;
-        _pauseWhitelist[_darwinCommunity] = true;
-        _pauseWhitelist[_vester5] = true;
-        _pauseWhitelist[_vester7] = true;
-
         // exclude addresses from receiving rewards
         _setExcludedFromRewards(_msgSender());
         _setExcludedFromRewards(_charity);
@@ -165,7 +154,7 @@ contract Darwin is IDarwin, ERC20Upgradeable, OwnableUpgradeable, AccessControlU
         _grantRole(MINTER_ROLE, _vester5);
         _grantRole(MINTER_ROLE, _vester7);
 
-        isPaused = true;
+        isPaused = false;
     }
 
     ////////////////////// SWAP FUNCTIONS ///////////////////////////////////
@@ -193,47 +182,6 @@ contract Darwin is IDarwin, ERC20Upgradeable, OwnableUpgradeable, AccessControlU
 
     function registerDarwinSwapPair(address _pair) external onlyRole(FACTORY_ROLE) {
         _setExcludedFromRewards(_pair);
-    }
-
-    ////////////////////// MAINTENANCE FUNCTIONS ///////////////////////////////////
-
-    function setLive() external onlyRole(MAINTENANCE_ROLE) {
-        isPaused = false;
-        isLive = true;
-
-        emit SetLive(block.timestamp);
-    }
-
-    function setPauseWhitelist(address _addr, bool value) external onlyRole(MAINTENANCE_ROLE) {
-        _pauseWhitelist[_addr] = value;
-
-        emit SetPauseWhitelist(_addr, value);
-    }
-
-    function setPresaleAddress(address _addr) external onlyRole(MAINTENANCE_ROLE) {
-        require(!isLive, "DARWIN: Darwin Protocol is already live");
-        _setExcludedFromRewards(_addr);
-        _pauseWhitelist[_addr] = true;
-
-        emit SetPresaleAddress(_addr);
-    }
-
-    ////////////////////// SECURITY FUNCTIONS ///////////////////////////////////
-
-    function emergencyPause() external onlyRole(SECURITY_ROLE) {
-        if(!isPaused && !isLive) {
-            isPaused = true;
-        }
-
-        emit SetPaused(block.timestamp);
-    }
-
-    function emergencyUnPause() external onlyRole(SECURITY_ROLE) {
-        if(isPaused && !isLive) {
-            isPaused = false;
-        }
-
-        emit SetUnpaused(block.timestamp);
     }
 
     ////////////////////// REWARDS FUNCTIONS /////////////////////////////////////

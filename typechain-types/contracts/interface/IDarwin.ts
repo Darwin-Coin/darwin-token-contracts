@@ -35,17 +35,14 @@ export interface IDarwinInterface extends utils.Interface {
     "communityPause()": FunctionFragment;
     "communityUnPause()": FunctionFragment;
     "distributeRewards(uint256)": FunctionFragment;
-    "emergencyPause()": FunctionFragment;
-    "emergencyUnPause()": FunctionFragment;
     "isPaused()": FunctionFragment;
     "mint(address,uint256)": FunctionFragment;
     "registerDarwinSwapPair(address)": FunctionFragment;
+    "setDarwinStaking(address)": FunctionFragment;
     "setDarwinSwapFactory(address)": FunctionFragment;
-    "setLive()": FunctionFragment;
     "setMaintenance(address,bool)": FunctionFragment;
+    "setMasterChef(address)": FunctionFragment;
     "setMinter(address,bool)": FunctionFragment;
-    "setPauseWhitelist(address,bool)": FunctionFragment;
-    "setPresaleAddress(address)": FunctionFragment;
     "setReceiveRewards(address,bool)": FunctionFragment;
     "setSecurity(address,bool)": FunctionFragment;
     "setUpgrader(address,bool)": FunctionFragment;
@@ -60,17 +57,14 @@ export interface IDarwinInterface extends utils.Interface {
       | "communityPause"
       | "communityUnPause"
       | "distributeRewards"
-      | "emergencyPause"
-      | "emergencyUnPause"
       | "isPaused"
       | "mint"
       | "registerDarwinSwapPair"
+      | "setDarwinStaking"
       | "setDarwinSwapFactory"
-      | "setLive"
       | "setMaintenance"
+      | "setMasterChef"
       | "setMinter"
-      | "setPauseWhitelist"
-      | "setPresaleAddress"
       | "setReceiveRewards"
       | "setSecurity"
       | "setUpgrader"
@@ -101,14 +95,6 @@ export interface IDarwinInterface extends utils.Interface {
     functionFragment: "distributeRewards",
     values: [PromiseOrValue<BigNumberish>]
   ): string;
-  encodeFunctionData(
-    functionFragment: "emergencyPause",
-    values?: undefined
-  ): string;
-  encodeFunctionData(
-    functionFragment: "emergencyUnPause",
-    values?: undefined
-  ): string;
   encodeFunctionData(functionFragment: "isPaused", values?: undefined): string;
   encodeFunctionData(
     functionFragment: "mint",
@@ -119,25 +105,24 @@ export interface IDarwinInterface extends utils.Interface {
     values: [PromiseOrValue<string>]
   ): string;
   encodeFunctionData(
+    functionFragment: "setDarwinStaking",
+    values: [PromiseOrValue<string>]
+  ): string;
+  encodeFunctionData(
     functionFragment: "setDarwinSwapFactory",
     values: [PromiseOrValue<string>]
   ): string;
-  encodeFunctionData(functionFragment: "setLive", values?: undefined): string;
   encodeFunctionData(
     functionFragment: "setMaintenance",
     values: [PromiseOrValue<string>, PromiseOrValue<boolean>]
   ): string;
   encodeFunctionData(
+    functionFragment: "setMasterChef",
+    values: [PromiseOrValue<string>]
+  ): string;
+  encodeFunctionData(
     functionFragment: "setMinter",
     values: [PromiseOrValue<string>, PromiseOrValue<boolean>]
-  ): string;
-  encodeFunctionData(
-    functionFragment: "setPauseWhitelist",
-    values: [PromiseOrValue<string>, PromiseOrValue<boolean>]
-  ): string;
-  encodeFunctionData(
-    functionFragment: "setPresaleAddress",
-    values: [PromiseOrValue<string>]
   ): string;
   encodeFunctionData(
     functionFragment: "setReceiveRewards",
@@ -174,14 +159,6 @@ export interface IDarwinInterface extends utils.Interface {
     functionFragment: "distributeRewards",
     data: BytesLike
   ): Result;
-  decodeFunctionResult(
-    functionFragment: "emergencyPause",
-    data: BytesLike
-  ): Result;
-  decodeFunctionResult(
-    functionFragment: "emergencyUnPause",
-    data: BytesLike
-  ): Result;
   decodeFunctionResult(functionFragment: "isPaused", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "mint", data: BytesLike): Result;
   decodeFunctionResult(
@@ -189,23 +166,22 @@ export interface IDarwinInterface extends utils.Interface {
     data: BytesLike
   ): Result;
   decodeFunctionResult(
+    functionFragment: "setDarwinStaking",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
     functionFragment: "setDarwinSwapFactory",
     data: BytesLike
   ): Result;
-  decodeFunctionResult(functionFragment: "setLive", data: BytesLike): Result;
   decodeFunctionResult(
     functionFragment: "setMaintenance",
     data: BytesLike
   ): Result;
+  decodeFunctionResult(
+    functionFragment: "setMasterChef",
+    data: BytesLike
+  ): Result;
   decodeFunctionResult(functionFragment: "setMinter", data: BytesLike): Result;
-  decodeFunctionResult(
-    functionFragment: "setPauseWhitelist",
-    data: BytesLike
-  ): Result;
-  decodeFunctionResult(
-    functionFragment: "setPresaleAddress",
-    data: BytesLike
-  ): Result;
   decodeFunctionResult(
     functionFragment: "setReceiveRewards",
     data: BytesLike
@@ -225,20 +201,12 @@ export interface IDarwinInterface extends utils.Interface {
 
   events: {
     "ExcludedFromReflection(address,bool)": EventFragment;
-    "ExcludedFromSellLimit(address,bool)": EventFragment;
-    "SetLive(uint256)": EventFragment;
-    "SetPauseWhitelist(address,bool)": EventFragment;
     "SetPaused(uint256)": EventFragment;
-    "SetPresaleAddress(address)": EventFragment;
     "SetUnpaused(uint256)": EventFragment;
   };
 
   getEvent(nameOrSignatureOrTopic: "ExcludedFromReflection"): EventFragment;
-  getEvent(nameOrSignatureOrTopic: "ExcludedFromSellLimit"): EventFragment;
-  getEvent(nameOrSignatureOrTopic: "SetLive"): EventFragment;
-  getEvent(nameOrSignatureOrTopic: "SetPauseWhitelist"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "SetPaused"): EventFragment;
-  getEvent(nameOrSignatureOrTopic: "SetPresaleAddress"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "SetUnpaused"): EventFragment;
 }
 
@@ -254,54 +222,12 @@ export type ExcludedFromReflectionEvent = TypedEvent<
 export type ExcludedFromReflectionEventFilter =
   TypedEventFilter<ExcludedFromReflectionEvent>;
 
-export interface ExcludedFromSellLimitEventObject {
-  account: string;
-  isExcluded: boolean;
-}
-export type ExcludedFromSellLimitEvent = TypedEvent<
-  [string, boolean],
-  ExcludedFromSellLimitEventObject
->;
-
-export type ExcludedFromSellLimitEventFilter =
-  TypedEventFilter<ExcludedFromSellLimitEvent>;
-
-export interface SetLiveEventObject {
-  timestamp: BigNumber;
-}
-export type SetLiveEvent = TypedEvent<[BigNumber], SetLiveEventObject>;
-
-export type SetLiveEventFilter = TypedEventFilter<SetLiveEvent>;
-
-export interface SetPauseWhitelistEventObject {
-  account: string;
-  isWhitelisted: boolean;
-}
-export type SetPauseWhitelistEvent = TypedEvent<
-  [string, boolean],
-  SetPauseWhitelistEventObject
->;
-
-export type SetPauseWhitelistEventFilter =
-  TypedEventFilter<SetPauseWhitelistEvent>;
-
 export interface SetPausedEventObject {
   timestamp: BigNumber;
 }
 export type SetPausedEvent = TypedEvent<[BigNumber], SetPausedEventObject>;
 
 export type SetPausedEventFilter = TypedEventFilter<SetPausedEvent>;
-
-export interface SetPresaleAddressEventObject {
-  account: string;
-}
-export type SetPresaleAddressEvent = TypedEvent<
-  [string],
-  SetPresaleAddressEventObject
->;
-
-export type SetPresaleAddressEventFilter =
-  TypedEventFilter<SetPresaleAddressEvent>;
 
 export interface SetUnpausedEventObject {
   timestamp: BigNumber;
@@ -363,14 +289,6 @@ export interface IDarwin extends BaseContract {
       overrides?: Overrides & { from?: PromiseOrValue<string> }
     ): Promise<ContractTransaction>;
 
-    emergencyPause(
-      overrides?: Overrides & { from?: PromiseOrValue<string> }
-    ): Promise<ContractTransaction>;
-
-    emergencyUnPause(
-      overrides?: Overrides & { from?: PromiseOrValue<string> }
-    ): Promise<ContractTransaction>;
-
     isPaused(overrides?: CallOverrides): Promise<[boolean]>;
 
     mint(
@@ -384,12 +302,13 @@ export interface IDarwin extends BaseContract {
       overrides?: Overrides & { from?: PromiseOrValue<string> }
     ): Promise<ContractTransaction>;
 
-    setDarwinSwapFactory(
-      _darwinSwapFactory: PromiseOrValue<string>,
+    setDarwinStaking(
+      _darwinStaking: PromiseOrValue<string>,
       overrides?: Overrides & { from?: PromiseOrValue<string> }
     ): Promise<ContractTransaction>;
 
-    setLive(
+    setDarwinSwapFactory(
+      _darwinSwapFactory: PromiseOrValue<string>,
       overrides?: Overrides & { from?: PromiseOrValue<string> }
     ): Promise<ContractTransaction>;
 
@@ -399,20 +318,14 @@ export interface IDarwin extends BaseContract {
       overrides?: Overrides & { from?: PromiseOrValue<string> }
     ): Promise<ContractTransaction>;
 
+    setMasterChef(
+      _masterChef: PromiseOrValue<string>,
+      overrides?: Overrides & { from?: PromiseOrValue<string> }
+    ): Promise<ContractTransaction>;
+
     setMinter(
       user_: PromiseOrValue<string>,
       canMint_: PromiseOrValue<boolean>,
-      overrides?: Overrides & { from?: PromiseOrValue<string> }
-    ): Promise<ContractTransaction>;
-
-    setPauseWhitelist(
-      _addr: PromiseOrValue<string>,
-      value: PromiseOrValue<boolean>,
-      overrides?: Overrides & { from?: PromiseOrValue<string> }
-    ): Promise<ContractTransaction>;
-
-    setPresaleAddress(
-      _addr: PromiseOrValue<string>,
       overrides?: Overrides & { from?: PromiseOrValue<string> }
     ): Promise<ContractTransaction>;
 
@@ -463,14 +376,6 @@ export interface IDarwin extends BaseContract {
     overrides?: Overrides & { from?: PromiseOrValue<string> }
   ): Promise<ContractTransaction>;
 
-  emergencyPause(
-    overrides?: Overrides & { from?: PromiseOrValue<string> }
-  ): Promise<ContractTransaction>;
-
-  emergencyUnPause(
-    overrides?: Overrides & { from?: PromiseOrValue<string> }
-  ): Promise<ContractTransaction>;
-
   isPaused(overrides?: CallOverrides): Promise<boolean>;
 
   mint(
@@ -484,12 +389,13 @@ export interface IDarwin extends BaseContract {
     overrides?: Overrides & { from?: PromiseOrValue<string> }
   ): Promise<ContractTransaction>;
 
-  setDarwinSwapFactory(
-    _darwinSwapFactory: PromiseOrValue<string>,
+  setDarwinStaking(
+    _darwinStaking: PromiseOrValue<string>,
     overrides?: Overrides & { from?: PromiseOrValue<string> }
   ): Promise<ContractTransaction>;
 
-  setLive(
+  setDarwinSwapFactory(
+    _darwinSwapFactory: PromiseOrValue<string>,
     overrides?: Overrides & { from?: PromiseOrValue<string> }
   ): Promise<ContractTransaction>;
 
@@ -499,20 +405,14 @@ export interface IDarwin extends BaseContract {
     overrides?: Overrides & { from?: PromiseOrValue<string> }
   ): Promise<ContractTransaction>;
 
+  setMasterChef(
+    _masterChef: PromiseOrValue<string>,
+    overrides?: Overrides & { from?: PromiseOrValue<string> }
+  ): Promise<ContractTransaction>;
+
   setMinter(
     user_: PromiseOrValue<string>,
     canMint_: PromiseOrValue<boolean>,
-    overrides?: Overrides & { from?: PromiseOrValue<string> }
-  ): Promise<ContractTransaction>;
-
-  setPauseWhitelist(
-    _addr: PromiseOrValue<string>,
-    value: PromiseOrValue<boolean>,
-    overrides?: Overrides & { from?: PromiseOrValue<string> }
-  ): Promise<ContractTransaction>;
-
-  setPresaleAddress(
-    _addr: PromiseOrValue<string>,
     overrides?: Overrides & { from?: PromiseOrValue<string> }
   ): Promise<ContractTransaction>;
 
@@ -559,10 +459,6 @@ export interface IDarwin extends BaseContract {
       overrides?: CallOverrides
     ): Promise<void>;
 
-    emergencyPause(overrides?: CallOverrides): Promise<void>;
-
-    emergencyUnPause(overrides?: CallOverrides): Promise<void>;
-
     isPaused(overrides?: CallOverrides): Promise<boolean>;
 
     mint(
@@ -576,12 +472,15 @@ export interface IDarwin extends BaseContract {
       overrides?: CallOverrides
     ): Promise<void>;
 
+    setDarwinStaking(
+      _darwinStaking: PromiseOrValue<string>,
+      overrides?: CallOverrides
+    ): Promise<void>;
+
     setDarwinSwapFactory(
       _darwinSwapFactory: PromiseOrValue<string>,
       overrides?: CallOverrides
     ): Promise<void>;
-
-    setLive(overrides?: CallOverrides): Promise<void>;
 
     setMaintenance(
       _addr: PromiseOrValue<string>,
@@ -589,20 +488,14 @@ export interface IDarwin extends BaseContract {
       overrides?: CallOverrides
     ): Promise<void>;
 
+    setMasterChef(
+      _masterChef: PromiseOrValue<string>,
+      overrides?: CallOverrides
+    ): Promise<void>;
+
     setMinter(
       user_: PromiseOrValue<string>,
       canMint_: PromiseOrValue<boolean>,
-      overrides?: CallOverrides
-    ): Promise<void>;
-
-    setPauseWhitelist(
-      _addr: PromiseOrValue<string>,
-      value: PromiseOrValue<boolean>,
-      overrides?: CallOverrides
-    ): Promise<void>;
-
-    setPresaleAddress(
-      _addr: PromiseOrValue<string>,
       overrides?: CallOverrides
     ): Promise<void>;
 
@@ -637,32 +530,8 @@ export interface IDarwin extends BaseContract {
       isExcluded?: null
     ): ExcludedFromReflectionEventFilter;
 
-    "ExcludedFromSellLimit(address,bool)"(
-      account?: null,
-      isExcluded?: null
-    ): ExcludedFromSellLimitEventFilter;
-    ExcludedFromSellLimit(
-      account?: null,
-      isExcluded?: null
-    ): ExcludedFromSellLimitEventFilter;
-
-    "SetLive(uint256)"(timestamp?: null): SetLiveEventFilter;
-    SetLive(timestamp?: null): SetLiveEventFilter;
-
-    "SetPauseWhitelist(address,bool)"(
-      account?: null,
-      isWhitelisted?: null
-    ): SetPauseWhitelistEventFilter;
-    SetPauseWhitelist(
-      account?: null,
-      isWhitelisted?: null
-    ): SetPauseWhitelistEventFilter;
-
     "SetPaused(uint256)"(timestamp?: null): SetPausedEventFilter;
     SetPaused(timestamp?: null): SetPausedEventFilter;
-
-    "SetPresaleAddress(address)"(account?: null): SetPresaleAddressEventFilter;
-    SetPresaleAddress(account?: null): SetPresaleAddressEventFilter;
 
     "SetUnpaused(uint256)"(timestamp?: null): SetUnpausedEventFilter;
     SetUnpaused(timestamp?: null): SetUnpausedEventFilter;
@@ -695,14 +564,6 @@ export interface IDarwin extends BaseContract {
       overrides?: Overrides & { from?: PromiseOrValue<string> }
     ): Promise<BigNumber>;
 
-    emergencyPause(
-      overrides?: Overrides & { from?: PromiseOrValue<string> }
-    ): Promise<BigNumber>;
-
-    emergencyUnPause(
-      overrides?: Overrides & { from?: PromiseOrValue<string> }
-    ): Promise<BigNumber>;
-
     isPaused(overrides?: CallOverrides): Promise<BigNumber>;
 
     mint(
@@ -716,12 +577,13 @@ export interface IDarwin extends BaseContract {
       overrides?: Overrides & { from?: PromiseOrValue<string> }
     ): Promise<BigNumber>;
 
-    setDarwinSwapFactory(
-      _darwinSwapFactory: PromiseOrValue<string>,
+    setDarwinStaking(
+      _darwinStaking: PromiseOrValue<string>,
       overrides?: Overrides & { from?: PromiseOrValue<string> }
     ): Promise<BigNumber>;
 
-    setLive(
+    setDarwinSwapFactory(
+      _darwinSwapFactory: PromiseOrValue<string>,
       overrides?: Overrides & { from?: PromiseOrValue<string> }
     ): Promise<BigNumber>;
 
@@ -731,20 +593,14 @@ export interface IDarwin extends BaseContract {
       overrides?: Overrides & { from?: PromiseOrValue<string> }
     ): Promise<BigNumber>;
 
+    setMasterChef(
+      _masterChef: PromiseOrValue<string>,
+      overrides?: Overrides & { from?: PromiseOrValue<string> }
+    ): Promise<BigNumber>;
+
     setMinter(
       user_: PromiseOrValue<string>,
       canMint_: PromiseOrValue<boolean>,
-      overrides?: Overrides & { from?: PromiseOrValue<string> }
-    ): Promise<BigNumber>;
-
-    setPauseWhitelist(
-      _addr: PromiseOrValue<string>,
-      value: PromiseOrValue<boolean>,
-      overrides?: Overrides & { from?: PromiseOrValue<string> }
-    ): Promise<BigNumber>;
-
-    setPresaleAddress(
-      _addr: PromiseOrValue<string>,
       overrides?: Overrides & { from?: PromiseOrValue<string> }
     ): Promise<BigNumber>;
 
@@ -796,14 +652,6 @@ export interface IDarwin extends BaseContract {
       overrides?: Overrides & { from?: PromiseOrValue<string> }
     ): Promise<PopulatedTransaction>;
 
-    emergencyPause(
-      overrides?: Overrides & { from?: PromiseOrValue<string> }
-    ): Promise<PopulatedTransaction>;
-
-    emergencyUnPause(
-      overrides?: Overrides & { from?: PromiseOrValue<string> }
-    ): Promise<PopulatedTransaction>;
-
     isPaused(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
     mint(
@@ -817,12 +665,13 @@ export interface IDarwin extends BaseContract {
       overrides?: Overrides & { from?: PromiseOrValue<string> }
     ): Promise<PopulatedTransaction>;
 
-    setDarwinSwapFactory(
-      _darwinSwapFactory: PromiseOrValue<string>,
+    setDarwinStaking(
+      _darwinStaking: PromiseOrValue<string>,
       overrides?: Overrides & { from?: PromiseOrValue<string> }
     ): Promise<PopulatedTransaction>;
 
-    setLive(
+    setDarwinSwapFactory(
+      _darwinSwapFactory: PromiseOrValue<string>,
       overrides?: Overrides & { from?: PromiseOrValue<string> }
     ): Promise<PopulatedTransaction>;
 
@@ -832,20 +681,14 @@ export interface IDarwin extends BaseContract {
       overrides?: Overrides & { from?: PromiseOrValue<string> }
     ): Promise<PopulatedTransaction>;
 
+    setMasterChef(
+      _masterChef: PromiseOrValue<string>,
+      overrides?: Overrides & { from?: PromiseOrValue<string> }
+    ): Promise<PopulatedTransaction>;
+
     setMinter(
       user_: PromiseOrValue<string>,
       canMint_: PromiseOrValue<boolean>,
-      overrides?: Overrides & { from?: PromiseOrValue<string> }
-    ): Promise<PopulatedTransaction>;
-
-    setPauseWhitelist(
-      _addr: PromiseOrValue<string>,
-      value: PromiseOrValue<boolean>,
-      overrides?: Overrides & { from?: PromiseOrValue<string> }
-    ): Promise<PopulatedTransaction>;
-
-    setPresaleAddress(
-      _addr: PromiseOrValue<string>,
       overrides?: Overrides & { from?: PromiseOrValue<string> }
     ): Promise<PopulatedTransaction>;
 

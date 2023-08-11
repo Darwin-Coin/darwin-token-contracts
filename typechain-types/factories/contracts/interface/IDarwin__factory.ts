@@ -89,76 +89,12 @@ const _abi = [
     inputs: [
       {
         indexed: false,
-        internalType: "address",
-        name: "account",
-        type: "address",
-      },
-      {
-        indexed: false,
-        internalType: "bool",
-        name: "isExcluded",
-        type: "bool",
-      },
-    ],
-    name: "ExcludedFromSellLimit",
-    type: "event",
-  },
-  {
-    anonymous: false,
-    inputs: [
-      {
-        indexed: false,
-        internalType: "uint256",
-        name: "timestamp",
-        type: "uint256",
-      },
-    ],
-    name: "SetLive",
-    type: "event",
-  },
-  {
-    anonymous: false,
-    inputs: [
-      {
-        indexed: false,
-        internalType: "address",
-        name: "account",
-        type: "address",
-      },
-      {
-        indexed: false,
-        internalType: "bool",
-        name: "isWhitelisted",
-        type: "bool",
-      },
-    ],
-    name: "SetPauseWhitelist",
-    type: "event",
-  },
-  {
-    anonymous: false,
-    inputs: [
-      {
-        indexed: false,
         internalType: "uint256",
         name: "timestamp",
         type: "uint256",
       },
     ],
     name: "SetPaused",
-    type: "event",
-  },
-  {
-    anonymous: false,
-    inputs: [
-      {
-        indexed: false,
-        internalType: "address",
-        name: "account",
-        type: "address",
-      },
-    ],
-    name: "SetPresaleAddress",
     type: "event",
   },
   {
@@ -247,20 +183,6 @@ const _abi = [
   },
   {
     inputs: [],
-    name: "emergencyPause",
-    outputs: [],
-    stateMutability: "nonpayable",
-    type: "function",
-  },
-  {
-    inputs: [],
-    name: "emergencyUnPause",
-    outputs: [],
-    stateMutability: "nonpayable",
-    type: "function",
-  },
-  {
-    inputs: [],
     name: "isPaused",
     outputs: [
       {
@@ -307,18 +229,24 @@ const _abi = [
     inputs: [
       {
         internalType: "address",
-        name: "_darwinSwapFactory",
+        name: "_darwinStaking",
         type: "address",
       },
     ],
-    name: "setDarwinSwapFactory",
+    name: "setDarwinStaking",
     outputs: [],
     stateMutability: "nonpayable",
     type: "function",
   },
   {
-    inputs: [],
-    name: "setLive",
+    inputs: [
+      {
+        internalType: "address",
+        name: "_darwinSwapFactory",
+        type: "address",
+      },
+    ],
+    name: "setDarwinSwapFactory",
     outputs: [],
     stateMutability: "nonpayable",
     type: "function",
@@ -345,6 +273,19 @@ const _abi = [
     inputs: [
       {
         internalType: "address",
+        name: "_masterChef",
+        type: "address",
+      },
+    ],
+    name: "setMasterChef",
+    outputs: [],
+    stateMutability: "nonpayable",
+    type: "function",
+  },
+  {
+    inputs: [
+      {
+        internalType: "address",
         name: "user_",
         type: "address",
       },
@@ -355,37 +296,6 @@ const _abi = [
       },
     ],
     name: "setMinter",
-    outputs: [],
-    stateMutability: "nonpayable",
-    type: "function",
-  },
-  {
-    inputs: [
-      {
-        internalType: "address",
-        name: "_addr",
-        type: "address",
-      },
-      {
-        internalType: "bool",
-        name: "value",
-        type: "bool",
-      },
-    ],
-    name: "setPauseWhitelist",
-    outputs: [],
-    stateMutability: "nonpayable",
-    type: "function",
-  },
-  {
-    inputs: [
-      {
-        internalType: "address",
-        name: "_addr",
-        type: "address",
-      },
-    ],
-    name: "setPresaleAddress",
     outputs: [],
     stateMutability: "nonpayable",
     type: "function",

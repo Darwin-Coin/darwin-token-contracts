@@ -55,15 +55,12 @@ export interface DarwinInterface extends utils.Interface {
     "decimals()": FunctionFragment;
     "decreaseAllowance(address,uint256)": FunctionFragment;
     "distributeRewards(uint256)": FunctionFragment;
-    "emergencyPause()": FunctionFragment;
-    "emergencyUnPause()": FunctionFragment;
     "excludedFromRewards(uint256)": FunctionFragment;
     "getRoleAdmin(bytes32)": FunctionFragment;
     "grantRole(bytes32,address)": FunctionFragment;
     "hasRole(bytes32,address)": FunctionFragment;
     "increaseAllowance(address,uint256)": FunctionFragment;
     "initialize(address,address,address,address,address,address,address,address,address,uint256)": FunctionFragment;
-    "isLive()": FunctionFragment;
     "isPaused()": FunctionFragment;
     "masterChef()": FunctionFragment;
     "mint(address,uint256)": FunctionFragment;
@@ -77,12 +74,9 @@ export interface DarwinInterface extends utils.Interface {
     "rewardsWallet()": FunctionFragment;
     "setDarwinStaking(address)": FunctionFragment;
     "setDarwinSwapFactory(address)": FunctionFragment;
-    "setLive()": FunctionFragment;
     "setMaintenance(address,bool)": FunctionFragment;
     "setMasterChef(address)": FunctionFragment;
     "setMinter(address,bool)": FunctionFragment;
-    "setPauseWhitelist(address,bool)": FunctionFragment;
-    "setPresaleAddress(address)": FunctionFragment;
     "setReceiveRewards(address,bool)": FunctionFragment;
     "setSecurity(address,bool)": FunctionFragment;
     "setUpgrader(address,bool)": FunctionFragment;
@@ -125,15 +119,12 @@ export interface DarwinInterface extends utils.Interface {
       | "decimals"
       | "decreaseAllowance"
       | "distributeRewards"
-      | "emergencyPause"
-      | "emergencyUnPause"
       | "excludedFromRewards"
       | "getRoleAdmin"
       | "grantRole"
       | "hasRole"
       | "increaseAllowance"
       | "initialize"
-      | "isLive"
       | "isPaused"
       | "masterChef"
       | "mint"
@@ -147,12 +138,9 @@ export interface DarwinInterface extends utils.Interface {
       | "rewardsWallet"
       | "setDarwinStaking"
       | "setDarwinSwapFactory"
-      | "setLive"
       | "setMaintenance"
       | "setMasterChef"
       | "setMinter"
-      | "setPauseWhitelist"
-      | "setPresaleAddress"
       | "setReceiveRewards"
       | "setSecurity"
       | "setUpgrader"
@@ -266,14 +254,6 @@ export interface DarwinInterface extends utils.Interface {
     values: [PromiseOrValue<BigNumberish>]
   ): string;
   encodeFunctionData(
-    functionFragment: "emergencyPause",
-    values?: undefined
-  ): string;
-  encodeFunctionData(
-    functionFragment: "emergencyUnPause",
-    values?: undefined
-  ): string;
-  encodeFunctionData(
     functionFragment: "excludedFromRewards",
     values: [PromiseOrValue<BigNumberish>]
   ): string;
@@ -308,7 +288,6 @@ export interface DarwinInterface extends utils.Interface {
       PromiseOrValue<BigNumberish>
     ]
   ): string;
-  encodeFunctionData(functionFragment: "isLive", values?: undefined): string;
   encodeFunctionData(functionFragment: "isPaused", values?: undefined): string;
   encodeFunctionData(
     functionFragment: "masterChef",
@@ -352,7 +331,6 @@ export interface DarwinInterface extends utils.Interface {
     functionFragment: "setDarwinSwapFactory",
     values: [PromiseOrValue<string>]
   ): string;
-  encodeFunctionData(functionFragment: "setLive", values?: undefined): string;
   encodeFunctionData(
     functionFragment: "setMaintenance",
     values: [PromiseOrValue<string>, PromiseOrValue<boolean>]
@@ -364,14 +342,6 @@ export interface DarwinInterface extends utils.Interface {
   encodeFunctionData(
     functionFragment: "setMinter",
     values: [PromiseOrValue<string>, PromiseOrValue<boolean>]
-  ): string;
-  encodeFunctionData(
-    functionFragment: "setPauseWhitelist",
-    values: [PromiseOrValue<string>, PromiseOrValue<boolean>]
-  ): string;
-  encodeFunctionData(
-    functionFragment: "setPresaleAddress",
-    values: [PromiseOrValue<string>]
   ): string;
   encodeFunctionData(
     functionFragment: "setReceiveRewards",
@@ -510,14 +480,6 @@ export interface DarwinInterface extends utils.Interface {
     data: BytesLike
   ): Result;
   decodeFunctionResult(
-    functionFragment: "emergencyPause",
-    data: BytesLike
-  ): Result;
-  decodeFunctionResult(
-    functionFragment: "emergencyUnPause",
-    data: BytesLike
-  ): Result;
-  decodeFunctionResult(
     functionFragment: "excludedFromRewards",
     data: BytesLike
   ): Result;
@@ -532,7 +494,6 @@ export interface DarwinInterface extends utils.Interface {
     data: BytesLike
   ): Result;
   decodeFunctionResult(functionFragment: "initialize", data: BytesLike): Result;
-  decodeFunctionResult(functionFragment: "isLive", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "isPaused", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "masterChef", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "mint", data: BytesLike): Result;
@@ -567,7 +528,6 @@ export interface DarwinInterface extends utils.Interface {
     functionFragment: "setDarwinSwapFactory",
     data: BytesLike
   ): Result;
-  decodeFunctionResult(functionFragment: "setLive", data: BytesLike): Result;
   decodeFunctionResult(
     functionFragment: "setMaintenance",
     data: BytesLike
@@ -577,14 +537,6 @@ export interface DarwinInterface extends utils.Interface {
     data: BytesLike
   ): Result;
   decodeFunctionResult(functionFragment: "setMinter", data: BytesLike): Result;
-  decodeFunctionResult(
-    functionFragment: "setPauseWhitelist",
-    data: BytesLike
-  ): Result;
-  decodeFunctionResult(
-    functionFragment: "setPresaleAddress",
-    data: BytesLike
-  ): Result;
   decodeFunctionResult(
     functionFragment: "setReceiveRewards",
     data: BytesLike
@@ -631,16 +583,12 @@ export interface DarwinInterface extends utils.Interface {
     "Approval(address,address,uint256)": EventFragment;
     "BeaconUpgraded(address)": EventFragment;
     "ExcludedFromReflection(address,bool)": EventFragment;
-    "ExcludedFromSellLimit(address,bool)": EventFragment;
     "Initialized(uint8)": EventFragment;
     "OwnershipTransferred(address,address)": EventFragment;
     "RoleAdminChanged(bytes32,bytes32,bytes32)": EventFragment;
     "RoleGranted(bytes32,address,address)": EventFragment;
     "RoleRevoked(bytes32,address,address)": EventFragment;
-    "SetLive(uint256)": EventFragment;
-    "SetPauseWhitelist(address,bool)": EventFragment;
     "SetPaused(uint256)": EventFragment;
-    "SetPresaleAddress(address)": EventFragment;
     "SetUnpaused(uint256)": EventFragment;
     "Transfer(address,address,uint256)": EventFragment;
     "Upgraded(address)": EventFragment;
@@ -650,16 +598,12 @@ export interface DarwinInterface extends utils.Interface {
   getEvent(nameOrSignatureOrTopic: "Approval"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "BeaconUpgraded"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "ExcludedFromReflection"): EventFragment;
-  getEvent(nameOrSignatureOrTopic: "ExcludedFromSellLimit"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "Initialized"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "OwnershipTransferred"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "RoleAdminChanged"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "RoleGranted"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "RoleRevoked"): EventFragment;
-  getEvent(nameOrSignatureOrTopic: "SetLive"): EventFragment;
-  getEvent(nameOrSignatureOrTopic: "SetPauseWhitelist"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "SetPaused"): EventFragment;
-  getEvent(nameOrSignatureOrTopic: "SetPresaleAddress"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "SetUnpaused"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "Transfer"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "Upgraded"): EventFragment;
@@ -709,18 +653,6 @@ export type ExcludedFromReflectionEvent = TypedEvent<
 
 export type ExcludedFromReflectionEventFilter =
   TypedEventFilter<ExcludedFromReflectionEvent>;
-
-export interface ExcludedFromSellLimitEventObject {
-  account: string;
-  isExcluded: boolean;
-}
-export type ExcludedFromSellLimitEvent = TypedEvent<
-  [string, boolean],
-  ExcludedFromSellLimitEventObject
->;
-
-export type ExcludedFromSellLimitEventFilter =
-  TypedEventFilter<ExcludedFromSellLimitEvent>;
 
 export interface InitializedEventObject {
   version: number;
@@ -778,42 +710,12 @@ export type RoleRevokedEvent = TypedEvent<
 
 export type RoleRevokedEventFilter = TypedEventFilter<RoleRevokedEvent>;
 
-export interface SetLiveEventObject {
-  timestamp: BigNumber;
-}
-export type SetLiveEvent = TypedEvent<[BigNumber], SetLiveEventObject>;
-
-export type SetLiveEventFilter = TypedEventFilter<SetLiveEvent>;
-
-export interface SetPauseWhitelistEventObject {
-  account: string;
-  isWhitelisted: boolean;
-}
-export type SetPauseWhitelistEvent = TypedEvent<
-  [string, boolean],
-  SetPauseWhitelistEventObject
->;
-
-export type SetPauseWhitelistEventFilter =
-  TypedEventFilter<SetPauseWhitelistEvent>;
-
 export interface SetPausedEventObject {
   timestamp: BigNumber;
 }
 export type SetPausedEvent = TypedEvent<[BigNumber], SetPausedEventObject>;
 
 export type SetPausedEventFilter = TypedEventFilter<SetPausedEvent>;
-
-export interface SetPresaleAddressEventObject {
-  account: string;
-}
-export type SetPresaleAddressEvent = TypedEvent<
-  [string],
-  SetPresaleAddressEventObject
->;
-
-export type SetPresaleAddressEventFilter =
-  TypedEventFilter<SetPresaleAddressEvent>;
 
 export interface SetUnpausedEventObject {
   timestamp: BigNumber;
@@ -947,14 +849,6 @@ export interface Darwin extends BaseContract {
       overrides?: Overrides & { from?: PromiseOrValue<string> }
     ): Promise<ContractTransaction>;
 
-    emergencyPause(
-      overrides?: Overrides & { from?: PromiseOrValue<string> }
-    ): Promise<ContractTransaction>;
-
-    emergencyUnPause(
-      overrides?: Overrides & { from?: PromiseOrValue<string> }
-    ): Promise<ContractTransaction>;
-
     excludedFromRewards(
       arg0: PromiseOrValue<BigNumberish>,
       overrides?: CallOverrides
@@ -996,8 +890,6 @@ export interface Darwin extends BaseContract {
       _darwinSoldInPresale: PromiseOrValue<BigNumberish>,
       overrides?: Overrides & { from?: PromiseOrValue<string> }
     ): Promise<ContractTransaction>;
-
-    isLive(overrides?: CallOverrides): Promise<[boolean]>;
 
     isPaused(overrides?: CallOverrides): Promise<[boolean]>;
 
@@ -1048,10 +940,6 @@ export interface Darwin extends BaseContract {
       overrides?: Overrides & { from?: PromiseOrValue<string> }
     ): Promise<ContractTransaction>;
 
-    setLive(
-      overrides?: Overrides & { from?: PromiseOrValue<string> }
-    ): Promise<ContractTransaction>;
-
     setMaintenance(
       _account: PromiseOrValue<string>,
       _hasRole: PromiseOrValue<boolean>,
@@ -1066,17 +954,6 @@ export interface Darwin extends BaseContract {
     setMinter(
       user_: PromiseOrValue<string>,
       canMint_: PromiseOrValue<boolean>,
-      overrides?: Overrides & { from?: PromiseOrValue<string> }
-    ): Promise<ContractTransaction>;
-
-    setPauseWhitelist(
-      _addr: PromiseOrValue<string>,
-      value: PromiseOrValue<boolean>,
-      overrides?: Overrides & { from?: PromiseOrValue<string> }
-    ): Promise<ContractTransaction>;
-
-    setPresaleAddress(
-      _addr: PromiseOrValue<string>,
       overrides?: Overrides & { from?: PromiseOrValue<string> }
     ): Promise<ContractTransaction>;
 
@@ -1220,14 +1097,6 @@ export interface Darwin extends BaseContract {
     overrides?: Overrides & { from?: PromiseOrValue<string> }
   ): Promise<ContractTransaction>;
 
-  emergencyPause(
-    overrides?: Overrides & { from?: PromiseOrValue<string> }
-  ): Promise<ContractTransaction>;
-
-  emergencyUnPause(
-    overrides?: Overrides & { from?: PromiseOrValue<string> }
-  ): Promise<ContractTransaction>;
-
   excludedFromRewards(
     arg0: PromiseOrValue<BigNumberish>,
     overrides?: CallOverrides
@@ -1269,8 +1138,6 @@ export interface Darwin extends BaseContract {
     _darwinSoldInPresale: PromiseOrValue<BigNumberish>,
     overrides?: Overrides & { from?: PromiseOrValue<string> }
   ): Promise<ContractTransaction>;
-
-  isLive(overrides?: CallOverrides): Promise<boolean>;
 
   isPaused(overrides?: CallOverrides): Promise<boolean>;
 
@@ -1321,10 +1188,6 @@ export interface Darwin extends BaseContract {
     overrides?: Overrides & { from?: PromiseOrValue<string> }
   ): Promise<ContractTransaction>;
 
-  setLive(
-    overrides?: Overrides & { from?: PromiseOrValue<string> }
-  ): Promise<ContractTransaction>;
-
   setMaintenance(
     _account: PromiseOrValue<string>,
     _hasRole: PromiseOrValue<boolean>,
@@ -1339,17 +1202,6 @@ export interface Darwin extends BaseContract {
   setMinter(
     user_: PromiseOrValue<string>,
     canMint_: PromiseOrValue<boolean>,
-    overrides?: Overrides & { from?: PromiseOrValue<string> }
-  ): Promise<ContractTransaction>;
-
-  setPauseWhitelist(
-    _addr: PromiseOrValue<string>,
-    value: PromiseOrValue<boolean>,
-    overrides?: Overrides & { from?: PromiseOrValue<string> }
-  ): Promise<ContractTransaction>;
-
-  setPresaleAddress(
-    _addr: PromiseOrValue<string>,
     overrides?: Overrides & { from?: PromiseOrValue<string> }
   ): Promise<ContractTransaction>;
 
@@ -1489,10 +1341,6 @@ export interface Darwin extends BaseContract {
       overrides?: CallOverrides
     ): Promise<void>;
 
-    emergencyPause(overrides?: CallOverrides): Promise<void>;
-
-    emergencyUnPause(overrides?: CallOverrides): Promise<void>;
-
     excludedFromRewards(
       arg0: PromiseOrValue<BigNumberish>,
       overrides?: CallOverrides
@@ -1534,8 +1382,6 @@ export interface Darwin extends BaseContract {
       _darwinSoldInPresale: PromiseOrValue<BigNumberish>,
       overrides?: CallOverrides
     ): Promise<void>;
-
-    isLive(overrides?: CallOverrides): Promise<boolean>;
 
     isPaused(overrides?: CallOverrides): Promise<boolean>;
 
@@ -1584,8 +1430,6 @@ export interface Darwin extends BaseContract {
       overrides?: CallOverrides
     ): Promise<void>;
 
-    setLive(overrides?: CallOverrides): Promise<void>;
-
     setMaintenance(
       _account: PromiseOrValue<string>,
       _hasRole: PromiseOrValue<boolean>,
@@ -1600,17 +1444,6 @@ export interface Darwin extends BaseContract {
     setMinter(
       user_: PromiseOrValue<string>,
       canMint_: PromiseOrValue<boolean>,
-      overrides?: CallOverrides
-    ): Promise<void>;
-
-    setPauseWhitelist(
-      _addr: PromiseOrValue<string>,
-      value: PromiseOrValue<boolean>,
-      overrides?: CallOverrides
-    ): Promise<void>;
-
-    setPresaleAddress(
-      _addr: PromiseOrValue<string>,
       overrides?: CallOverrides
     ): Promise<void>;
 
@@ -1712,15 +1545,6 @@ export interface Darwin extends BaseContract {
       isExcluded?: null
     ): ExcludedFromReflectionEventFilter;
 
-    "ExcludedFromSellLimit(address,bool)"(
-      account?: null,
-      isExcluded?: null
-    ): ExcludedFromSellLimitEventFilter;
-    ExcludedFromSellLimit(
-      account?: null,
-      isExcluded?: null
-    ): ExcludedFromSellLimitEventFilter;
-
     "Initialized(uint8)"(version?: null): InitializedEventFilter;
     Initialized(version?: null): InitializedEventFilter;
 
@@ -1766,23 +1590,8 @@ export interface Darwin extends BaseContract {
       sender?: PromiseOrValue<string> | null
     ): RoleRevokedEventFilter;
 
-    "SetLive(uint256)"(timestamp?: null): SetLiveEventFilter;
-    SetLive(timestamp?: null): SetLiveEventFilter;
-
-    "SetPauseWhitelist(address,bool)"(
-      account?: null,
-      isWhitelisted?: null
-    ): SetPauseWhitelistEventFilter;
-    SetPauseWhitelist(
-      account?: null,
-      isWhitelisted?: null
-    ): SetPauseWhitelistEventFilter;
-
     "SetPaused(uint256)"(timestamp?: null): SetPausedEventFilter;
     SetPaused(timestamp?: null): SetPausedEventFilter;
-
-    "SetPresaleAddress(address)"(account?: null): SetPresaleAddressEventFilter;
-    SetPresaleAddress(account?: null): SetPresaleAddressEventFilter;
 
     "SetUnpaused(uint256)"(timestamp?: null): SetUnpausedEventFilter;
     SetUnpaused(timestamp?: null): SetUnpausedEventFilter;
@@ -1886,14 +1695,6 @@ export interface Darwin extends BaseContract {
       overrides?: Overrides & { from?: PromiseOrValue<string> }
     ): Promise<BigNumber>;
 
-    emergencyPause(
-      overrides?: Overrides & { from?: PromiseOrValue<string> }
-    ): Promise<BigNumber>;
-
-    emergencyUnPause(
-      overrides?: Overrides & { from?: PromiseOrValue<string> }
-    ): Promise<BigNumber>;
-
     excludedFromRewards(
       arg0: PromiseOrValue<BigNumberish>,
       overrides?: CallOverrides
@@ -1935,8 +1736,6 @@ export interface Darwin extends BaseContract {
       _darwinSoldInPresale: PromiseOrValue<BigNumberish>,
       overrides?: Overrides & { from?: PromiseOrValue<string> }
     ): Promise<BigNumber>;
-
-    isLive(overrides?: CallOverrides): Promise<BigNumber>;
 
     isPaused(overrides?: CallOverrides): Promise<BigNumber>;
 
@@ -1987,10 +1786,6 @@ export interface Darwin extends BaseContract {
       overrides?: Overrides & { from?: PromiseOrValue<string> }
     ): Promise<BigNumber>;
 
-    setLive(
-      overrides?: Overrides & { from?: PromiseOrValue<string> }
-    ): Promise<BigNumber>;
-
     setMaintenance(
       _account: PromiseOrValue<string>,
       _hasRole: PromiseOrValue<boolean>,
@@ -2005,17 +1800,6 @@ export interface Darwin extends BaseContract {
     setMinter(
       user_: PromiseOrValue<string>,
       canMint_: PromiseOrValue<boolean>,
-      overrides?: Overrides & { from?: PromiseOrValue<string> }
-    ): Promise<BigNumber>;
-
-    setPauseWhitelist(
-      _addr: PromiseOrValue<string>,
-      value: PromiseOrValue<boolean>,
-      overrides?: Overrides & { from?: PromiseOrValue<string> }
-    ): Promise<BigNumber>;
-
-    setPresaleAddress(
-      _addr: PromiseOrValue<string>,
       overrides?: Overrides & { from?: PromiseOrValue<string> }
     ): Promise<BigNumber>;
 
@@ -2166,14 +1950,6 @@ export interface Darwin extends BaseContract {
       overrides?: Overrides & { from?: PromiseOrValue<string> }
     ): Promise<PopulatedTransaction>;
 
-    emergencyPause(
-      overrides?: Overrides & { from?: PromiseOrValue<string> }
-    ): Promise<PopulatedTransaction>;
-
-    emergencyUnPause(
-      overrides?: Overrides & { from?: PromiseOrValue<string> }
-    ): Promise<PopulatedTransaction>;
-
     excludedFromRewards(
       arg0: PromiseOrValue<BigNumberish>,
       overrides?: CallOverrides
@@ -2215,8 +1991,6 @@ export interface Darwin extends BaseContract {
       _darwinSoldInPresale: PromiseOrValue<BigNumberish>,
       overrides?: Overrides & { from?: PromiseOrValue<string> }
     ): Promise<PopulatedTransaction>;
-
-    isLive(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
     isPaused(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
@@ -2267,10 +2041,6 @@ export interface Darwin extends BaseContract {
       overrides?: Overrides & { from?: PromiseOrValue<string> }
     ): Promise<PopulatedTransaction>;
 
-    setLive(
-      overrides?: Overrides & { from?: PromiseOrValue<string> }
-    ): Promise<PopulatedTransaction>;
-
     setMaintenance(
       _account: PromiseOrValue<string>,
       _hasRole: PromiseOrValue<boolean>,
@@ -2285,17 +2055,6 @@ export interface Darwin extends BaseContract {
     setMinter(
       user_: PromiseOrValue<string>,
       canMint_: PromiseOrValue<boolean>,
-      overrides?: Overrides & { from?: PromiseOrValue<string> }
-    ): Promise<PopulatedTransaction>;
-
-    setPauseWhitelist(
-      _addr: PromiseOrValue<string>,
-      value: PromiseOrValue<boolean>,
-      overrides?: Overrides & { from?: PromiseOrValue<string> }
-    ): Promise<PopulatedTransaction>;
-
-    setPresaleAddress(
-      _addr: PromiseOrValue<string>,
       overrides?: Overrides & { from?: PromiseOrValue<string> }
     ): Promise<PopulatedTransaction>;
 
