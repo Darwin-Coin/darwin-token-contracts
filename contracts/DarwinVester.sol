@@ -4,12 +4,15 @@ pragma solidity 0.8.14;
 import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/security/ReentrancyGuard.sol";
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
+import "@openzeppelin/contracts/token/ERC721/IERC721Receiver.sol";
+import "@openzeppelin/contracts/token/ERC721/IERC721.sol";
 
 import {IDarwinVester} from "./interface/IDarwinVester.sol";
 import {IDarwin} from "./interface/IDarwin.sol";
+import {IEvoturesNFT} from "./interface/IEvoturesNFT.sol";
 
 /// @title Darwin Vester
-contract DarwinVester is IDarwinVester, ReentrancyGuard, Ownable {
+contract DarwinVester is IDarwinVester, ReentrancyGuard, Ownable, IERC721Receiver {
 
     /// @notice Percentage of monthly interest (0.625%, 7.5% in a year)
     uint256 public constant INTEREST = 625;
@@ -106,6 +109,41 @@ contract DarwinVester is IDarwinVester, ReentrancyGuard, Ownable {
         }
     }
 
+    function stakeEvoture(address _nft, uint16 _tokenId) external nonReentrant {
+        require(userInfo[msg.sender].nft == address(0), "DarwinVester: NFT_ALREADY_STAKED");
+        require(supportedNFT[_nft], "DarwinVester: UNSUPPORTED_NFT");
+
+        _claim(msg.sender);
+        IERC721(_nft).safeTransferFrom(msg.sender, address(this), _tokenId);
+        userInfo[msg.sender].nft = _nft;
+        userInfo[msg.sender].boost = IEvoturesNFT(_nft).multipliers(_tokenId);
+        userInfo[msg.sender].tokenId = _tokenId;
+
+        emit StakeEvoture(msg.sender, _tokenId, userInfo[msg.sender].boost);
+    }
+
+    function withdrawEvoture() external nonReentrant {
+        require(userInfo[msg.sender].nft != address(0), "DarwinVester: NO_NFT_TO_WITHDRAW");
+
+        _claim(msg.sender);
+        IERC721(userInfo[msg.sender].nft).safeTransferFrom(address(this), msg.sender, userInfo[msg.sender].tokenId);
+        userInfo[msg.sender].nft = address(0);
+        userInfo[msg.sender].boost = 0;
+        userInfo[msg.sender].tokenId = 0;
+
+        emit WithdrawEvoture(msg.sender, userInfo[msg.sender].tokenId);
+    }
+
+    function addSupportedNFT(address _nft) external {
+        require(msg.sender == deployer, "DarwinVester: CALLER_IS_NOT_DEV");
+        supportedNFT[_nft] = true;
+    }
+
+    function removeSupportedNFT(address _nft) external {
+        require(msg.sender == deployer, "DarwinVester: CALLER_IS_NOT_DEV");
+        supportedNFT[_nft] = false;
+    }
+
     function withdrawableDarwin(address _user) public view returns(uint256 withdrawable) {
         uint vested = userInfo[_user].vested;
         if (vested == 0) {
@@ -129,8 +167,22 @@ contract DarwinVester is IDarwinVester, ReentrancyGuard, Ownable {
             return 0;
         }
         uint claimed = userInfo[_user].claimed;
+        uint boost = userInfo[_user].boost;
         uint start = userInfo[_user].vestTimestamp;
         uint passedMonthsFromStart = (block.timestamp - start) / (30 days);
         claimable = (((vested * INTEREST) / 100000) * passedMonthsFromStart) - claimed;
+
+        if (boost > 0) {
+            claimable += ((claimable * boost) / 1000);
+        }
+    }
+
+    function onERC721Received(
+        address,
+        address,
+        uint256,
+        bytes calldata
+    ) external returns (bytes4) {
+        return IERC721Receiver.onERC721Received.selector;
     }
 }
