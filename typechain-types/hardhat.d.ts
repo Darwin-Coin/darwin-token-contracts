@@ -117,6 +117,10 @@ declare module "hardhat/types/runtime" {
       signerOrOptions?: ethers.Signer | FactoryOptions
     ): Promise<Contracts.IUniswapV2Router02__factory>;
     getContractFactory(
+      name: "BlueDarwin",
+      signerOrOptions?: ethers.Signer | FactoryOptions
+    ): Promise<Contracts.BlueDarwin__factory>;
+    getContractFactory(
       name: "BoosterNFT",
       signerOrOptions?: ethers.Signer | FactoryOptions
     ): Promise<Contracts.BoosterNFT__factory>;
@@ -164,6 +168,10 @@ declare module "hardhat/types/runtime" {
       name: "IVRFv2Consumer",
       signerOrOptions?: ethers.Signer | FactoryOptions
     ): Promise<Contracts.IVRFv2Consumer__factory>;
+    getContractFactory(
+      name: "IBlueDarwin",
+      signerOrOptions?: ethers.Signer | FactoryOptions
+    ): Promise<Contracts.IBlueDarwin__factory>;
     getContractFactory(
       name: "IBoosterNFT",
       signerOrOptions?: ethers.Signer | FactoryOptions
@@ -372,6 +380,11 @@ declare module "hardhat/types/runtime" {
       signer?: ethers.Signer
     ): Promise<Contracts.IUniswapV2Router02>;
     getContractAt(
+      name: "BlueDarwin",
+      address: string,
+      signer?: ethers.Signer
+    ): Promise<Contracts.BlueDarwin>;
+    getContractAt(
       name: "BoosterNFT",
       address: string,
       signer?: ethers.Signer
@@ -431,6 +444,11 @@ declare module "hardhat/types/runtime" {
       address: string,
       signer?: ethers.Signer
     ): Promise<Contracts.IVRFv2Consumer>;
+    getContractAt(
+      name: "IBlueDarwin",
+      address: string,
+      signer?: ethers.Signer
+    ): Promise<Contracts.IBlueDarwin>;
     getContractAt(
       name: "IBoosterNFT",
       address: string,

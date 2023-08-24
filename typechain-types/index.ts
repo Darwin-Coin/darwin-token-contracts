@@ -60,6 +60,8 @@ export type { IUniswapV2Router01 } from "./@uniswap/v2-periphery/contracts/inter
 export { IUniswapV2Router01__factory } from "./factories/@uniswap/v2-periphery/contracts/interfaces/IUniswapV2Router01__factory";
 export type { IUniswapV2Router02 } from "./@uniswap/v2-periphery/contracts/interfaces/IUniswapV2Router02";
 export { IUniswapV2Router02__factory } from "./factories/@uniswap/v2-periphery/contracts/interfaces/IUniswapV2Router02__factory";
+export type { BlueDarwin } from "./contracts/BlueDarwin";
+export { BlueDarwin__factory } from "./factories/contracts/BlueDarwin__factory";
 export type { BoosterNFT } from "./contracts/BoosterNFT";
 export { BoosterNFT__factory } from "./factories/contracts/BoosterNFT__factory";
 export type { Darwin } from "./contracts/Darwin";
@@ -82,6 +84,8 @@ export type { EvoturesNFT } from "./contracts/EvoturesNFT.sol/EvoturesNFT";
 export { EvoturesNFT__factory } from "./factories/contracts/EvoturesNFT.sol/EvoturesNFT__factory";
 export type { IVRFv2Consumer } from "./contracts/EvoturesNFT.sol/IVRFv2Consumer";
 export { IVRFv2Consumer__factory } from "./factories/contracts/EvoturesNFT.sol/IVRFv2Consumer__factory";
+export type { IBlueDarwin } from "./contracts/interface/IBlueDarwin";
+export { IBlueDarwin__factory } from "./factories/contracts/interface/IBlueDarwin__factory";
 export type { IBoosterNFT } from "./contracts/interface/IBoosterNFT";
 export { IBoosterNFT__factory } from "./factories/contracts/interface/IBoosterNFT__factory";
 export type { IDarwinCommunity } from "./contracts/interface/IDarwinCommunity";

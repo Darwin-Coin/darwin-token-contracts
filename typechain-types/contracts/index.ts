@@ -13,6 +13,7 @@ import type * as vrFv2ConsumerSol from "./VRFv2Consumer.sol";
 export type { vrFv2ConsumerSol };
 import type * as interface from "./interface";
 export type { interface };
+export type { BlueDarwin } from "./BlueDarwin";
 export type { BoosterNFT } from "./BoosterNFT";
 export type { Darwin } from "./Darwin";
 export type { DarwinPresale } from "./DarwinPresale";

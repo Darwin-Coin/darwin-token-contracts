@@ -7,6 +7,7 @@ export * as evoturesNftSol from "./EvoturesNFT.sol";
 export * as openzeppelin from "./Openzeppelin";
 export * as vrFv2ConsumerSol from "./VRFv2Consumer.sol";
 export * as interface from "./interface";
+export { BlueDarwin__factory } from "./BlueDarwin__factory";
 export { BoosterNFT__factory } from "./BoosterNFT__factory";
 export { Darwin__factory } from "./Darwin__factory";
 export { DarwinPresale__factory } from "./DarwinPresale__factory";
